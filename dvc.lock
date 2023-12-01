@@ -1,0 +1,50 @@
+schema: '2.0'
+stages:
+  filter_dataset:
+    cmd: python src/filter_dataset.py --data data/FMereani.csv --dest data/filtered.csv
+      --params params.yaml
+    deps:
+    - path: data/FMereani.csv
+      hash: md5
+      md5: 3f25b32037cab2b97b17e8ad26cf5f5c
+      size: 19129116
+    - path: src/filter_dataset.py
+      hash: md5
+      md5: 78a81ea6803e1f0fe79c0a4a9b35d058
+      size: 1174
+    params:
+      params.yaml:
+        filter_dataset:
+          starting_strs:
+          - https://
+          - http://
+    outs:
+    - path: data/filtered.csv
+      hash: md5
+      md5: 2fc675ff5189b179493acdceeabac0ac
+      size: 4228007
+  dataset_split:
+    cmd: python src/dataset_split.py --data data/filtered.csv --dest_train data/train.csv
+      --dest_test data/test.csv --params params.yaml
+    deps:
+    - path: data/filtered.csv
+      hash: md5
+      md5: 2fc675ff5189b179493acdceeabac0ac
+      size: 4228007
+    - path: src/dataset_split.py
+      hash: md5
+      md5: d63f32181ac37664d763485b80326439
+      size: 1400
+    params:
+      params.yaml:
+        dataset_split:
+          train_size: 0.5
+    outs:
+    - path: data/test.csv
+      hash: md5
+      md5: 4902e4e8ff944240ba7aea2f6d01be59
+      size: 2097528
+    - path: data/train.csv
+      hash: md5
+      md5: 86903d4ace32b27740e00d4daddbb17a
+      size: 2130494
