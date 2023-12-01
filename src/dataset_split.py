@@ -1,6 +1,9 @@
 import pandas as pd
 from ruamel.yaml import YAML
 import argparse
+#fix seed for pandas sampling
+import numpy as np
+np.random.seed(42)
 
 def dataset_split(opt, params):
     df = pd.read_csv(opt.data, encoding = "ISO-8859-1")

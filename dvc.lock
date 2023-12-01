@@ -33,8 +33,8 @@ stages:
       size: 4228007
     - path: src/dataset_split.py
       hash: md5
-      md5: d63f32181ac37664d763485b80326439
-      size: 1400
+      md5: 7b5377b9be415d41c8580df84eab24ec
+      size: 1468
     params:
       params.yaml:
         dataset_split:
@@ -42,9 +42,9 @@ stages:
     outs:
     - path: data/test.csv
       hash: md5
-      md5: 4902e4e8ff944240ba7aea2f6d01be59
-      size: 2097528
+      md5: 2729d90175cf8d55989b29f9c79cc65e
+      size: 2116897
     - path: data/train.csv
       hash: md5
-      md5: 86903d4ace32b27740e00d4daddbb17a
-      size: 2130494
+      md5: ecfaf7d7df5d43f7e2b6612dfc1862a0
+      size: 2111125
