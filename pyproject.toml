@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "rag-secure-code-generation"
+version = "0.1.0"
+description = ""
+authors = ["PasiniSamuele <samu.pasini98@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+dvc = "^3.30.3"
+dvc-gdrive = "^2.20.0"
+pandas = "^2.1.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
