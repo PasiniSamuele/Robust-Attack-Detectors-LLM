@@ -9,7 +9,22 @@
 	"--gpus", "all"],
 	"mounts": [
 		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-	]
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"njpwerner.autodocstring",
+				"iterative.dvc",
+				"GitHub.copilot",
+				"ms-toolsai.jupyter",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"mechatroner.rainbow-csv",
+				"ms-azuretools.vscode-docker",
+				"zeshuaro.vscode-python-poetry"
+			]
+		}
+	}
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
