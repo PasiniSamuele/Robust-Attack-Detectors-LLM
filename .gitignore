@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 google_drive_credentials.json
+poetry.lock
