@@ -51,9 +51,8 @@ RUN curl -sSL https://install.python-poetry.org | python3 - --git https://github
 WORKDIR $PYSETUP_PATH
 COPY ./poetry.lock ./
 COPY ./pyproject.toml ./
-RUN ls
-#COPY /home/samuele/repos/sven/pyproject.toml ./pyproject.toml
-#RUN ssh-add $HOME/.ssh/id_rsa_github
+#RUN eval "$(ssh-agent -s)"
+#RUN ssh-add /home/vscode/.ssh/id_rsa_github
 RUN poetry install 
 
 #RUN poetry init

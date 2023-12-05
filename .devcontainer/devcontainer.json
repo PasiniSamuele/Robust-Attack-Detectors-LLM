@@ -8,7 +8,7 @@
 	"runArgs": ["--add-host=host.docker.internal:host-gateway",
 	"--gpus", "all"],
 	"mounts": [
-		//"source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
 	],
 	"customizations": {
 		"vscode": {
@@ -23,20 +23,21 @@
 				"zeshuaro.vscode-python-poetry"
 			]
 		}
-	}
+	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	
+	"postCreateCommand": "ssh-add /home/vscode/.ssh/id_rsa_github"
+
 	
 
 	// Configure tool-specific properties.
 	// "customizations": {},
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	 //"remoteUser": "vscode"
 }
 
