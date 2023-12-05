@@ -8,7 +8,7 @@
 	"runArgs": ["--add-host=host.docker.internal:host-gateway",
 	"--gpus", "all"],
 	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
+		//"source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached"
 	],
 	"customizations": {
 		"vscode": {
@@ -18,7 +18,6 @@
 				"GitHub.copilot",
 				"ms-toolsai.jupyter",
 				"ms-python.python",
-				"ms-python.vscode-pylance",
 				"mechatroner.rainbow-csv",
 				"ms-azuretools.vscode-docker",
 				"zeshuaro.vscode-python-poetry"

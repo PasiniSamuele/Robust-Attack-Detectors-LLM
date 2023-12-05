@@ -53,7 +53,7 @@ COPY ./poetry.lock ./
 COPY ./pyproject.toml ./
 RUN ls
 #COPY /home/samuele/repos/sven/pyproject.toml ./pyproject.toml
-
+#RUN ssh-add $HOME/.ssh/id_rsa_github
 RUN poetry install 
 
 #RUN poetry init
