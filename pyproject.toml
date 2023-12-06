@@ -10,6 +10,9 @@ python = "^3.9"
 dvc = "^3.30.3"
 dvc-gdrive = "^2.20.0"
 pandas = "^2.1.3"
+langchain = "^0.0.345"
+huggingface-hub = "^0.19.4"
+tqdm = "^4.66.1"
 
 
 [tool.poetry.group.dev.dependencies]
