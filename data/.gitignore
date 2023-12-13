@@ -2,3 +2,6 @@
 /train.csv
 /test.csv
 /filtered.csv
+/prompt_parameters
+/tasks
+/templates
