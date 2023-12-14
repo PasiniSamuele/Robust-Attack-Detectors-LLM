@@ -1,12 +1,11 @@
 from re import sub
 from utils.utils import init_argument_parser, NpEncoder
 from utils.path_utils import get_last_run, get_subfolders
-from utils.evaluation_utils import create_confusion_matrix, save_confusion_matrix, get_results_from_cm
+from utils.evaluation_utils import create_confusion_matrix, save_confusion_matrix, get_results_from_cm, summarize_results
 import pandas as pd
 import os
 import shutil
 import json
-import seaborn as sn
 
 
 def evaluate_run(opt):
@@ -59,9 +58,12 @@ def evaluate_run(opt):
                 continue
         #delete temp folder
         shutil.rmtree(exec_dir)
-            
-            
 
+        if opt.summarize_results:
+            single_results = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
+            summarized_results = summarize_results(single_results)            
+            with open(os.path.join(opt.run, opt.result_file_name), 'w') as f:
+                    json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
 
 
 

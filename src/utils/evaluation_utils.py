@@ -1,7 +1,10 @@
+import re
 import pandas as pd
 import seaborn as sn
 import os 
 import matplotlib.pyplot as plt
+import numpy as np
+from typing import Tuple
 
 def create_confusion_matrix(test_set:pd.DataFrame,
                             label_column:str = "label",
@@ -41,4 +44,34 @@ def get_results_from_cm(cm:pd.DataFrame)->dict:
     results["recall"] = recall
     results["f1"] = f1
     results["accuracy"] = accuracy
+    return results
+
+
+def average_metric(single_results:list, metric:str)->Tuple[float, float, float]:
+    avg =  sum(map(lambda x: x["results"][metric], single_results)) / len(single_results)
+    std = np.std(list(map(lambda x: x["results"][metric], single_results)))
+    var = np.var(list(map(lambda x: x["results"][metric], single_results)))
+    return avg, std, var
+
+def summarize_results(single_results:list)->dict:
+    results = dict()
+
+    #filter out the failed experiments
+    successful_experiments = list(filter(lambda x: not x["failed"], single_results))
+
+    #count the number of successful experiments
+    results["successes"] = len(successful_experiments)
+
+    #count the number of failed experiments
+    results["failures"] = len(single_results) - results["successes"]
+
+    #count the total number of experiments
+    results["total"] = len(single_results)
+
+    #calculate avg, std and var for each metric
+    results["accuracy"], results["accuracy_std"], results["accuracy_var"] = average_metric(successful_experiments, "accuracy")
+    results["precision"], results["precision_std"], results["precision_var"] = average_metric(successful_experiments, "precision")
+    results["recall"], results["recall_std"], results["recall_var"] = average_metric(successful_experiments, "recall")
+    results["f1"], results["f1_std"], results["f1_var"] = average_metric(successful_experiments, "f1")
+
     return results
