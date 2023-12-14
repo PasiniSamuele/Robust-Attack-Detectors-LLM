@@ -55,6 +55,8 @@ def add_parse_arguments(parser):
     parser.add_argument('--task', type=str, default='data/tasks/detect_xss_simple_prompt.txt', help='input task')
     parser.add_argument('--template', type=str, default='data/templates/complete_function.yaml', help='template for the prompt')
     parser.add_argument('--prompt_parameters', type=str, default='data/prompt_parameters/empty.yaml', help='parameters to format the prompt template')
+    parser.add_argument('--generation_mode', type=str, default='one_shot', help='Generation mode: one_shot, few_shot, rag or react')
+
 
     #output
     parser.add_argument('--experiments_folder', type=str, default='experiments', help='experiments folder')

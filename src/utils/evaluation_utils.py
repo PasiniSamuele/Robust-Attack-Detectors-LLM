@@ -44,6 +44,10 @@ def get_results_from_cm(cm:pd.DataFrame)->dict:
     results["recall"] = recall
     results["f1"] = f1
     results["accuracy"] = accuracy
+
+    for k, v in results.items():
+        if np.isnan(v):
+            results[k] = 0
     return results
 
 

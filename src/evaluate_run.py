@@ -1,4 +1,3 @@
-from re import sub
 from utils.utils import init_argument_parser, NpEncoder
 from utils.path_utils import get_last_run, get_subfolders
 from utils.evaluation_utils import create_confusion_matrix, save_confusion_matrix, get_results_from_cm, summarize_results
@@ -50,8 +49,7 @@ def evaluate_run(opt):
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
                 
             except Exception as e:
-                #print(f"Experiment {subfolder_name} failed to execute")
-                print(e)
+                print(f"Experiment {subfolder_name} failed to execute")
                 experiment_results["failed"] = True
                 with open(os.path.join(subfolder, opt.result_file_name), 'w') as f:
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4)
@@ -62,7 +60,7 @@ def evaluate_run(opt):
         if opt.summarize_results:
             single_results = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
             summarized_results = summarize_results(single_results)            
-            with open(os.path.join(opt.run, opt.result_file_name), 'w') as f:
+            with open(os.path.join(run_path, opt.result_file_name), 'w') as f:
                     json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
 
 

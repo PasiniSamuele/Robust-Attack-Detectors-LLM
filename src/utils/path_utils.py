@@ -53,7 +53,8 @@ def create_folder_for_experiment(opt)->str:
                                               task, 
                                               template, 
                                               prompt_parameters,
-                                                opt.model_name, 
+                                                opt.model_name,
+                                                opt.generation_mode, 
                                                 opt.temperature)
     os.makedirs(experiment_folder, exist_ok=True)
     
