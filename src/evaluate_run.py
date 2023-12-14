@@ -1,10 +1,13 @@
 from re import sub
 from utils.utils import init_argument_parser, NpEncoder
 from utils.path_utils import get_last_run, get_subfolders
+from utils.evaluation_utils import create_confusion_matrix, save_confusion_matrix, get_results_from_cm
 import pandas as pd
 import os
 import shutil
 import json
+import seaborn as sn
+
 
 def evaluate_run(opt):
     run_path = opt.run if opt.run is not None else get_last_run(opt)
@@ -16,8 +19,11 @@ def evaluate_run(opt):
     if opt.isolated_execution:
         raise NotImplementedError('Isolated execution is not implemented yet')
     else:
+        code_dir = os.path.dirname(os.path.realpath(__file__)).split('/')[-1]
+        exec_dir = os.path.join(code_dir, opt.execution_dir)
+        os.makedirs(exec_dir, exist_ok=True)
         subfolders = get_subfolders(run_path)
-        for subfolder in subfolders:
+        for i, subfolder in enumerate(subfolders):
             experiment_results = {
                 "failed": False,
             }
@@ -27,47 +33,20 @@ def evaluate_run(opt):
             file = os.path.join(subfolder, 'generated.py')
            
             try:
-                code_dir = os.path.dirname(os.path.realpath(__file__)).split('/')[-1]
-                exec_dir = os.path.join(code_dir, opt.execution_dir)
-                os.makedirs(exec_dir, exist_ok=True)
-                shutil.copy2(file, exec_dir)
-                new_file = os.path.join(opt.execution_dir, 'generated')
-
+                shutil.copy2(file, os.path.join(exec_dir,f"generated_{i}.py"))
+                new_file = os.path.join(opt.execution_dir, f'generated_{i}')
                 #replace / with .
                 new_file = new_file.replace('/', '.')
-                statement = f'from {new_file} import {opt.function_name} as fn'
+                statement = f'from {new_file} import {opt.function_name} as fn_{i}'
                 exec(statement, globals())
-                print(fn)
-                print(fn("test"))
-                print(fn("<script>alert('test')</script>"))
+                exec(f"fn = fn_{i}", globals())
 
                 exp_test_set['prediction'] = exp_test_set["Payloads"].apply(lambda x: int(fn(x)))
                 #print(exp_test_set.tail())
-                grouped_results = exp_test_set.groupby(['label', 'prediction'])['Payloads'].count().reset_index(name="count")
-                cm = grouped_results.pivot(index='label', columns='prediction', values='count').fillna(0)
-                missing_cols = [col for col in cm.index if col not in cm.columns]
-                for col in missing_cols:
-                    cm[col] = 0
-                cm = cm[cm.index.values]
-                true_positives = cm[1][1]
-                true_negatives = cm[0][0]
-                false_positives = cm[0][1]
-                false_negatives = cm[1][0]
-
-                precision = true_positives / (true_positives + false_positives)
-                recall = true_positives / (true_positives + false_negatives)
-                f1 = 2 * (precision * recall) / (precision + recall)
-                accuracy = (true_positives + true_negatives) / (true_positives + true_negatives + false_positives + false_negatives)
-
-                experiment_results["true_positives"] = true_positives
-                experiment_results["true_negatives"] = true_negatives
-                experiment_results["false_positives"] = false_positives
-                experiment_results["false_negatives"] = false_negatives
-                experiment_results["total"] = true_positives + true_negatives + false_positives + false_negatives
-                experiment_results["precision"] = precision
-                experiment_results["recall"] = recall
-                experiment_results["f1"] = f1
-                experiment_results["accuracy"] = accuracy
+                cm = create_confusion_matrix(exp_test_set)
+                if opt.create_confusion_matrix:
+                    save_confusion_matrix(cm, subfolder)
+                experiment_results["results"] = get_results_from_cm(cm)
                 with open(os.path.join(subfolder, opt.result_file_name), 'w') as f:
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
                 
@@ -78,6 +57,8 @@ def evaluate_run(opt):
                 with open(os.path.join(subfolder, opt.result_file_name), 'w') as f:
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4)
                 continue
+        #delete temp folder
+        shutil.rmtree(exec_dir)
             
             
 
@@ -96,6 +77,7 @@ def add_parse_arguments(parser):
     parser.add_argument('--summarize_results', type=bool, default=True, help='if true, the results for every experiment in the run will be summarized in a file')
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
     parser.add_argument('--execution_dir', type=str, default='tmp', help='temporary directory for the execution of the generated code')
+    parser.add_argument('--create_confusion_matrix', type=bool, default=True, help='if true, for every experiment it generates a confusion matrix')
 
 
 

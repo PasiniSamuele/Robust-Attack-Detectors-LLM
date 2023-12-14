@@ -161,3 +161,4 @@ cython_debug/
 
 google_drive_credentials.json
 poetry.lock
+/experiments
