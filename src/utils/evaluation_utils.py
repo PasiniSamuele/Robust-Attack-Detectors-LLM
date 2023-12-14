@@ -27,8 +27,8 @@ def get_results_from_cm(cm:pd.DataFrame)->dict:
     results = dict()
     true_positives = cm[1][1]
     true_negatives = cm[0][0]
-    false_positives = cm[0][1]
-    false_negatives = cm[1][0]
+    false_positives = cm[1][0]
+    false_negatives = cm[0][1]
 
     precision = true_positives / (true_positives + false_positives)
     recall = true_positives / (true_positives + false_negatives)

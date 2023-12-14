@@ -11,12 +11,14 @@ def get_experiment_folder(base_folder:str,
                           template:str,
                           prompt_parameters:str,
                           model_name:str,
+                          generation_mode:str,
                           temperature:float)->str:
     folder = os.path.join(base_folder, 
                                      f"task_{task}",
                                      f"template_{template}",
                                     f"prompt_parameters_{prompt_parameters}",
                                     f"model_{model_name}",
+                                    f"generation_mode_{generation_mode}",
                                     f"temperature_{temperature}")
     #replace - with _ and . with _
     #folder = folder.replace('-', '_').replace('.', '_')
@@ -38,6 +40,7 @@ def get_last_run(opt)->str:
                                               template, 
                                               prompt_parameters,
                                                 opt.model_name, 
+                                                opt.generation_mode,
                                                 opt.temperature)
     run_number = get_last_run_number(experiment_folder, default=0)
     return os.path.join(experiment_folder, f"run_{run_number}")
