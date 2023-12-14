@@ -1,6 +1,7 @@
 from ruamel.yaml import YAML
 import argparse
-
+import json
+import numpy as np
 def load_yaml(path):
     with open(path) as f:
         yaml = YAML(typ="safe")
@@ -21,3 +22,13 @@ def fill_default_parameters(prompt_parameters:dict, default_parameters:dict)->di
         if key not in prompt_parameters.keys():
             prompt_parameters[key] = default_parameters[key]
     return prompt_parameters
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
