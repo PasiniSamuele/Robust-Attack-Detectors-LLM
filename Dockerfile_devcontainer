@@ -39,7 +39,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     python3 \
     python3-distutils \
-    unzip
+    unzip \
+    screen
 #install poetry
 RUN curl -sSL https://install.python-poetry.org | python3 - --git https://github.com/python-poetry/poetry.git@master
 #ENV PATH="/root/.local/bin:${PATH}"
@@ -56,6 +57,8 @@ COPY ./pyproject.toml ./
 RUN curl -fsSL https://get.docker.com | sh
 
 RUN poetry install 
+
+RUN poetry run pip install --upgrade pip
 
 #RUN poetry init
 #RUN poetry shell
