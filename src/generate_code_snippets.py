@@ -1,5 +1,5 @@
-from numpy import number
 from utils.openai_utils import is_openai_model, build_chat_model
+from utils.hf_utils import create_hf_pipeline
 from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters
 from utils.path_utils import create_folder_for_experiment
 from dotenv import dotenv_values
@@ -23,7 +23,7 @@ def generate_code_snippets(opt, env):
     if use_openai_api:
         model = build_chat_model(opt, env)
     else:
-        raise NotImplementedError('Only OpenAI models are supported at the moment')
+        model = create_hf_pipeline(opt, env)
     
     #get experiment folder
     experiment_folder = create_folder_for_experiment(opt)
@@ -37,11 +37,13 @@ def generate_code_snippets(opt, env):
         try:
             response = chain.invoke(prompt_parameters)
             save_dir = os.path.join(experiment_folder, f"exp_{i}")
-            os.makedirs(save_dir, exist_ok=False)
+            os.makedirs(save_dir, exist_ok=True)
             with open(os.path.join(save_dir, 'generated.py'), 'w') as f:
                 f.write(response)
         except Exception as e:
             print("Experiment failed, try again")
+            i = i-1
+            continue
         
     
 
@@ -62,6 +64,9 @@ def add_parse_arguments(parser):
     parser.add_argument('--experiments_folder', type=str, default='experiments', help='experiments folder')
     parser.add_argument('--experiments', type=int, default=25, help= 'number of experiments to run')
 
+    #hf parameters
+    parser.add_argument('--hf_max_new_tokens', type=int, default=400, help='max new tokens for hf model')
+    parser.add_argument('--hf_load_in_4bit', type=bool, default=True, help='load in 4 bit for hf model (qlora quantization)')
 
     return parser
     

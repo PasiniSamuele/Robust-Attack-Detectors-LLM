@@ -17,7 +17,7 @@ def get_experiment_folder(base_folder:str,
                                      f"task_{task}",
                                      f"template_{template}",
                                     f"prompt_parameters_{prompt_parameters}",
-                                    f"model_{model_name}",
+                                    f"model_{model_name.replace('/', '_')}",
                                     f"generation_mode_{generation_mode}",
                                     f"temperature_{temperature}")
     #replace - with _ and . with _
