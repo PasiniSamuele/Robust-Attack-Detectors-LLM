@@ -1,0 +1,6 @@
+outs:
+- md5: ccddd4e516da5912598c7e08907e2551.dir
+  size: 33
+  nfiles: 1
+  hash: md5
+  path: example_templates
