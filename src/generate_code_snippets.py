@@ -1,3 +1,4 @@
+from openai import embeddings
 from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
 from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file
@@ -6,11 +7,12 @@ from dotenv import dotenv_values
 from langchain.prompts import (
     ChatPromptTemplate,
 )
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
+
 from langchain_core.output_parsers import StrOutputParser
 import os
 import random
 import numpy as np
-import pandas as pd
 from utils.few_shot_utils import create_few_shot
 
 def generate_code_snippets(opt, env):
@@ -19,6 +21,14 @@ def generate_code_snippets(opt, env):
         random.seed(opt.seed)
         np.random.seed(opt.seed)
 
+    #load model 
+    if use_openai_api:
+        model = build_chat_model(opt, env)
+        embeddings = OpenAIEmbeddings()
+    else:
+        model = create_hf_pipeline(opt, env)
+        embeddings = HuggingFaceInstructEmbeddings()
+        
     # load template
     template = load_yaml(opt.template)
     # load parameters
@@ -38,10 +48,7 @@ def generate_code_snippets(opt, env):
         )
     prompt_parameters = fill_default_parameters(prompt_parameters, template["default_parameters"])
     use_openai_api = is_openai_model(opt.model_name)
-    if use_openai_api:
-        model = build_chat_model(opt, env)
-    else:
-        model = create_hf_pipeline(opt, env)
+    
     
     #get experiment folder
     experiment_folder = create_folder_for_experiment(opt)
