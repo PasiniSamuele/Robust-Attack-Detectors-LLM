@@ -23,6 +23,11 @@ def fill_default_parameters(prompt_parameters:dict, default_parameters:dict)->di
             prompt_parameters[key] = default_parameters[key]
     return prompt_parameters
 
+def save_parameters_file(file_path:str,
+                         opt):
+    with open(file_path, "w") as f:
+        json.dump(vars(opt), f, cls=NpEncoder,ensure_ascii=False,indent=4)
+
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
