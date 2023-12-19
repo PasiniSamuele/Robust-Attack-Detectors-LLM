@@ -69,7 +69,7 @@ def generate_code_snippets(opt, env):
 def add_parse_arguments(parser):
 
     #model parameters
-    parser.add_argument('--model_name', type=str, default='gpt-3.5-turbo', help='name of the model')
+    parser.add_argument('--model_name', type=str, default='gpt-3.5-turbo-0613', help='name of the model')
     parser.add_argument('--temperature', type=float, default=1.0, help='model temperature')
 
     #task parameters
