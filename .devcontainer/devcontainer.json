@@ -6,9 +6,11 @@
 	"dockerFile": "../Dockerfile_devcontainer",
 
 	"runArgs": ["--add-host=host.docker.internal:host-gateway",
+	"--network=host",
 	"--gpus", "all"],
 	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+		//"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
 	],
 	"customizations": {
 		"vscode": {
@@ -26,9 +28,8 @@
 	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts":[8080],
+	"forwardPorts":[8080, 8070],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "ssh-add /home/vscode/.ssh/id_rsa_github"
 
