@@ -5,6 +5,8 @@ import pandas as pd
 import os
 import shutil
 import json
+import importlib
+import importlib.util 
 
 
 def evaluate_run(opt):
@@ -17,9 +19,6 @@ def evaluate_run(opt):
     if opt.isolated_execution:
         raise NotImplementedError('Isolated execution is not implemented yet')
     else:
-        code_dir = os.path.dirname(os.path.realpath(__file__)).split('/')[-1]
-        exec_dir = os.path.join(code_dir, opt.execution_dir)
-        os.makedirs(exec_dir, exist_ok=True)
         subfolders = get_subfolders(run_path)
         for i, subfolder in enumerate(subfolders):
             experiment_results = {
@@ -31,15 +30,15 @@ def evaluate_run(opt):
             file = os.path.join(subfolder, 'generated.py')
            
             try:
-                shutil.copy2(file, os.path.join(exec_dir,f"generated_{i}.py"))
-                new_file = os.path.join(opt.execution_dir, f'generated_{i}')
-                #replace / with .
-                new_file = new_file.replace('/', '.')
-                statement = f'from {new_file} import {opt.function_name} as fn_{i}'
-                exec(statement, globals())
-                exec(f"fn = fn_{i}", globals())
+            
+                spec = importlib.util.spec_from_file_location(
+                name=f"generation_{i}",
+                location=file,
+                )
+                generation_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(generation_module)
 
-                exp_test_set['prediction'] = exp_test_set["Payloads"].apply(lambda x: int(fn(x)))
+                exp_test_set['prediction'] = exp_test_set["Payloads"].apply(lambda x: int(generation_module.__dict__[opt.function_name](x)))
                 #print(exp_test_set.tail())
                 cm = create_confusion_matrix(exp_test_set)
                 if opt.create_confusion_matrix:
@@ -55,7 +54,7 @@ def evaluate_run(opt):
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4)
                 continue
         #delete temp folder
-        shutil.rmtree(exec_dir)
+        #shutil.rmtree(exec_dir)
 
         if opt.summarize_results:
             single_results = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
@@ -76,7 +75,6 @@ def add_parse_arguments(parser):
     parser.add_argument('--isolated_execution', type=bool, default=False, help='if true, the evaluation will be executed in a separate docker environment')
     parser.add_argument('--summarize_results', type=bool, default=True, help='if true, the results for every experiment in the run will be summarized in a file')
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
-    parser.add_argument('--execution_dir', type=str, default='tmp', help='temporary directory for the execution of the generated code')
     parser.add_argument('--create_confusion_matrix', type=bool, default=True, help='if true, for every experiment it generates a confusion matrix')
 
 

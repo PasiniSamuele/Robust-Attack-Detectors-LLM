@@ -1,4 +1,4 @@
-from openai import embeddings
+from sympy import use
 from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
 from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file
@@ -21,13 +21,11 @@ def generate_code_snippets(opt, env):
         random.seed(opt.seed)
         np.random.seed(opt.seed)
 
+    use_openai_api = is_openai_model(opt.model_name)
+
     #load model 
-    if use_openai_api:
-        model = build_chat_model(opt, env)
-        embeddings = OpenAIEmbeddings()
-    else:
-        model = create_hf_pipeline(opt, env)
-        embeddings = HuggingFaceInstructEmbeddings()
+    model, embeddings = build_chat_model(opt, env) if use_openai_api else create_hf_pipeline(opt, env)
+   
         
     # load template
     template = load_yaml(opt.template)
@@ -47,7 +45,6 @@ def generate_code_snippets(opt, env):
             opt.examples_file
         )
     prompt_parameters = fill_default_parameters(prompt_parameters, template["default_parameters"])
-    use_openai_api = is_openai_model(opt.model_name)
     
     
     #get experiment folder

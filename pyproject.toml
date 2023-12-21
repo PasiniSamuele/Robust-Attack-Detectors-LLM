@@ -28,6 +28,7 @@ bs4 = "^0.0.1"
 lxml = "^4.9.4"
 frontend = "^0.0.3"
 pymupdf = "^1.23.8"
+langchainhub = "^0.1.14"
 
 
 [tool.poetry.group.dev.dependencies]

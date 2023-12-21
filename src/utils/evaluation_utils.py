@@ -30,10 +30,13 @@ def get_results_from_cm(cm:pd.DataFrame)->dict:
     false_positives = cm[1][0]
     false_negatives = cm[0][1]
 
-    precision = true_positives / (true_positives + false_positives)
-    recall = true_positives / (true_positives + false_negatives)
-    f1 = 2 * (precision * recall) / (precision + recall)
-    accuracy = (true_positives + true_negatives) / (true_positives + true_negatives + false_positives + false_negatives)
+    classified_positives = true_positives + false_positives
+    labeled_positives = true_positives + false_negatives
+    all_instances = (true_positives + true_negatives + false_positives + false_negatives)
+    precision = true_positives / classified_positives if classified_positives > 0 else 0
+    recall = true_positives / labeled_positives if labeled_positives > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
+    accuracy = (true_positives + true_negatives) / all_instances if all_instances > 0 else 0
 
     results["true_positives"] = true_positives
     results["true_negatives"] = true_negatives
@@ -52,9 +55,9 @@ def get_results_from_cm(cm:pd.DataFrame)->dict:
 
 
 def average_metric(single_results:list, metric:str)->Tuple[float, float, float]:
-    avg =  sum(map(lambda x: x["results"][metric], single_results)) / len(single_results)
-    std = np.std(list(map(lambda x: x["results"][metric], single_results)))
-    var = np.var(list(map(lambda x: x["results"][metric], single_results)))
+    avg =  sum(map(lambda x: x["results"][metric], single_results)) / len(single_results) if len(single_results) > 0 else 0
+    std = np.std(list(map(lambda x: x["results"][metric], single_results))) if len(single_results) > 0 else 0
+    var = np.var(list(map(lambda x: x["results"][metric], single_results))) if len(single_results) > 0 else 0
     return avg, std, var
 
 def summarize_results(single_results:list)->dict:

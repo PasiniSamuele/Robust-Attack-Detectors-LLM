@@ -1,5 +1,6 @@
 from langchain.llms.huggingface_pipeline import HuggingFacePipeline
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from langchain.embeddings import HuggingFaceInstructEmbeddings
 
 
 def create_hf_pipeline(opt, env):
@@ -9,5 +10,7 @@ def create_hf_pipeline(opt, env):
     tokenizer = AutoTokenizer.from_pretrained(opt.model_name, trust_remote_code = True, token = hf_key)
     pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=opt.hf_max_new_tokens, temperature=opt.temperature)
     llm = HuggingFacePipeline(pipeline=pipe)
-    return llm
+    embeddings = HuggingFaceInstructEmbeddings()
+
+    return llm, embeddings
 
