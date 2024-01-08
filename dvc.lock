@@ -48,3 +48,55 @@ stages:
       hash: md5
       md5: ecfaf7d7df5d43f7e2b6612dfc1862a0
       size: 2111125
+  dataset_trainval_test_split:
+    cmd: python src/dataset_split.py --data data/filtered.csv --dest_train data/trainval.csv
+      --dest_test data/test.csv --split_arguments dataset_trainval_test_split --params
+      params.yaml
+    deps:
+    - path: data/filtered.csv
+      hash: md5
+      md5: 2fc675ff5189b179493acdceeabac0ac
+      size: 4228007
+    - path: src/dataset_split.py
+      hash: md5
+      md5: c571c3fa613cc9e7fff9d96b40629a6d
+      size: 1610
+    params:
+      params.yaml:
+        dataset_trainval_test_split:
+          train_size: 0.8
+    outs:
+    - path: data/test.csv
+      hash: md5
+      md5: dc5a8a1a8ee2e39f1dc1398d8353fd25
+      size: 838801
+    - path: data/trainval.csv
+      hash: md5
+      md5: a7ed92a62625648df212013212a94fe1
+      size: 3389221
+  dataset_train_val_split:
+    cmd: python src/dataset_split.py --data data/trainval.csv --dest_train data/train.csv
+      --dest_test data/val.csv --split_arguments dataset_train_val_split --params
+      params.yaml
+    deps:
+    - path: data/trainval.csv
+      hash: md5
+      md5: a7ed92a62625648df212013212a94fe1
+      size: 3389221
+    - path: src/dataset_split.py
+      hash: md5
+      md5: c571c3fa613cc9e7fff9d96b40629a6d
+      size: 1610
+    params:
+      params.yaml:
+        dataset_train_val_split:
+          train_size: 0.5
+    outs:
+    - path: data/train.csv
+      hash: md5
+      md5: 4d662e8151248357e7ddbe1aa8fa0b85
+      size: 1693928
+    - path: data/val.csv
+      hash: md5
+      md5: 434b53d54c13886b212481287ab8a2c1
+      size: 1695308

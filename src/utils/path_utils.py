@@ -13,15 +13,17 @@ def get_experiment_folder(base_folder:str,
                           model_name:str,
                           generation_mode:str,
                           n_few_shot:int,
-                          temperature:float)->str:
-    if generation_mode == "one_shot":
+                          temperature:float,
+                          seed:int)->str:
+    if generation_mode == "zero_shot":
         folder = os.path.join(base_folder, 
                                         f"task_{task}",
                                         f"template_{template}",
                                         f"prompt_parameters_{prompt_parameters}",
                                         f"model_{model_name.replace('/', '_')}",
                                         f"generation_mode_{generation_mode}",
-                                        f"temperature_{temperature}")
+                                        f"temperature_{temperature}",
+                                        f"seed_{seed}")
     elif generation_mode == "few_shot":
         folder = os.path.join(base_folder, 
                                         f"task_{task}",
@@ -30,7 +32,8 @@ def get_experiment_folder(base_folder:str,
                                         f"model_{model_name.replace('/', '_')}",
                                         f"generation_mode_{generation_mode}",
                                         f"n_few_shot_{n_few_shot}",
-                                        f"temperature_{temperature}")
+                                        f"temperature_{temperature}"
+                                        f"seed_{seed}")
     #replace - with _ and . with _
     #folder = folder.replace('-', '_').replace('.', '_')
     return folder
@@ -53,7 +56,8 @@ def get_last_run(opt)->str:
                                                 opt.model_name, 
                                                 opt.generation_mode,
                                                 opt.examples_per_class,
-                                                opt.temperature)
+                                                opt.temperature,
+                                                opt.seed)
     run_number = get_last_run_number(experiment_folder, default=0)
     return os.path.join(experiment_folder, f"run_{run_number}")
 
@@ -71,7 +75,8 @@ def create_folder_for_experiment(opt)->str:
                                                 opt.model_name,
                                                 opt.generation_mode, 
                                                 opt.examples_per_class,
-                                                opt.temperature)
+                                                opt.temperature,
+                                                opt.seed)
     os.makedirs(experiment_folder, exist_ok=True)
     
     #enumerate the subfolders related to previous runs

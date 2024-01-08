@@ -7,7 +7,7 @@ np.random.seed(42)
 
 def dataset_split(opt, params):
     df = pd.read_csv(opt.data, encoding = "ISO-8859-1")
-    train_percentage = params["dataset_split"]["train_size"]
+    train_percentage = params[opt.split_arguments]["train_size"]
 
     classes = list(df['Class'].unique())
     train_df = pd.DataFrame(columns=df.columns)
@@ -26,6 +26,7 @@ def parse_arguments():
     parser.add_argument('--data', type=str, default='data/dataset.csv', help='source')
     parser.add_argument('--dest_train', type=str, default='data/train.csv', help='train set')
     parser.add_argument('--dest_test', type=str, default='data/test.csv', help='test set')
+    parser.add_argument('--split_arguments', type=str, default='dataset_trainval_test_split', help='parameters containing split numbers')
 
     parser.add_argument('--params', type=str, default='params.yaml', help='params')  # file/folder, 0 for webcam
 

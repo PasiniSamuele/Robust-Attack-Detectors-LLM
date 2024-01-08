@@ -13,8 +13,8 @@ def evaluate_run(opt):
     run_path = opt.run if opt.run is not None else get_last_run(opt)
     run_name = run_path.split('/')[-1]
     print(f"Evaluating {run_name}")
-    test_set = pd.read_csv(opt.data)
-    test_set['label'] = test_set.Class.map({'Malicious': 1, 'Benign': 0})
+    val_set = pd.read_csv(opt.data)
+    val_set['label'] = val_set.Class.map({'Malicious': 1, 'Benign': 0})
 
     if opt.isolated_execution:
         raise NotImplementedError('Isolated execution is not implemented yet')
@@ -24,7 +24,7 @@ def evaluate_run(opt):
             experiment_results = {
                 "failed": False,
             }
-            exp_test_set = test_set.copy()
+            exp_test_set = val_set.copy()
             subfolder_name = subfolder.split('/')[-1]
             print(f"Evaluating  {subfolder_name}")
             file = os.path.join(subfolder, 'generated.py')
@@ -58,7 +58,7 @@ def evaluate_run(opt):
 
         if opt.summarize_results:
             single_results = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
-            summarized_results = summarize_results(single_results)            
+            summarized_results = summarize_results(single_results, opt.top_n_metric, opt.top_n)            
             with open(os.path.join(run_path, opt.result_file_name), 'w') as f:
                     json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
 
@@ -68,7 +68,7 @@ def evaluate_run(opt):
 def add_parse_arguments(parser):
     #run parameters
     parser.add_argument('--run', type=str, default=None, help='Run to be evaluated, if it is None, the last run given model parameters will be evaluated')
-    parser.add_argument('--data', type=str, default='data/test.csv', help='test dataset')
+    parser.add_argument('--data', type=str, default='data/val.csv', help='validation dataset')
     parser.add_argument('--function_name', type=str, default='detect_xss', help='name of the generated function to be executed for evaluation')
 
     #evaluation parameters
@@ -76,6 +76,9 @@ def add_parse_arguments(parser):
     parser.add_argument('--summarize_results', type=bool, default=True, help='if true, the results for every experiment in the run will be summarized in a file')
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
     parser.add_argument('--create_confusion_matrix', type=bool, default=True, help='if true, for every experiment it generates a confusion matrix')
+    parser.add_argument('--top_n_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
+    parser.add_argument('--top_n', type=int, action='append', help='top_n value to be considered for the top_n_metric, you can append more than one')
+
 
 
 

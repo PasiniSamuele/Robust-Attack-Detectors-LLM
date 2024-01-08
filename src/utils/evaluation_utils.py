@@ -60,7 +60,9 @@ def average_metric(single_results:list, metric:str)->Tuple[float, float, float]:
     var = np.var(list(map(lambda x: x["results"][metric], single_results))) if len(single_results) > 0 else 0
     return avg, std, var
 
-def summarize_results(single_results:list)->dict:
+def summarize_results(single_results:list,
+                      top_n_metric:str = "accuracy",
+                      top_n:list = [1,3,5,10,15])->dict:
     results = dict()
 
     #filter out the failed experiments
@@ -80,5 +82,16 @@ def summarize_results(single_results:list)->dict:
     results["precision"], results["precision_std"], results["precision_var"] = average_metric(successful_experiments, "precision")
     results["recall"], results["recall_std"], results["recall_var"] = average_metric(successful_experiments, "recall")
     results["f1"], results["f1_std"], results["f1_var"] = average_metric(successful_experiments, "f1")
-
+    for top in top_n:
+        if top > len(successful_experiments):
+            continue
+        top_n_results = dict()
+        #keep only the top n experiments based on the top_n_metric
+        exps = sorted(successful_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
+        #calculate avg, std and var for each metric
+        top_n_results["accuracy"], top_n_results["accuracy_std"], top_n_results["accuracy_var"] = average_metric(exps, "accuracy")
+        top_n_results["precision"], top_n_results["precision_std"], top_n_results["precision_var"] = average_metric(exps, "precision")
+        top_n_results["recall"], top_n_results["recall_std"], top_n_results["recall_var"] = average_metric(exps, "recall")
+        top_n_results["f1"], top_n_results["f1_std"], top_n_results["f1_var"] = average_metric(exps, "f1")
+        results[f"top_{top}"] = top_n_results
     return results

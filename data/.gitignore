@@ -7,3 +7,5 @@
 /templates
 /example_templates
 /papers
+/trainval.csv
+/val.csv
