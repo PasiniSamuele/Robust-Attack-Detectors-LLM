@@ -88,6 +88,9 @@ def summarize_results(single_results:list,
         top_n_results = dict()
         #keep only the top n experiments based on the top_n_metric
         exps = sorted(successful_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
+
+        #write the top_n experiments names
+        top_n_results["experiments"] = list(map(lambda x: x["experiment"], exps))
         #calculate avg, std and var for each metric
         top_n_results["accuracy"], top_n_results["accuracy_std"], top_n_results["accuracy_var"] = average_metric(exps, "accuracy")
         top_n_results["precision"], top_n_results["precision_std"], top_n_results["precision_var"] = average_metric(exps, "precision")

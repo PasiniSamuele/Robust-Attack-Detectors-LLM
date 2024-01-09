@@ -32,7 +32,7 @@ def get_experiment_folder(base_folder:str,
                                         f"model_{model_name.replace('/', '_')}",
                                         f"generation_mode_{generation_mode}",
                                         f"n_few_shot_{n_few_shot}",
-                                        f"temperature_{temperature}"
+                                        f"temperature_{temperature}",
                                         f"seed_{seed}")
     #replace - with _ and . with _
     #folder = folder.replace('-', '_').replace('.', '_')

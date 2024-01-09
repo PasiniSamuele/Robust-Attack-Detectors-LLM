@@ -1,7 +1,7 @@
 from sympy import use
 from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
-from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file
+from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file, save_input_prompt_file
 from utils.path_utils import create_folder_for_experiment
 from dotenv import dotenv_values
 from langchain.prompts import (
@@ -52,7 +52,9 @@ def generate_code_snippets(opt, env):
     #build prompt and chain
     prompt = ChatPromptTemplate.from_messages([("system", template["input"]), ("human", "{input}")])
     chain = prompt | model | StrOutputParser() | sanitize_output
-    print(prompt.format(**prompt_parameters))
+    input_prompt = prompt.format(**prompt_parameters)
+    print(input_prompt)
+    save_input_prompt_file(os.path.join(experiment_folder, opt.input_prompt_file_name), input_prompt)
     save_parameters_file(os.path.join(experiment_folder, opt.parameters_file_name), opt)
     #run experiments
     for i in range(opt.experiments):
@@ -87,6 +89,8 @@ def add_parse_arguments(parser):
     parser.add_argument('--experiments_folder', type=str, default='experiments', help='experiments folder')
     parser.add_argument('--experiments', type=int, default=25, help= 'number of experiments to run')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the parameters file')
+    parser.add_argument('--input_prompt_file_name', type=str, default='prompt.txt', help='name of the input prompt file')
+
 
     #hf parameters
     parser.add_argument('--hf_max_new_tokens', type=int, default=400, help='max new tokens for hf model')

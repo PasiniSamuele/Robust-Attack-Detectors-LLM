@@ -28,6 +28,11 @@ def save_parameters_file(file_path:str,
     with open(file_path, "w") as f:
         json.dump(vars(opt), f, cls=NpEncoder,ensure_ascii=False,indent=4)
 
+def save_input_prompt_file(file_path:str,
+                         input_prompt):
+    with open(file_path, "w") as f:
+        f.write(input_prompt)
+
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):

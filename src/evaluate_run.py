@@ -28,7 +28,8 @@ def evaluate_run(opt):
             subfolder_name = subfolder.split('/')[-1]
             print(f"Evaluating  {subfolder_name}")
             file = os.path.join(subfolder, 'generated.py')
-           
+            experiment_results["experiment"] = subfolder_name
+
             try:
             
                 spec = importlib.util.spec_from_file_location(
@@ -44,6 +45,9 @@ def evaluate_run(opt):
                 if opt.create_confusion_matrix:
                     save_confusion_matrix(cm, subfolder)
                 experiment_results["results"] = get_results_from_cm(cm)
+
+                #write into the results the number of the executed experiment
+
                 with open(os.path.join(subfolder, opt.result_file_name), 'w') as f:
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
                 
