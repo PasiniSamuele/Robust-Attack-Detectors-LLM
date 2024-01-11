@@ -34,6 +34,17 @@ def generate_experiments_summary(opt):
         #if the run is None, set it to the folder name
         if results_dict['run'] is None:
             results_dict['run'] = folder.split('/')[-1]
+        to_remove_list = []
+        temp_dict = dict()
+        #flatten the dictionary
+        for k, v in results_dict.items():
+            if isinstance(v, dict):
+                to_remove_list.append(k)
+                for k2, v2 in v.items():
+                    temp_dict[k+'_'+k2] = v2
+        results_dict.update(temp_dict)
+        for k in to_remove_list:
+            del results_dict[k]
         results_dicts.append(results_dict)
     #convert the list of dictionaries to a dataframe
     df = pd.DataFrame(results_dicts)
@@ -43,7 +54,7 @@ def generate_experiments_summary(opt):
 
 def add_parse_arguments(parser):
 
-    parser.add_argument('--experiments_root_folder', type=str, default='experiments', help='root of the experiments')
+    parser.add_argument('--experiments_root_folder', type=str, default='experiments/task_detect_xss_simple_prompt', help='root of the experiments')
     parser.add_argument('--tail_folder', type=str, default='run_', help='tail folder of the experiments')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the file containing the parameters')
     parser.add_argument('--results_file_name', type=str, default='results.json', help='name of the file containing the results')
@@ -51,6 +62,7 @@ def add_parse_arguments(parser):
     parser.add_argument('--output_file', type=str, default='experiments_summary.csv', help='name of the file containing the summary of the experiments')
 
     return parser
+
 def main():
     opt = init_argument_parser(add_parse_arguments)
     generate_experiments_summary(opt)
