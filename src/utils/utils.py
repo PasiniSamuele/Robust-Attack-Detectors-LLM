@@ -2,6 +2,15 @@ from ruamel.yaml import YAML
 import argparse
 import json
 import numpy as np
+from urllib.parse import urlparse
+
+def is_valid_url(url):
+    try:
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+    
 def load_yaml(path):
     with open(path) as f:
         yaml = YAML(typ="safe")

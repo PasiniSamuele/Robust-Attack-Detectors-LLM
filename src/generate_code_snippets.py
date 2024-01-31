@@ -1,8 +1,8 @@
 from sympy import use
 from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
-from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file, save_input_prompt_file
-from utils.path_utils import create_folder_for_experiment
+from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file, save_input_prompt_file, is_valid_url
+from utils.path_utils import create_folder_for_experiment, folder_exists_and_not_empty
 from dotenv import dotenv_values
 from langchain.prompts import (
     ChatPromptTemplate,
@@ -14,6 +14,9 @@ import os
 import random
 import numpy as np
 from utils.few_shot_utils import create_few_shot
+from utils.rag_utils import build_scientific_papers_loader, build_documents_retriever, build_web_page_loader, format_docs
+
+
 
 def generate_code_snippets(opt, env):
     #fix seed if it is not None
@@ -45,6 +48,18 @@ def generate_code_snippets(opt, env):
             opt.examples_file
         )
     prompt_parameters = fill_default_parameters(prompt_parameters, template["default_parameters"])
+
+    if opt.generation_mode == "rag":
+        with open(opt.rag_template_file) as f:
+            template["input"] = template["input"] +"\n" + f.read()
+        if folder_exists_and_not_empty(opt.db_persist_path):
+            docs =  build_scientific_papers_loader(opt.papers_folder) if not is_valid_url(opt.rag_source) else build_web_page_loader(opt.rag_source)
+        else: 
+            docs = []
+        retriever = build_documents_retriever(docs, db_persist_path=opt.db_persist_path, chunk_size=opt.chunk_size, chunk_overlap=opt.chunk_overlap, embeddings=embeddings)
+        prompt_parameters['context'] = (retriever | format_docs).invoke(prompt_parameters['input'])
+
+
     
     
     #get experiment folder
@@ -108,6 +123,12 @@ def add_parse_arguments(parser):
     parser.add_argument('--example_positive_label', type=str, default='Malicious', help='Label for positive examples')
     parser.add_argument('--example_negative_label', type=str, default='Benign', help='Label for negative examples')
 
+    #rag parameters
+    parser.add_argument('--rag_template_file', type=str, default='data/rag_templates/basic_rag_suffix.txt', help='template for the prompt with RAG')
+    parser.add_argument('--rag_source', type=str, default='data/papers', help='folder with papers or url of a webpage')
+    parser.add_argument('--db_persist_path', type=str, default='data/db/chroma', help='path to the db')
+    parser.add_argument('--chunk_size', type=int, default=1000, help='chunk size')
+    parser.add_argument('--chunk_overlap', type=int, default=200, help='chunk overlap')
 
     return parser
     

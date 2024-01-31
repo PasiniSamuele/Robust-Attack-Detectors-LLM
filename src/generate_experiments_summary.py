@@ -34,6 +34,7 @@ def generate_experiments_summary(opt):
         #if the run is None, set it to the folder name
         if results_dict['run'] is None:
             results_dict['run'] = folder.split('/')[-1]
+        results_dict['folder'] = folder
         to_remove_list = []
         temp_dict = dict()
         #flatten the dictionary

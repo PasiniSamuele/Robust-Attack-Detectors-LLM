@@ -15,7 +15,7 @@ def get_experiment_folder(base_folder:str,
                           n_few_shot:int,
                           temperature:float,
                           seed:int)->str:
-    if generation_mode == "zero_shot":
+    if generation_mode == "zero_shot" or "rag":
         folder = os.path.join(base_folder, 
                                         f"task_{task}",
                                         f"template_{template}",
@@ -84,3 +84,6 @@ def create_folder_for_experiment(opt)->str:
     run_folder = os.path.join(experiment_folder, f"run_{current_run_number}")
     os.makedirs(run_folder, exist_ok=False)
     return run_folder
+
+def folder_exists_and_not_empty(folder:str)->bool:
+    return os.path.isdir(folder) and os.listdir(folder)
