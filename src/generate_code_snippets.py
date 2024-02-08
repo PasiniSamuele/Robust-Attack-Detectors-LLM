@@ -38,7 +38,7 @@ def generate_code_snippets(opt, env):
     #read txt containing the task
     with open(opt.task) as f:
         prompt_parameters["input"] = f.read()
-    if opt.generation_mode == "few_shot":
+    if opt.generation_mode == "few_shot" or opt.generation_mode == "rag_few_shot":
         prompt_parameters["input"] = create_few_shot(
             prompt_parameters["input"],
             opt.example_template,
@@ -49,7 +49,7 @@ def generate_code_snippets(opt, env):
         )
     prompt_parameters = fill_default_parameters(prompt_parameters, template["default_parameters"])
 
-    if opt.generation_mode == "rag":
+    if opt.generation_mode == "rag" or opt.generation_mode == "rag_few_shot":
         with open(opt.rag_template_file) as f:
             template["input"] = template["input"] +"\n" + f.read()
         if folder_exists_and_not_empty(opt.db_persist_path):
@@ -116,7 +116,7 @@ def add_parse_arguments(parser):
 
     #few shot parameters
     parser.add_argument('--example_template', type=str, default='data/example_templates/detect_xss_simple_prompt.txt', help='template for the examples')
-    parser.add_argument('--examples_per_class', type=int, default=2, help='number of examples for each class')
+    parser.add_argument('--examples_per_class', type=int, default=0, help='number of examples for each class')
     parser.add_argument('--examples_file', type=str, default='data/train.csv', help='file containing the examples')
     parser.add_argument('--examples_payload_column', type=str, default='Payloads', help='column containing the payloads')
     parser.add_argument('--examples_label_column', type=str, default='Class', help='column containing the labels')

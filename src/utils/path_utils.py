@@ -15,7 +15,7 @@ def get_experiment_folder(base_folder:str,
                           n_few_shot:int,
                           temperature:float,
                           seed:int)->str:
-    if generation_mode == "zero_shot" or "rag":
+    if generation_mode == "zero_shot" or generation_mode == "rag":
         folder = os.path.join(base_folder, 
                                         f"task_{task}",
                                         f"template_{template}",
@@ -24,7 +24,7 @@ def get_experiment_folder(base_folder:str,
                                         f"generation_mode_{generation_mode}",
                                         f"temperature_{temperature}",
                                         f"seed_{seed}")
-    elif generation_mode == "few_shot":
+    elif generation_mode == "few_shot" or generation_mode == "rag_few_shot":
         folder = os.path.join(base_folder, 
                                         f"task_{task}",
                                         f"template_{template}",
