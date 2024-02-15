@@ -52,7 +52,8 @@ def generate_code_snippets(opt, env):
     if opt.generation_mode == "rag" or opt.generation_mode == "rag_few_shot":
         with open(opt.rag_template_file) as f:
             template["input"] = template["input"] +"\n" + f.read()
-        if folder_exists_and_not_empty(opt.db_persist_path):
+        if not folder_exists_and_not_empty(opt.db_persist_path):
+            print("Creating vectorstore")
             docs =  build_scientific_papers_loader(opt.papers_folder) if not is_valid_url(opt.rag_source) else build_web_page_loader(opt.rag_source)
         else: 
             docs = []
@@ -81,6 +82,7 @@ def generate_code_snippets(opt, env):
             with open(os.path.join(save_dir, 'generated.py'), 'w') as f:
                 f.write(response)
         except Exception as e:
+            print(e)
             print("Experiment failed, try again")
             i = i-1
             continue

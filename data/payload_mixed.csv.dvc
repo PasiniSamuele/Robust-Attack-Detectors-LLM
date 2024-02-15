@@ -1,0 +1,5 @@
+outs:
+- md5: 38ff928ee312b2b5742f306c5e83c29c
+  size: 1996540
+  hash: md5
+  path: payload_mixed.csv

@@ -100,3 +100,83 @@ stages:
       hash: md5
       md5: 434b53d54c13886b212481287ab8a2c1
       size: 1695308
+  uniform_dataset:
+    cmd: python src/uniform_dataset.py --data data/payload_mixed.csv --dest data/payload_sqli.csv
+      --params params.yaml
+    deps:
+    - path: data/payload_mixed.csv
+      hash: md5
+      md5: 38ff928ee312b2b5742f306c5e83c29c
+      size: 1996540
+    - path: src/uniform_dataset.py
+      hash: md5
+      md5: 5bb3519f24cce75a2c732426153dda5b
+      size: 2546
+    params:
+      params.yaml:
+        uniform_sqli:
+          payload_column: payload
+          label_column: attack_type
+          benign_label: norm
+          malicious_label: sqli
+          final_benign_label: Benign
+          final_malicious_label: Malicious
+          final_payload_column: Payloads
+          final_label_column: Class
+    outs:
+    - path: data/payload_sqli.csv
+      hash: md5
+      md5: 66c5683cf1e962168cff8cfc70841d0b
+      size: 1341655
+  sqli_trainval_test_split:
+    cmd: python src/dataset_split.py --data data/payload_sqli.csv --dest_train data/trainval_sqli.csv
+      --dest_test data/test_sqli.csv --split_arguments dataset_trainval_test_split
+      --params params.yaml
+    deps:
+    - path: data/payload_sqli.csv
+      hash: md5
+      md5: 66c5683cf1e962168cff8cfc70841d0b
+      size: 1341655
+    - path: src/dataset_split.py
+      hash: md5
+      md5: c571c3fa613cc9e7fff9d96b40629a6d
+      size: 1610
+    params:
+      params.yaml:
+        dataset_trainval_test_split:
+          train_size: 0.8
+    outs:
+    - path: data/test_sqli.csv
+      hash: md5
+      md5: 1656e8a95947d904247dc1fd514809b7
+      size: 267309
+    - path: data/trainval_sqli.csv
+      hash: md5
+      md5: de69000e1668bdd6a1d375068f935f12
+      size: 1074361
+  sqli_train_val_split:
+    cmd: python src/dataset_split.py --data data/trainval_sqli.csv --dest_train data/train_sqli.csv
+      --dest_test data/val_sqli.csv --split_arguments dataset_train_val_split --params
+      params.yaml
+    deps:
+    - path: data/trainval_sqli.csv
+      hash: md5
+      md5: de69000e1668bdd6a1d375068f935f12
+      size: 1074361
+    - path: src/dataset_split.py
+      hash: md5
+      md5: c571c3fa613cc9e7fff9d96b40629a6d
+      size: 1610
+    params:
+      params.yaml:
+        dataset_train_val_split:
+          train_size: 0.5
+    outs:
+    - path: data/train_sqli.csv
+      hash: md5
+      md5: 7db5bc133a3ba9201c437e9662a0bf15
+      size: 535375
+    - path: data/val_sqli.csv
+      hash: md5
+      md5: 470ac2c8e11b38df55e50ed1c083fb6a
+      size: 539001

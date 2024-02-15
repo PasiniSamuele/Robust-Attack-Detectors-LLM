@@ -1,4 +1,13 @@
 stages:
+  uniform_dataset:
+    cmd: python src/uniform_dataset.py --data data/payload_mixed.csv --dest data/payload_sqli.csv --params params.yaml
+    deps: 
+    - data/payload_mixed.csv
+    - src/uniform_dataset.py
+    params:
+    - uniform_sqli
+    outs:
+    - data/payload_sqli.csv
   filter_dataset:
     cmd: python src/filter_dataset.py --data data/FMereani.csv --dest data/filtered.csv --params params.yaml
     deps: 
@@ -28,3 +37,23 @@ stages:
     outs:
     - data/train.csv
     - data/val.csv
+  sqli_trainval_test_split:
+    cmd: python src/dataset_split.py --data data/payload_sqli.csv --dest_train data/trainval_sqli.csv --dest_test data/test_sqli.csv --split_arguments dataset_trainval_test_split --params params.yaml
+    deps: 
+    - data/payload_sqli.csv
+    - src/dataset_split.py
+    params:
+    - dataset_trainval_test_split
+    outs:
+    - data/trainval_sqli.csv
+    - data/test_sqli.csv
+  sqli_train_val_split:
+    cmd: python src/dataset_split.py --data data/trainval_sqli.csv --dest_train data/train_sqli.csv --dest_test data/val_sqli.csv --split_arguments dataset_train_val_split --params params.yaml
+    deps: 
+    - data/trainval_sqli.csv
+    - src/dataset_split.py
+    params:
+    - dataset_train_val_split
+    outs:
+    - data/train_sqli.csv
+    - data/val_sqli.csv

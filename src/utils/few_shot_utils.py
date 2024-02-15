@@ -43,6 +43,22 @@ def create_few_shot(prompt:str,
                     examples_file:str = 'data/train.csv',):
     mapping_dict = {negative_label: False, positive_label: True}
     trainset = pd.read_csv(examples_file)
+
+    end_with_triple_quotes = False
+    end_with_triple_single_quotes = False
+
+    #check if the last three character of prompt are """
+    if prompt.endswith('"""'):
+        end_with_triple_quotes = True
+        #remove the last 3 characters
+        prompt = prompt[:-3]
+
+    #check if the prompt ends with '''
+    elif prompt.endswith("'''"):
+        end_with_triple_single_quotes = True
+        #remove the last 3 characters
+        prompt = prompt[:-3]
+
     with open(example_template_file) as f:
         example_template = f.read()
     partial_format_function = partial(humaneval_style_format, label_column="Class", payload_column="Payloads", template =  example_template, mappig = mapping_dict)
@@ -50,4 +66,9 @@ def create_few_shot(prompt:str,
     prompt += "\n"
     for example in examples:
         prompt += example
+
+    if end_with_triple_quotes:
+        prompt += '"""'
+    elif end_with_triple_single_quotes:
+        prompt += "'''"
     return prompt
