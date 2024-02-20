@@ -163,3 +163,4 @@ google_drive_credentials.json
 poetry.lock
 /experiments
 /output
+/plots

@@ -1,4 +1,5 @@
 import os
+import json
 
 def from_file_to_name(file)->str:
     return file.split('/')[-1].split('.')[0]
@@ -87,3 +88,24 @@ def create_folder_for_experiment(opt)->str:
 
 def folder_exists_and_not_empty(folder:str)->bool:
     return os.path.isdir(folder) and os.listdir(folder)
+
+def from_folder_to_accuracy_list(folder:str)->list:
+    #find all the subfolder in folder:
+    subfolders = [f.path for f in os.scandir(folder) if f.is_dir() ]
+    #map subfolder to the dict conteined in results.json file
+    results = []
+    for subfolder in subfolders:
+        with open(os.path.join(subfolder, 'results.json')) as f:
+            results.append(json.load(f))
+    #keep only the results where failed is False
+    results = [r for r in results if not r['failed']]
+    #map results to accuracy
+    results = [r['results']['accuracy'] for r in results]
+    return results
+
+def from_folder_to_success(folder:str)->list:
+
+    with open(os.path.join(folder, 'results.json')) as f:
+        data = json.load(f)
+    success_rate = data['successes']/data['total']
+    return success_rate
