@@ -63,8 +63,8 @@ def generate_plots(opt):
 def add_parse_arguments(parser):
     #general parameters
     parser.add_argument('--summary_file', type=str, default="experiments/task_detect_xss_simple_prompt/experiments_summary.csv", help='Summary file')
-    parser.add_argument('--plots_folder', type=str, default='plots', help='Folder to save plots')
-    parser.add_argument('--minimum_success_rate', type=float, default=0.5, help='Minimum success rate to print the plot')
+    parser.add_argument('--plots_folder', type=str, default='plots/detect_xss_simple_prompt', help='Folder to save plots')
+    parser.add_argument('--minimum_success_rate', type=float, default=0.1, help='Minimum success rate to print the plot')
 
     #plot parameters
     parser.add_argument('--generate_countplot', type=bool, default=True, help='Generate countplot for successes')

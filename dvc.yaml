@@ -1,13 +1,21 @@
 stages:
-  uniform_dataset:
-    cmd: python src/uniform_dataset.py --data data/payload_mixed.csv --dest data/payload_sqli.csv --params params.yaml
+  fix_dataset_quotes:
+    cmd: python src/fix_dataset_quotes.py --data data/payload_mixed.csv --dest data/payload_quoted.csv 
     deps: 
     - data/payload_mixed.csv
+    - src/fix_dataset_quotes.py
+    outs:
+    - data/payload_quoted.csv
+  uniform_dataset:
+    cmd: python src/uniform_dataset.py --data data/payload_quoted.csv --dest data/payload_sqli.csv --params params.yaml
+    deps: 
+    - data/payload_quoted.csv
     - src/uniform_dataset.py
     params:
     - uniform_sqli
     outs:
     - data/payload_sqli.csv
+
   filter_dataset:
     cmd: python src/filter_dataset.py --data data/FMereani.csv --dest data/filtered.csv --params params.yaml
     deps: 

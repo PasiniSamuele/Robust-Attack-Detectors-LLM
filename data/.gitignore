@@ -16,3 +16,5 @@
 /test_sqli.csv
 /train_sqli.csv
 /val_sqli.csv
+/payload_sqli_fixed.csv
+/payload_quoted.csv

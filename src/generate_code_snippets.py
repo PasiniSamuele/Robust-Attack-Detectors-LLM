@@ -73,7 +73,9 @@ def generate_code_snippets(opt, env):
     save_input_prompt_file(os.path.join(experiment_folder, opt.input_prompt_file_name), input_prompt)
     save_parameters_file(os.path.join(experiment_folder, opt.parameters_file_name), opt)
     #run experiments
-    for i in range(opt.experiments):
+    i = 0
+    failures = 0
+    while i < opt.experiments:
         print(f"Experiment {i}")
         try:
             response = chain.invoke(prompt_parameters)
@@ -81,10 +83,16 @@ def generate_code_snippets(opt, env):
             os.makedirs(save_dir, exist_ok=True)
             with open(os.path.join(save_dir, 'generated.py'), 'w') as f:
                 f.write(response)
+            i = i + 1
+            failures = 0
         except Exception as e:
-            print(e)
+            #print(e)
             print("Experiment failed, try again")
-            i = i-1
+            failures = failures + 1
+            if failures > 10:
+                print("Too many failures, moving to next experiment")
+                i = i + 1
+                continue
             continue
         
     
