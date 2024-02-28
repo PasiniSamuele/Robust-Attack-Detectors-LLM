@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from typing import Tuple
+import Levenshtein
 
 def create_confusion_matrix(test_set:pd.DataFrame,
                             label_column:str = "label",
@@ -60,6 +61,17 @@ def average_metric(single_results:list, metric:str)->Tuple[float, float, float]:
     var = np.var(list(map(lambda x: x["results"][metric], single_results))) if len(single_results) > 0 else 0
     return avg, std, var
 
+def get_top_n_results(exps):
+        top_n_results = dict()
+        #write the top_n experiments names
+        top_n_results["experiments"] = list(map(lambda x: x["experiment"], exps))
+        #calculate avg, std and var for each metric
+        top_n_results["accuracy"], top_n_results["accuracy_std"], top_n_results["accuracy_var"] = average_metric(exps, "accuracy")
+        top_n_results["precision"], top_n_results["precision_std"], top_n_results["precision_var"] = average_metric(exps, "precision")
+        top_n_results["recall"], top_n_results["recall_std"], top_n_results["recall_var"] = average_metric(exps, "recall")
+        top_n_results["f1"], top_n_results["f1_std"], top_n_results["f1_var"] = average_metric(exps, "f1")
+        return top_n_results
+
 def summarize_results(single_results:list,
                       top_n_metric:str = "accuracy",
                       top_n:list = [1,3,5,10,15])->dict:
@@ -85,16 +97,45 @@ def summarize_results(single_results:list,
     for top in top_n:
         if top > len(successful_experiments):
             continue
-        top_n_results = dict()
         #keep only the top n experiments based on the top_n_metric
         exps = sorted(successful_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
+        results[f"top_{top}"] = get_top_n_results(exps)
+    return results
 
-        #write the top_n experiments names
-        top_n_results["experiments"] = list(map(lambda x: x["experiment"], exps))
-        #calculate avg, std and var for each metric
-        top_n_results["accuracy"], top_n_results["accuracy_std"], top_n_results["accuracy_var"] = average_metric(exps, "accuracy")
-        top_n_results["precision"], top_n_results["precision_std"], top_n_results["precision_var"] = average_metric(exps, "precision")
-        top_n_results["recall"], top_n_results["recall_std"], top_n_results["recall_var"] = average_metric(exps, "recall")
-        top_n_results["f1"], top_n_results["f1_std"], top_n_results["f1_var"] = average_metric(exps, "f1")
-        results[f"top_{top}"] = top_n_results
+def get_results_from_name(experiments, names):
+    results = list(filter(lambda x: x["experiment"] in names, experiments))
+    return results
+
+def list_distance(A, B):
+    # Assign each unique value of the list to a unicode character
+    unique_map = {v:chr(k) for (k,v) in enumerate(set(A+B))}
+    
+    # Create string versions of the lists
+    a = ''.join(list(map(unique_map.get, A)))
+    b = ''.join(list(map(unique_map.get, B)))
+
+    return Levenshtein.distance(a, b)
+
+def get_results_from_synthetic(synthetic_experiments:list,
+                                experiments:list,
+                                top_n_metric:str = "accuracy",
+                                top_n:list = [1,3,5,10,15])->dict:
+    results = dict()
+    successful_experiments = list(filter(lambda x: not x["failed"], experiments))
+    successful_syn_experiments = list(filter(lambda x: not x["failed"], synthetic_experiments))
+    top_n.append(min(len(successful_experiments), len(successful_syn_experiments)))
+    #print(successful_syn_experiments)
+    for top in top_n:
+        if top > len(successful_experiments) or top > len(successful_syn_experiments):
+            continue
+        top_exp_syn = sorted(successful_syn_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
+        names = list(map(lambda x: x["experiment"], top_exp_syn))
+        exps = get_results_from_name(successful_experiments, names)
+        best_exps = sorted(successful_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
+        val_top_n_results = get_top_n_results(best_exps)
+        best_exps_names = list(map(lambda x: x["experiment"], best_exps))
+        results[f"top_{top}"] = get_top_n_results(exps)
+        results[f"top_{top}"]["distance"] = list_distance(names, best_exps_names)
+        results[f"top_{top}"]["accuracy_diff"] = abs(val_top_n_results["accuracy"] - results[f"top_{top}"]["accuracy"])
+
     return results

@@ -2,11 +2,15 @@ from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
 from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file, save_input_prompt_file, is_valid_url
 from utils.path_utils import create_folder_for_experiment, folder_exists_and_not_empty
+from utils.synthetic_dataset_utils import XSS_dataset, fill_df
 from dotenv import dotenv_values
 from langchain.prompts import (
+    SystemMessagePromptTemplate,
     ChatPromptTemplate,
+    HumanMessagePromptTemplate,
 )
 from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
+from langchain.output_parsers import PydanticOutputParser
 
 from langchain_core.output_parsers import StrOutputParser
 import os
@@ -16,8 +20,7 @@ from utils.few_shot_utils import create_few_shot
 from utils.rag_utils import build_scientific_papers_loader, build_documents_retriever, build_web_page_loader, format_docs
 
 
-
-def generate_code_snippets(opt, env):
+def generate_synthetic_dataset(opt, env):
     #fix seed if it is not None
     if opt.seed is not None:
         random.seed(opt.seed)
@@ -59,14 +62,20 @@ def generate_code_snippets(opt, env):
         retriever = build_documents_retriever(docs, db_persist_path=opt.db_persist_path, chunk_size=opt.chunk_size, chunk_overlap=opt.chunk_overlap, embeddings=embeddings)
         prompt_parameters['context'] = (retriever | format_docs).invoke(prompt_parameters['input'])
 
-
-    
-    
     #get experiment folder
     experiment_folder = create_folder_for_experiment(opt)
+    output_parser = PydanticOutputParser(pydantic_object=XSS_dataset)
+
     #build prompt and chain
-    prompt = ChatPromptTemplate.from_messages([("system", template["input"]), ("human", "{input}")])
-    chain = prompt | model | StrOutputParser() | sanitize_output
+    prompt = ChatPromptTemplate(
+        messages=[
+            SystemMessagePromptTemplate.from_template(template['input']+ "\n{format_instructions}"),
+            HumanMessagePromptTemplate.from_template("{input}")  
+        ],
+        input_variables=["input"],
+        partial_variables={"format_instructions": output_parser.get_format_instructions()}
+    )
+    chain = prompt | model | output_parser
     input_prompt = prompt.format(**prompt_parameters)
     print(input_prompt)
     save_input_prompt_file(os.path.join(experiment_folder, opt.input_prompt_file_name), input_prompt)
@@ -77,11 +86,9 @@ def generate_code_snippets(opt, env):
     while i < opt.experiments:
         print(f"Experiment {i}")
         try:
-            response = chain.invoke(prompt_parameters)
-            save_dir = os.path.join(experiment_folder, f"exp_{i}")
-            os.makedirs(save_dir, exist_ok=True)
-            with open(os.path.join(save_dir, 'generated.py'), 'w') as f:
-                f.write(response)
+            df= fill_df(chain, prompt_parameters)
+            save_file = os.path.join(experiment_folder, f"exp_{i}.csv")
+            df.to_csv(save_file, index=False)
             i = i + 1
             failures = 0
         except Exception as e:
@@ -94,7 +101,6 @@ def generate_code_snippets(opt, env):
                 continue
             continue
         
-    
 
 def add_parse_arguments(parser):
 
@@ -104,14 +110,14 @@ def add_parse_arguments(parser):
 
     #task parameters
     parser.add_argument('--task', type=str, default='data/tasks/detect_xss_simple_prompt.txt', help='input task')
-    parser.add_argument('--template', type=str, default='data/templates/complete_function.yaml', help='template for the prompt')
-    parser.add_argument('--prompt_parameters', type=str, default='data/prompt_parameters/empty.yaml', help='parameters to format the prompt template')
+    parser.add_argument('--template', type=str, default='data/templates/create_synthetic_dataset.yaml', help='template for the prompt')
+    parser.add_argument('--prompt_parameters', type=str, default='data/prompt_parameters/medium_dataset.yaml', help='parameters to format the prompt template')
     parser.add_argument('--generation_mode', type=str, default='zero_shot', help='Generation mode: zero_shot, few_shot, rag or react')
 
 
     #output
-    parser.add_argument('--experiments_folder', type=str, default='experiments', help='experiments folder')
-    parser.add_argument('--experiments', type=int, default=25, help= 'number of experiments to run')
+    parser.add_argument('--experiments_folder', type=str, default='data/synthetic_datasets', help='experiments folder')
+    parser.add_argument('--experiments', type=int, default=5, help= 'number of experiments to run')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the parameters file')
     parser.add_argument('--input_prompt_file_name', type=str, default='prompt.txt', help='name of the input prompt file')
 
@@ -145,7 +151,7 @@ def add_parse_arguments(parser):
 def main():
     opt = init_argument_parser(add_parse_arguments)
     env = dotenv_values()
-    generate_code_snippets(opt, env)
+    generate_synthetic_dataset(opt, env)
 
 if __name__ == '__main__':
     main()

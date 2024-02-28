@@ -47,14 +47,18 @@ def evaluate_run(opt):
                 experiment_results["results"] = get_results_from_cm(cm)
 
                 #write into the results the number of the executed experiment
+                filename = os.path.join(subfolder, opt.result_file_name)
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-                with open(os.path.join(subfolder, opt.result_file_name), 'w') as f:
+                with open(filename, 'w') as f:
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
                 
             except Exception as e:
                 print(f"Experiment {subfolder_name} failed to execute")
                 experiment_results["failed"] = True
-                with open(os.path.join(subfolder, opt.result_file_name), 'w') as f:
+                filename = os.path.join(subfolder, opt.result_file_name)
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
+                with open(filename, 'w') as f:
                     json.dump(experiment_results, f,ensure_ascii=False,indent=4)
                 continue
         #delete temp folder

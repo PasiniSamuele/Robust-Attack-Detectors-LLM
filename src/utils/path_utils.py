@@ -5,7 +5,7 @@ def from_file_to_name(file)->str:
     return file.split('/')[-1].split('.')[0]
 
 def get_subfolders(experiment_folder:str)->list:
-    return [f.path for f in os.scandir(experiment_folder) if f.is_dir()]
+    return [f.path for f in os.scandir(experiment_folder) if (f.is_dir() and f.path.split('/')[-1].startswith('exp'))]
 
 def get_experiment_folder(base_folder:str,
                           task:str,
