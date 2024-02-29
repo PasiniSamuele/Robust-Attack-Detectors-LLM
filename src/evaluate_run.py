@@ -66,7 +66,7 @@ def evaluate_run(opt):
 
         if opt.summarize_results:
             single_results = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
-            summarized_results = summarize_results(single_results, opt.top_n_metric, opt.top_n)            
+            summarized_results = summarize_results(single_results, opt.top_k_metric, opt.top_k)            
             with open(os.path.join(run_path, opt.result_file_name), 'w') as f:
                     json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
 
@@ -84,8 +84,8 @@ def add_parse_arguments(parser):
     parser.add_argument('--summarize_results', type=bool, default=True, help='if true, the results for every experiment in the run will be summarized in a file')
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
     parser.add_argument('--create_confusion_matrix', type=bool, default=True, help='if true, for every experiment it generates a confusion matrix')
-    parser.add_argument('--top_n_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
-    parser.add_argument('--top_n', type=int, action='append', help='top_n value to be considered for the top_n_metric, you can append more than one')
+    parser.add_argument('--top_k_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
+    parser.add_argument('--top_k', type=int, action='append', help='top_k value to be considered for the top_k_metric, you can append more than one')
 
 
 

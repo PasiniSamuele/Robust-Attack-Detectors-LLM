@@ -61,20 +61,20 @@ def average_metric(single_results:list, metric:str)->Tuple[float, float, float]:
     var = np.var(list(map(lambda x: x["results"][metric], single_results))) if len(single_results) > 0 else 0
     return avg, std, var
 
-def get_top_n_results(exps):
-        top_n_results = dict()
-        #write the top_n experiments names
-        top_n_results["experiments"] = list(map(lambda x: x["experiment"], exps))
+def get_top_k_results(exps):
+        top_k_results = dict()
+        #write the top_k experiments names
+        top_k_results["experiments"] = list(map(lambda x: x["experiment"], exps))
         #calculate avg, std and var for each metric
-        top_n_results["accuracy"], top_n_results["accuracy_std"], top_n_results["accuracy_var"] = average_metric(exps, "accuracy")
-        top_n_results["precision"], top_n_results["precision_std"], top_n_results["precision_var"] = average_metric(exps, "precision")
-        top_n_results["recall"], top_n_results["recall_std"], top_n_results["recall_var"] = average_metric(exps, "recall")
-        top_n_results["f1"], top_n_results["f1_std"], top_n_results["f1_var"] = average_metric(exps, "f1")
-        return top_n_results
+        top_k_results["accuracy"], top_k_results["accuracy_std"], top_k_results["accuracy_var"] = average_metric(exps, "accuracy")
+        top_k_results["precision"], top_k_results["precision_std"], top_k_results["precision_var"] = average_metric(exps, "precision")
+        top_k_results["recall"], top_k_results["recall_std"], top_k_results["recall_var"] = average_metric(exps, "recall")
+        top_k_results["f1"], top_k_results["f1_std"], top_k_results["f1_var"] = average_metric(exps, "f1")
+        return top_k_results
 
 def summarize_results(single_results:list,
-                      top_n_metric:str = "accuracy",
-                      top_n:list = [1,3,5,10,15])->dict:
+                      top_k_metric:str = "accuracy",
+                      top_k:list = [1,3,5,10,15])->dict:
     results = dict()
 
     #filter out the failed experiments
@@ -94,12 +94,12 @@ def summarize_results(single_results:list,
     results["precision"], results["precision_std"], results["precision_var"] = average_metric(successful_experiments, "precision")
     results["recall"], results["recall_std"], results["recall_var"] = average_metric(successful_experiments, "recall")
     results["f1"], results["f1_std"], results["f1_var"] = average_metric(successful_experiments, "f1")
-    for top in top_n:
+    for top in top_k:
         if top > len(successful_experiments):
             continue
-        #keep only the top n experiments based on the top_n_metric
-        exps = sorted(successful_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
-        results[f"top_{top}"] = get_top_n_results(exps)
+        #keep only the top n experiments based on the top_k_metric
+        exps = sorted(successful_experiments, key=lambda x: x["results"][top_k_metric], reverse=True)[:top]
+        results[f"top_{top}"] = get_top_k_results(exps)
     return results
 
 def get_results_from_name(experiments, names):
@@ -118,24 +118,29 @@ def list_distance(A, B):
 
 def get_results_from_synthetic(synthetic_experiments:list,
                                 experiments:list,
-                                top_n_metric:str = "accuracy",
-                                top_n:list = [1,3,5,10,15])->dict:
+                                top_k_metric:str = "accuracy",
+                                top_k:list = [1,3,5,10,15])->dict:
     results = dict()
     successful_experiments = list(filter(lambda x: not x["failed"], experiments))
     successful_syn_experiments = list(filter(lambda x: not x["failed"], synthetic_experiments))
-    top_n.append(min(len(successful_experiments), len(successful_syn_experiments)))
+    top_k.append(min(len(successful_experiments), len(successful_syn_experiments)))
     #print(successful_syn_experiments)
-    for top in top_n:
+    for top in top_k:
         if top > len(successful_experiments) or top > len(successful_syn_experiments):
             continue
-        top_exp_syn = sorted(successful_syn_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
+        top_exp_syn = sorted(successful_syn_experiments, key=lambda x: x["results"][top_k_metric], reverse=True)[:top]
         names = list(map(lambda x: x["experiment"], top_exp_syn))
         exps = get_results_from_name(successful_experiments, names)
-        best_exps = sorted(successful_experiments, key=lambda x: x["results"][top_n_metric], reverse=True)[:top]
-        val_top_n_results = get_top_n_results(best_exps)
+        all_best_exps = sorted(successful_experiments, key=lambda x: x["results"][top_k_metric], reverse=True)
+        best_exps = all_best_exps[:top]
+        val_top_k_results = get_top_k_results(best_exps)
         best_exps_names = list(map(lambda x: x["experiment"], best_exps))
-        results[f"top_{top}"] = get_top_n_results(exps)
+        results[f"top_{top}"] = get_top_k_results(exps)
         results[f"top_{top}"]["distance"] = list_distance(names, best_exps_names)
-        results[f"top_{top}"]["accuracy_diff"] = abs(val_top_n_results["accuracy"] - results[f"top_{top}"]["accuracy"])
+        results[f"top_{top}"]["accuracy_diff"] = abs(val_top_k_results["accuracy"] - results[f"top_{top}"]["accuracy"])
+
+        #find the keys of exps in all_best_exps
+        top_indexes = list(map(lambda x: all_best_exps.index(x), exps))
+        results[f"top_{top}"]["indexes_sum"] = sum(top_indexes)
 
     return results

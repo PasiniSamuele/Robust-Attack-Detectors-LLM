@@ -10,14 +10,14 @@ def generate_analyzed_summaries(opt):
     "temperature",
     "successes",
     ]
-    top_n_parameters_to_keep = [
+    top_k_parameters_to_keep = [
     "accuracy",
     "precision",
     "recall",
     "f1"
     ]
 
-    top_n_values = [1,3,5,10,15]
+    top_k_values = [1,3,5,10,15]
 
     #keep only the rows with seed
     df = df[df["seed"] == opt.seed]
@@ -27,34 +27,34 @@ def generate_analyzed_summaries(opt):
     #analyze zero shot
     df_zero_shot = df[df["generation_mode"] == "zero_shot"]
     #keep only the parameters we are interested in
-    params = parameters_to_keep + top_n_parameters_to_keep
+    params = parameters_to_keep + top_k_parameters_to_keep
     df_zero_shot_total = df_zero_shot[params].copy()
     output = os.path.join(opt.output_folder, "experiments_zero_shot.csv")
     df_zero_shot_total.to_csv(output, index=False)
 
     #analyze zero shot top n values
-    for n in top_n_values:
+    for n in top_k_values:
         output = os.path.join(opt.output_folder, f"experiments_zero_shot_top_{n}.csv")
-        params = parameters_to_keep + list(map(lambda x: f"top_{n}_{x}",top_n_parameters_to_keep))
-        df_zero_shot_top_n = df_zero_shot[params].copy()
-        df_zero_shot_top_n.to_csv(output, index=False)
+        params = parameters_to_keep + list(map(lambda x: f"top_{n}_{x}",top_k_parameters_to_keep))
+        df_zero_shot_top_k = df_zero_shot[params].copy()
+        df_zero_shot_top_k.to_csv(output, index=False)
 
     #analyze few shot
     df_few_shot = df[df["generation_mode"] == "few_shot"]
     examples_values = list(df_few_shot["examples_per_class"].unique())
     for n_examples in examples_values:
         df_few_shot_examples = df_few_shot[df_few_shot["examples_per_class"] == n_examples].copy()
-        params = parameters_to_keep + top_n_parameters_to_keep
+        params = parameters_to_keep + top_k_parameters_to_keep
         df_few_shot_total = df_few_shot_examples[params].copy()
         output = os.path.join(opt.output_folder, f"experiments_few_shot_{n_examples}_examples.csv")
         df_few_shot_total.to_csv(output, index=False)
 
         #analyze few shot top n values
-        for n in top_n_values:
+        for n in top_k_values:
             output = os.path.join(opt.output_folder, f"experiments_few_shot_{n_examples}_examples_top_{n}.csv")
-            params = parameters_to_keep + list(map(lambda x: f"top_{n}_{x}",top_n_parameters_to_keep))
-            df_few_shot_top_n = df_few_shot_examples[params].copy()
-            df_few_shot_top_n.to_csv(output, index=False)
+            params = parameters_to_keep + list(map(lambda x: f"top_{n}_{x}",top_k_parameters_to_keep))
+            df_few_shot_top_k = df_few_shot_examples[params].copy()
+            df_few_shot_top_k.to_csv(output, index=False)
 
 
 

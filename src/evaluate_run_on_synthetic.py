@@ -33,7 +33,7 @@ def evaluate_synth_run(opt):
         exp_folder_in_subfolder = os.path.join(subfolder, exp_folder)
         single_results = list(map(lambda x: json.load(open(os.path.join(exp_folder_in_subfolder, os.path.join(f"exp_{x}",opt.result_file_name)))), range(n_datasets)))
         summarized_results = dict()
-        summarized_results['results'] = summarize_results(single_results, opt.top_n_metric, [])   
+        summarized_results['results'] = summarize_results(single_results, opt.top_k_metric, [])   
         summarized_results['failed'] = True if summarized_results["results"]["successes"] == 0 else False
         summarized_results['experiment'] = subfolder.split('/')[-1]
         with open(os.path.join(exp_folder_in_subfolder, opt.result_file_name), 'w') as f:
@@ -42,17 +42,17 @@ def evaluate_synth_run(opt):
     summarized_results = dict()
 
     single_results_syn = list(map(lambda x: json.load(open(os.path.join(x, os.path.join(exp_folder,opt.result_file_name)))), subfolders))
-    summarized_results_syn = summarize_results(single_results_syn, opt.top_n_metric, opt.top_n)            
+    summarized_results_syn = summarize_results(single_results_syn, opt.top_k_metric, opt.top_k)            
     summarized_results["synthetic_dataset"] = summarized_results_syn
 
     single_results_val = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
-    summarized_results_val = summarize_results(single_results_val, opt.top_n_metric, opt.top_n)  
+    summarized_results_val = summarize_results(single_results_val, opt.top_k_metric, opt.top_k)  
     summarized_results["validation_dataset"] = summarized_results_val
 
-    summarized_results["top_n_metrics"] = get_results_from_synthetic(single_results_syn, 
+    summarized_results["top_k_metrics"] = get_results_from_synthetic(single_results_syn, 
                                                                      single_results_val, 
-                                                                     opt.top_n_metric, 
-                                                                     opt.top_n)
+                                                                     opt.top_k_metric, 
+                                                                     opt.top_k)
     
     summary_dir = os.path.join(opt.run, exp_folder)
     filename = os.path.join(summary_dir, opt.result_file_name)
@@ -72,8 +72,8 @@ def add_parse_arguments(parser):
     #evaluation parameters
     parser.add_argument('--isolated_execution', type=bool, default=False, help='if true, the evaluation will be executed in a separate docker environment')
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
-    parser.add_argument('--top_n_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
-    parser.add_argument('--top_n', type=int, action='append', help='top_n value to be considered for the top_n_metric, you can append more than one')
+    parser.add_argument('--top_k_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
+    parser.add_argument('--top_k', type=int, action='append', help='top_k value to be considered for the top_k_metric, you can append more than one')
 
     return parser
 

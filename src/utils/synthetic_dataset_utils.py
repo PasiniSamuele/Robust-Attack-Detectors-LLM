@@ -39,6 +39,7 @@ def fill_df(chain, prompt_parameters):
             #drop duplicates
             df = df.drop_duplicates()
             #print(df)
+            
             malicious_rows = len(df[df["Class"] == "Malicious"])
             benign_rows = len(df[df["Class"] == "Benign"])
             failures = 0

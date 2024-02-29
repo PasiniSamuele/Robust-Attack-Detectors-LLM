@@ -1,6 +1,6 @@
 outs:
-- md5: aaa8bc964468ce5dd871688245a22663.dir
-  size: 2147
+- md5: 52e8b914c244131509616175873e4264.dir
+  size: 2092
   nfiles: 4
   hash: md5
   path: templates
