@@ -5,16 +5,17 @@ import argparse
 def wrap_row_with_quotes(row):
     #if the row starts and ends with "
     if row[0] == '"' and row[-1] == '"':
-        return row
+        return row[1:-1]
     elif row[0] == "'" and row[-1] == "'":
-        return row
+        return row[1:-1]
     elif '"' in row:
-        print(row)
-        return f"'{row}'"
+        return row
     elif "'" in row:
-        return f'"{row}"'
+        #substitute ' with "
+        row = row.replace("'", '"')
+        return row
     else:
-        return f"'{row}'"
+        return row
 
 def fix_dataset_quotes(opt):
     df = pd.read_csv(opt.data, encoding = "ISO-8859-1")

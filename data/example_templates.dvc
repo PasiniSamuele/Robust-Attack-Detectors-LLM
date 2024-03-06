@@ -1,6 +1,6 @@
 outs:
-- md5: 52f83301b5f4b0c60061c6e3ef5f23e9.dir
-  size: 69
+- md5: fa999b062b12cbf0fe6c2929ac315d5c.dir
+  size: 71
   nfiles: 2
   hash: md5
   path: example_templates

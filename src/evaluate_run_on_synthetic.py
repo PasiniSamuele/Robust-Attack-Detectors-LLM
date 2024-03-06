@@ -1,7 +1,7 @@
 from utils.utils import init_argument_parser, NpEncoder
 from argparse import Namespace
 import json
-from utils.path_utils import get_experiment_folder, from_file_to_name, get_subfolders
+from utils.path_utils import get_experiment_folder, from_file_to_name, get_exp_subfolders
 import os
 from evaluate_run import evaluate_run
 from utils.evaluation_utils import summarize_results, get_results_from_synthetic
@@ -28,7 +28,7 @@ def evaluate_synth_run(opt):
         evaluation_namespace.create_confusion_matrix = False
         evaluation_namespace.summarize_results = False
         evaluate_run(evaluation_namespace)
-    subfolders = get_subfolders(opt.run)
+    subfolders = get_exp_subfolders(opt.run)
     for i, subfolder in enumerate(subfolders):
         exp_folder_in_subfolder = os.path.join(subfolder, exp_folder)
         single_results = list(map(lambda x: json.load(open(os.path.join(exp_folder_in_subfolder, os.path.join(f"exp_{x}",opt.result_file_name)))), range(n_datasets)))

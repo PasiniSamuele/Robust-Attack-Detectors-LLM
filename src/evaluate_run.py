@@ -1,5 +1,5 @@
 from utils.utils import init_argument_parser, NpEncoder
-from utils.path_utils import get_last_run, get_subfolders
+from utils.path_utils import get_last_run, get_exp_subfolders
 from utils.evaluation_utils import create_confusion_matrix, save_confusion_matrix, get_results_from_cm, summarize_results
 import pandas as pd
 import os
@@ -19,7 +19,7 @@ def evaluate_run(opt):
     if opt.isolated_execution:
         raise NotImplementedError('Isolated execution is not implemented yet')
     else:
-        subfolders = get_subfolders(run_path)
+        subfolders = get_exp_subfolders(run_path)
         for i, subfolder in enumerate(subfolders):
             experiment_results = {
                 "failed": False,
