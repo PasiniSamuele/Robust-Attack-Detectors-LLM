@@ -49,14 +49,14 @@ stages:
       md5: ecfaf7d7df5d43f7e2b6612dfc1862a0
       size: 2111125
   dataset_trainval_test_split:
-    cmd: python src/dataset_split.py --data data/filtered.csv --dest_train data/trainval.csv
-      --dest_test data/test.csv --split_arguments dataset_trainval_test_split --params
-      params.yaml
+    cmd: python src/dataset_split.py --data data/filtered_oracle.csv --dest_train
+      data/trainval.csv --dest_test data/test.csv --split_arguments dataset_trainval_test_split
+      --params params.yaml
     deps:
-    - path: data/filtered.csv
+    - path: data/filtered_oracle.csv
       hash: md5
-      md5: 2fc675ff5189b179493acdceeabac0ac
-      size: 4228007
+      md5: f246c824a0660b1bfd8b883e33175c3c
+      size: 4161460
     - path: src/dataset_split.py
       hash: md5
       md5: c571c3fa613cc9e7fff9d96b40629a6d
@@ -68,12 +68,12 @@ stages:
     outs:
     - path: data/test.csv
       hash: md5
-      md5: dc5a8a1a8ee2e39f1dc1398d8353fd25
-      size: 838801
+      md5: 0445c93403cd252730286e038c4c5168
+      size: 836383
     - path: data/trainval.csv
       hash: md5
-      md5: a7ed92a62625648df212013212a94fe1
-      size: 3389221
+      md5: 8bc069cf10d032e3116bef35875c67b7
+      size: 3325092
   dataset_train_val_split:
     cmd: python src/dataset_split.py --data data/trainval.csv --dest_train data/train.csv
       --dest_test data/val.csv --split_arguments dataset_train_val_split --params
@@ -81,8 +81,8 @@ stages:
     deps:
     - path: data/trainval.csv
       hash: md5
-      md5: a7ed92a62625648df212013212a94fe1
-      size: 3389221
+      md5: 8bc069cf10d032e3116bef35875c67b7
+      size: 3325092
     - path: src/dataset_split.py
       hash: md5
       md5: c571c3fa613cc9e7fff9d96b40629a6d
@@ -90,16 +90,16 @@ stages:
     params:
       params.yaml:
         dataset_train_val_split:
-          train_size: 0.5
+          train_size: 0.8
     outs:
     - path: data/train.csv
       hash: md5
-      md5: 4d662e8151248357e7ddbe1aa8fa0b85
-      size: 1693928
+      md5: 6f5b7be3ce9a53f3aa1112f83bd59027
+      size: 2660843
     - path: data/val.csv
       hash: md5
-      md5: 434b53d54c13886b212481287ab8a2c1
-      size: 1695308
+      md5: 5bbc22c5ce978ef9cc6713b5bb8b5535
+      size: 664264
   uniform_dataset:
     cmd: python src/uniform_dataset.py --data data/payload_quoted.csv --dest data/payload_sqli.csv
       --params params.yaml
@@ -170,16 +170,16 @@ stages:
     params:
       params.yaml:
         dataset_train_val_split:
-          train_size: 0.5
+          train_size: 0.8
     outs:
     - path: data/train_sqli.csv
       hash: md5
-      md5: 6e8c37c5f9ed298f652578b50e12c01c
-      size: 106611
+      md5: 69d43acee87aaf934a08ac2a3845bb83
+      size: 169419
     - path: data/val_sqli.csv
       hash: md5
-      md5: dc8467a0c737a16f700c1ecd5065b708
-      size: 105197
+      md5: ba0dfcb8f031f0c32940ebc443b15915
+      size: 42389
   fix_dataset_quotes:
     cmd: python src/fix_dataset_quotes.py --data data/payload_mixed.csv --dest data/payload_quoted.csv
     deps:
@@ -196,3 +196,20 @@ stages:
       hash: md5
       md5: 6686470fd159a686d6fd17d3c08961b0
       size: 764421
+  filter_dataset_with_oracle:
+    cmd: python src/filter_xss_with_oracle.py --data data/filtered.csv --dest data/filtered_oracle.csv
+      --endpoint http://127.0.0.1:5555/vuln_backend/1.0/endpoint/
+    deps:
+    - path: data/filtered.csv
+      hash: md5
+      md5: 2fc675ff5189b179493acdceeabac0ac
+      size: 4228007
+    - path: src/filter_xss_with_oracle.py
+      hash: md5
+      md5: 885b270bc22a115859a5f62999b48a61
+      size: 1347
+    outs:
+    - path: data/filtered_oracle.csv
+      hash: md5
+      md5: f246c824a0660b1bfd8b883e33175c3c
+      size: 4161460

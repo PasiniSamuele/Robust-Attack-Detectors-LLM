@@ -30,6 +30,8 @@ frontend = "^0.0.3"
 pymupdf = "^1.23.8"
 langchainhub = "^0.1.14"
 levenshtein = "^0.25.0"
+requests = "^2.31.0"
+zss = "^1.2.0"
 
 
 [tool.poetry.group.dev.dependencies]

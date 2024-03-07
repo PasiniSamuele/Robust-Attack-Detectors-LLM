@@ -5,7 +5,7 @@ filter_dataset:
 dataset_trainval_test_split:
   train_size: 0.8
 dataset_train_val_split:
-  train_size: 0.5
+  train_size: 0.8
 uniform_sqli:
   payload_column: payload
   label_column: attack_type
