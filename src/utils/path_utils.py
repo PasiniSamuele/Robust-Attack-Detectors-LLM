@@ -1,5 +1,6 @@
 import os
 import json
+import re
 
 def from_file_to_name(file)->str:
     return file.split('/')[-1].split('.')[0]
@@ -9,6 +10,9 @@ def get_exp_subfolders(experiment_folder:str)->list:
 
 def get_subfolders(experiment_folder:str)->list:
     return [f.path for f in os.scandir(experiment_folder) if f.is_dir()]
+
+def get_not_exp_subfolders(experiment_folder:str)->list:
+    return [f.path for f in os.scandir(experiment_folder) if (f.is_dir() and not f.path.split('/')[-1].startswith('exp'))]
 
 def get_experiment_folder(base_folder:str,
                           task:str,
@@ -93,18 +97,44 @@ def create_folder_for_experiment(opt)->str:
 def folder_exists_and_not_empty(folder:str)->bool:
     return os.path.isdir(folder) and os.listdir(folder)
 
-def from_folder_to_accuracy_list(folder:str)->list:
+def from_folder_to_accuracy_list(folder:str, top_k_list = None)->list:
     #find all the subfolder in folder:
     subfolders = [f.path for f in os.scandir(folder) if f.is_dir() ]
+    #keep only subfolder starting with exp_
+    
+    subfolders = list(filter(lambda x: x.split('/')[-1].startswith('exp_'), subfolders))
     #map subfolder to the dict conteined in results.json file
     results = []
+    if top_k_list:
+        #filter subfolders keeping only the ones where the last folder is in the list
+        subfolders = list(filter(lambda x: x.split('/')[-1] in top_k_list, subfolders))
     for subfolder in subfolders:
         with open(os.path.join(subfolder, 'results.json')) as f:
             results.append(json.load(f))
-    #keep only the results where failed is False
+
     results = [r for r in results if not r['failed']]
     #map results to accuracy
     results = [r['results']['accuracy'] for r in results]
+    return results
+
+def from_folder_to_accuracy_std_list(folder:str, top_k_list = None)->list:
+    #find all the subfolder in folder:
+    subfolders = [f.path for f in os.scandir(folder) if f.is_dir() ]
+    #keep only subfolder starting with exp_
+    
+    subfolders = list(filter(lambda x: x.split('/')[-1].startswith('exp_'), subfolders))
+    #map subfolder to the dict conteined in results.json file
+    results = []
+    if top_k_list:
+        #filter subfolders keeping only the ones where the last folder is in the list
+        subfolders = list(filter(lambda x: x.split('/')[-1] in top_k_list, subfolders))
+    for subfolder in subfolders:
+        with open(os.path.join(subfolder, 'results.json')) as f:
+            results.append(json.load(f))
+
+    results = [r for r in results if not r['failed']]
+    #map results to accuracy
+    results = [r['results']['accuracy_std'] for r in results]
     return results
 
 def from_folder_to_success(folder:str)->list:
@@ -113,3 +143,91 @@ def from_folder_to_success(folder:str)->list:
         data = json.load(f)
     success_rate = data['successes']/data['total']
     return success_rate
+
+def from_folder_to_top_k(folder:str, synthetic_dataset:str)->list:
+    with open(folder+synthetic_dataset) as f:
+        data = json.load(f)
+    elements =  data['top_k_metrics'].keys()
+    #keep only elements starting with top_
+    elements = list(filter(lambda x: x.startswith('top_'), elements))
+    return elements
+    
+def from_folder_to_subsets(folder:str, synthetic_dataset:str)->list:
+    with open(folder+synthetic_dataset) as f:
+        data = json.load(f)
+    return data['top_k_metrics']["subsets"].keys()
+
+def from_folder_to_top_k_experiments(folder:str, synthetic_dataset:str, top_k_metric:str)->list:
+    with open(folder+synthetic_dataset) as f:
+        data = json.load(f)
+        return data['top_k_metrics'][top_k_metric]["experiments"]
+    
+def from_folder_to_top_k_subset_experiments(folder:str, synthetic_dataset:str, top_k_metric:str, subset:str)->list:
+    with open(folder+synthetic_dataset) as f:
+        data = json.load(f)
+        return data['top_k_metrics']["subsets"][subset][top_k_metric]["experiments"]
+
+def loadFile_recursive(ext,path=os.getcwd()):
+    
+
+    cfiles = []
+    for root, dirs, files in os.walk(path):
+      for file in files:
+        #print(file)
+        for i in ext:
+            if file.endswith(i):
+                cfiles.append(os.path.join(root, file))
+    #print(cfiles)
+    
+    #for i in range(0, len(cfiles)):
+    #    print(cfiles[i])
+    
+    return cfiles
+
+def get_list_of_synth_results(folder, synthetic_datasets_folder):
+    results_files = loadFile_recursive(['.json'], os.path.join(folder,synthetic_datasets_folder))
+    #keep only the folder removing file
+
+    #keep only the relative part starting from folder on
+    results_files = list(map(lambda x: x.split(folder)[1], results_files))
+    return results_files
+
+def from_folder_to_top_k_accuracy_std(folder:str, synthetic_dataset:str, top_k_list = None):
+     #find all the subfolder in folder:
+    subfolders = [f.path for f in os.scandir(folder) if f.is_dir()]
+    #keep only subfolder starting with exp_
+    subfolders = list(filter(lambda x: x.split('/')[-1].startswith('exp_'), subfolders))
+    #map subfolder to the dict conteined in results.json file
+    results = []
+    if top_k_list:
+        #filter subfolders keeping only the ones where the last folder is in the list
+        subfolders = list(filter(lambda x: x.split('/')[-1] in top_k_list, subfolders))
+    for subfolder in subfolders:
+        with open(os.path.join(subfolder + synthetic_dataset, 'results.json')) as f:
+            results.append(json.load(f))
+
+    results = [r for r in results if not r['failed']]
+    #map results to accuracy
+    results = [r['results']['accuracy_std'] for r in results]
+
+    return results
+
+def from_folder_to_top_k_subset__accuracy_std(folder:str, synthetic_dataset:str, subset:str, top_k_list = None):
+     #find all the subfolder in folder:
+    subfolders = [f.path for f in os.scandir(folder) if f.is_dir()]
+    #keep only subfolder starting with exp_
+    subfolders = list(filter(lambda x: x.split('/')[-1].startswith('exp_'), subfolders))
+    #map subfolder to the dict conteined in results.json file
+    results = []
+    if top_k_list:
+        #filter subfolders keeping only the ones where the last folder is in the list
+        subfolders = list(filter(lambda x: x.split('/')[-1] in top_k_list, subfolders))
+    for subfolder in subfolders:
+        with open(os.path.join(subfolder + synthetic_dataset, 'results.json')) as f:
+            results.append(json.load(f))
+
+    results = [r for r in results if not r['failed']]
+    #map results to accuracy
+    results = [r['subsets'][subset]['results']['accuracy_std'] for r in results]
+
+    return results

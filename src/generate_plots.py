@@ -2,10 +2,14 @@ import pandas as pd
 import seaborn as sns
 import os
 import matplotlib.pyplot as plt
-from utils.path_utils import from_folder_to_accuracy_list, from_folder_to_success
+from utils.path_utils import from_folder_to_accuracy_list,from_folder_to_top_k_accuracy_std, from_folder_to_top_k_subset__accuracy_std,from_folder_to_top_k_subset_experiments, from_folder_to_subsets, from_folder_to_success,from_folder_to_top_k_experiments, get_list_of_synth_results, from_folder_to_top_k
 from utils.utils import init_argument_parser
-from utils.plot_utils import generate_plot, generate_plots_config
+from utils.plot_utils import generate_plot, generate_plots_config, model_temperature_plots
+import warnings
+import json
+from ruamel.yaml import YAML
 
+warnings.filterwarnings("ignore")
 
 def generate_plots(opt): 
     sns.color_palette("hls", 8)
@@ -16,9 +20,23 @@ def generate_plots(opt):
     df['generation_mode'] = df['generation_mode'].replace('rag_few_shot', 'rag')
     df['generation_mode'] = df['generation_mode'].replace('zero_shot', 'no_rag')
     df['generation_mode'] = df['generation_mode'].replace('few_shot', 'no_rag')
+    basic_columns = ['model_name', 'temperature', 'generation_mode','examples_per_class', 'folder']
+    df = df[basic_columns]
 
-    df = df[['model_name', 'temperature', 'generation_mode','examples_per_class', 'folder']]
+    df["synthetic_dataset"] = df["folder"].map(lambda x: get_list_of_synth_results(x, opt.synthetic_datasets_folder))
 
+    #obtain a set of all the synthetic datasets
+    synthetic_datasets = set()
+    for dataset in df["synthetic_dataset"]:
+        synthetic_datasets.update(dataset)
+    
+    #create a column for each synthetic dataset that is True if this dataset is present in the list and False otherwise
+    for dataset in synthetic_datasets:
+        df[dataset] = df["synthetic_dataset"].map(lambda x: dataset in x)
+    #drop the synthetic_dataset column
+    df = df.drop(columns = ["synthetic_dataset"])
+    #transform synthetic datasets in list
+    synthetic_datasets = list(synthetic_datasets)
     df['accuracy'] = df['folder'].map(from_folder_to_accuracy_list)
     df['success'] = df['folder'].map(from_folder_to_success)
 
@@ -31,19 +49,53 @@ def generate_plots(opt):
     plot_configs = generate_plots_config(opt)
     if opt.model_temperature_plots:
         for model_temperature in df["model_temperature"].unique():
-            save_dir = os.path.join(opt.plots_folder, model_temperature)
-            os.makedirs(save_dir, exist_ok=True)
-            df_sub = df[df["model_temperature"] == model_temperature]
-            hue_order = df.groupby('examples_per_class')["examples_per_class"].first().sort_values().index
+            print(f"Model: {model_temperature}")
+            model_temperature_plots(df, opt.plots_folder, model_temperature, plot_configs)
+            for dataset in synthetic_datasets:
+                print(f"Synthetic Dataset: {dataset}")
 
-            for plot_config in plot_configs:
-                generate_plot(**plot_config.model_dump(exclude_none = True), 
-                              df = df_sub, 
-                              save_dir = save_dir, 
-                              legend = "full", 
-                              title = model_temperature, 
-                              hue = "examples_per_class",
-                              hue_order = hue_order)
+                df_dataset = df[df[dataset] == True]
+                #drop duplicates considering model_temperature, generation_mode and examples_per_class
+                df_dataset = df_dataset.drop_duplicates(subset = ["model_temperature", "generation_mode", "examples_per_class"])
+
+                #open json file corresponding to the dataset in the folder and get top_k indexes, and top_k experiments
+                df_dataset['top_k_metrics'] = df_dataset['folder'].map(lambda x: from_folder_to_top_k(x, dataset))
+                top_ks_metrics = set()
+                for metric in df_dataset["top_k_metrics"]:
+                    top_ks_metrics.update(metric)
+                df_dataset = df_dataset.drop(columns = ["top_k_metrics"])
+
+                for top_k_metric in top_ks_metrics:
+                    df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_experiments(x, dataset, top_k_metric))
+                    print(f"Top K: {top_k_metric}")
+                    df_dataset_top_k = df_dataset.copy()
+                    df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
+                    df_dataset_top_k = df_dataset_top_k.explode('accuracy')
+                    df_dataset_top_k.to_csv("df_dataset_top_k.csv")
+                    
+                    #df_dataset = df_dataset.reset_index(drop=False)
+                    #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
+                    model_temperature_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,top_k_metric), model_temperature, plot_configs)
+                    sdfsd
+                df_dataset['subsets'] = df_dataset['folder'].map(lambda x: from_folder_to_subsets(x, dataset))
+                subsets = set()
+                for subset in df_dataset["subsets"]:
+                    subsets.update(subset)
+                df_dataset = df_dataset.drop(columns = ["subsets"])
+                for subset in subsets:
+                    print(f"Subset: {subset}")
+                    for top_k_metric in top_ks_metrics:
+                        print(f"Top K: {top_k_metric}")
+                        df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_subset_experiments(x, dataset, top_k_metric, subset))
+                    
+                        df_dataset_top_k = df_dataset.copy()
+                        df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
+                        df_dataset_top_k = df_dataset_top_k.explode('accuracy')
+                        #df_dataset = df_dataset.reset_index(drop=False)
+                        #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
+                        model_temperature_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,"subsets",subset,top_k_metric), model_temperature, plot_configs)
+            
+
 
     if opt.n_examples_plots:
         for n_examples in df["examples_per_class"].unique():
@@ -73,8 +125,11 @@ def add_parse_arguments(parser):
 
     #group parameters
     parser.add_argument('--model_temperature_plots', type=bool, default=True, help='Generate plots grouped by model and temperature')
-    parser.add_argument('--n_examples_plots', type=bool, default=True, help='Generate plots grouped by number of examples per class')
+    parser.add_argument('--n_examples_plots', type=bool, default=False, help='Generate plots grouped by number of examples per class')
 
+    #synthetic datasets parameter
+    parser.add_argument('--synthetic_datasets_folder', type=str, default='synthetic_results', help='Path with synthetic datasets')
+    parser.add_argument('--synthetic_dataset_root', type=str, default='data/synthetic_datasets', help='Root containing synthetic dataset csv')
     return parser
     
 

@@ -85,7 +85,7 @@ def generate_code_snippets(opt, env):
             i = i + 1
             failures = 0
         except Exception as e:
-            #print(e)
+            print(e)
             print("Experiment failed, try again")
             failures = failures + 1
             if failures > 10:

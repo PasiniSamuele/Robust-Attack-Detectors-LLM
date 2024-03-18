@@ -1,15 +1,53 @@
-from utils.utils import init_argument_parser, NpEncoder
+
+from pyparsing import Opt
+from torch import exp_
+from utils.utils import init_argument_parser
 from argparse import Namespace
 import json
-from utils.path_utils import get_experiment_folder, from_file_to_name, get_exp_subfolders
+from utils.path_utils import get_experiment_folder, from_file_to_name, get_exp_subfolders, get_subfolders
 import os
+from utils.evaluation_utils import summarize_synth_results
 from evaluate_run import evaluate_run
-from utils.evaluation_utils import summarize_results, get_results_from_synthetic
+from utils.plot_utils import experiment_std_synth_plot, experiment_acc_diff_synth_plot
+from utils.synthetic_dataset_utils import get_df_metrics
+from ruamel.yaml import YAML
+
+def synth_eval_run(dataset:int,
+                   exp_folder:str, 
+                   opt:Namespace,
+                   result_file_name:str,
+                   subset:int=None)->None:
+        opt.data = os.path.join(opt.dataset_folder, subset or "", f"exp_{dataset}.csv")
+
+        exp_folder_single_dataset = os.path.join(exp_folder, subset or "",f"exp_{dataset}")
+        opt.result_file_name = os.path.join(exp_folder_single_dataset, result_file_name)
+
+        opt.create_confusion_matrix = False
+        opt.summarize_results = False
+        evaluate_run(opt)
+
+def evalaute_synth_dataset(n_datasets:str,
+                           exp_folder:str,
+                           opt:Namespace)->None:
+    result_file_name = opt.result_file_name
+    for i in range(n_datasets):
+        synth_eval_run(i, exp_folder, opt, result_file_name)
+        #find all subfolders in opt.dataset_folders
+        subset_folders = get_subfolders(opt.dataset_folder)
+        #keep only last folder name
+        subset_folders = [f.split("/")[-1] for f in subset_folders]
+        for subfolder in subset_folders:
+            synth_eval_run(i, exp_folder, opt, result_file_name, subfolder)
 
 def evaluate_synth_run(opt):
     #open parameters file
     with open(f"{opt.dataset_folder}/{opt.parameters_file_name}") as f:
         parameters = json.load(f)
+    prompt_parameters = parameters["prompt_parameters"]
+    with open(prompt_parameters) as f:
+        yaml = YAML(typ="safe")
+        params = yaml.load(f) 
+    dataset_size = params["rows"]
     evaluation_namespace = Namespace(**vars(opt))
     n_datasets = parameters["experiments"]
     exp_folder = get_experiment_folder(opt.evaluation_folder,
@@ -21,49 +59,22 @@ def evaluate_synth_run(opt):
                                             parameters["examples_per_class"],
                                             parameters["temperature"],
                                             parameters["seed"])
-    for i in range(n_datasets):
-        evaluation_namespace.data = f"{opt.dataset_folder}/exp_{i}.csv"
-        exp_folder_single_dataset = os.path.join(exp_folder, f"exp_{i}")
-        evaluation_namespace.result_file_name = os.path.join(exp_folder_single_dataset, opt.result_file_name)
-        evaluation_namespace.create_confusion_matrix = False
-        evaluation_namespace.summarize_results = False
-        evaluate_run(evaluation_namespace)
+    evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
+
     subfolders = get_exp_subfolders(opt.run)
-    for i, subfolder in enumerate(subfolders):
-        exp_folder_in_subfolder = os.path.join(subfolder, exp_folder)
-        single_results = list(map(lambda x: json.load(open(os.path.join(exp_folder_in_subfolder, os.path.join(f"exp_{x}",opt.result_file_name)))), range(n_datasets)))
-        summarized_results = dict()
-        summarized_results['results'] = summarize_results(single_results, opt.top_k_metric, [])   
-        summarized_results['failed'] = True if summarized_results["results"]["successes"] == 0 else False
-        summarized_results['experiment'] = subfolder.split('/')[-1]
-        with open(os.path.join(exp_folder_in_subfolder, opt.result_file_name), 'w') as f:
-            json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
+    summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
 
-    summarized_results = dict()
-
-    single_results_syn = list(map(lambda x: json.load(open(os.path.join(x, os.path.join(exp_folder,opt.result_file_name)))), subfolders))
-    summarized_results_syn = summarize_results(single_results_syn, opt.top_k_metric, opt.top_k)            
-    summarized_results["synthetic_dataset"] = summarized_results_syn
-
-    single_results_val = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
-    summarized_results_val = summarize_results(single_results_val, opt.top_k_metric, opt.top_k)  
-    summarized_results["validation_dataset"] = summarized_results_val
-
-    summarized_results["top_k_metrics"] = get_results_from_synthetic(single_results_syn, 
-                                                                     single_results_val, 
-                                                                     opt.top_k_metric, 
-                                                                     opt.top_k)
-    
     summary_dir = os.path.join(opt.run, exp_folder)
-    filename = os.path.join(summary_dir, opt.result_file_name)
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    with open(filename, 'w') as f:
-        json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
+
+    if opt.plot:
+        df_metrics = get_df_metrics(summarized_results, opt.top_k, dataset_size)
+        experiment_std_synth_plot(df_metrics, summary_dir)
+        experiment_acc_diff_synth_plot(df_metrics, summary_dir)
 
 def add_parse_arguments(parser):
     #run parameters
     parser.add_argument('--run', type=str, required=True, help='Run to be evaluated')
-    parser.add_argument('--dataset_folder', type=str, default='data/synthetic_datasets/run_0', help='synthetic dataset folder')
+    parser.add_argument('--dataset_folder', type=str, default='data/synthetic_datasets/task_detect_xss_simple_prompt/template_create_synthetic_dataset/prompt_parameters_medium_dataset/model_gpt-4-0125-preview/generation_mode_few_shot/n_few_shot_5/temperature_1.0/seed_156/run_0', help='synthetic dataset folder')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='parameters file name of the synthetic dataset')
     parser.add_argument('--function_name', type=str, default='detect_xss', help='name of the generated function to be executed for evaluation')
     parser.add_argument('--evaluation_folder', type=str, default='synthetic_results', help='synthetic dataset folder')
@@ -75,6 +86,8 @@ def add_parse_arguments(parser):
     parser.add_argument('--top_k_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
     parser.add_argument('--top_k', type=int, action='append', help='top_k value to be considered for the top_k_metric, you can append more than one')
 
+    #plot parameters
+    parser.add_argument('--plot', type=bool, default=True, help='if true, the plots will be generated')
     return parser
 
 def main():

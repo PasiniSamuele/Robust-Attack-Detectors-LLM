@@ -2,7 +2,7 @@ from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
 from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file, save_input_prompt_file, is_valid_url
 from utils.path_utils import create_folder_for_experiment, folder_exists_and_not_empty
-from utils.synthetic_dataset_utils import XSS_dataset, fill_df
+from utils.synthetic_dataset_utils import XSS_dataset, fill_df, save_subset_of_df
 from dotenv import dotenv_values
 from langchain.prompts import (
     SystemMessagePromptTemplate,
@@ -89,6 +89,8 @@ def generate_synthetic_dataset(opt, env):
             df= fill_df(chain, prompt_parameters)
             save_file = os.path.join(experiment_folder, f"exp_{i}.csv")
             df.to_csv(save_file, index=False)
+            for s in opt.subset:
+                save_subset_of_df(save_file, s)
             i = i + 1
             failures = 0
         except Exception as e:
@@ -120,7 +122,7 @@ def add_parse_arguments(parser):
     parser.add_argument('--experiments', type=int, default=5, help= 'number of experiments to run')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the parameters file')
     parser.add_argument('--input_prompt_file_name', type=str, default='prompt.txt', help='name of the input prompt file')
-
+    parser.add_argument('--subset', type=int, action = 'append', help='subset of the experiments to run')
 
     #hf parameters
     parser.add_argument('--hf_max_new_tokens', type=int, default=400, help='max new tokens for hf model')

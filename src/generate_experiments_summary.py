@@ -49,6 +49,9 @@ def generate_experiments_summary(opt):
         results_dicts.append(results_dict)
     #convert the list of dictionaries to a dataframe
     df = pd.DataFrame(results_dicts)
+
+    #filter the dataframe using template
+    df = df[df['template'] == opt.template]
     #save the dataframe to a csv
     df.to_csv(os.path.join(opt.experiments_root_folder,opt.output_file))
 
@@ -59,6 +62,7 @@ def add_parse_arguments(parser):
     parser.add_argument('--tail_folder', type=str, default='run_', help='tail folder of the experiments')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the file containing the parameters')
     parser.add_argument('--results_file_name', type=str, default='results.json', help='name of the file containing the results')
+    parser.add_argument('--template', type=str, default='data/templates/create_function_readable.yaml', help='template file')
 
     parser.add_argument('--output_file', type=str, default='experiments_summary.csv', help='name of the file containing the summary of the experiments')
 
