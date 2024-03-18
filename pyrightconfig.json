@@ -1,0 +1,11 @@
+    {"exclude": [
+        "**/.git/objects/**",
+        "**/.git/subtree-cache/**",
+        "**/node_modules/*/**",
+        "**/.hg/store/**",
+        "**/.venv/**",
+        "**/experiments/**",
+        "**/plots/**",
+
+    ]
+}
