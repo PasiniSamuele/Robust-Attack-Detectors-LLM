@@ -3,7 +3,6 @@ from utils.path_utils import get_last_run, get_exp_subfolders
 from utils.evaluation_utils import create_confusion_matrix, save_confusion_matrix, get_results_from_cm, summarize_results
 import pandas as pd
 import os
-import shutil
 import json
 import importlib
 import importlib.util 
@@ -55,6 +54,7 @@ def evaluate_run(opt):
                 
             except Exception as e:
                 print(f"Experiment {subfolder_name} failed to execute")
+
                 experiment_results["failed"] = True
                 filename = os.path.join(subfolder, opt.result_file_name)
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -66,7 +66,7 @@ def evaluate_run(opt):
 
         if opt.summarize_results:
             single_results = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
-            summarized_results = summarize_results(single_results, opt.top_k_metric, opt.top_k)            
+            summarized_results = summarize_results(single_results, opt.top_k_metric, opt.top_k if opt.top_k else [])            
             with open(os.path.join(run_path, opt.result_file_name), 'w') as f:
                     json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
 

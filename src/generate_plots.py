@@ -1,13 +1,10 @@
 import pandas as pd
 import seaborn as sns
 import os
-import matplotlib.pyplot as plt
-from utils.path_utils import from_folder_to_accuracy_list,from_folder_to_top_k_accuracy_std, from_folder_to_top_k_subset__accuracy_std,from_folder_to_top_k_subset_experiments, from_folder_to_subsets, from_folder_to_success,from_folder_to_top_k_experiments, get_list_of_synth_results, from_folder_to_top_k
+from utils.path_utils import from_folder_to_accuracy_list,from_folder_to_top_k_subset_experiments, from_folder_to_subsets, from_folder_to_success,from_folder_to_top_k_experiments, get_list_of_synth_results, from_folder_to_top_k
 from utils.utils import init_argument_parser
 from utils.plot_utils import generate_plot, generate_plots_config, model_temperature_plots
 import warnings
-import json
-from ruamel.yaml import YAML
 
 warnings.filterwarnings("ignore")
 
@@ -76,7 +73,6 @@ def generate_plots(opt):
                     #df_dataset = df_dataset.reset_index(drop=False)
                     #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
                     model_temperature_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,top_k_metric), model_temperature, plot_configs)
-                    sdfsd
                 df_dataset['subsets'] = df_dataset['folder'].map(lambda x: from_folder_to_subsets(x, dataset))
                 subsets = set()
                 for subset in df_dataset["subsets"]:
