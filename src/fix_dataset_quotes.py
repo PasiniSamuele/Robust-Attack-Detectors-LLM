@@ -1,33 +1,29 @@
 import pandas as pd
-from ruamel.yaml import YAML
 import argparse
 
 def wrap_row_with_quotes(row):
     #if the row starts and ends with "
+    row = row.strip()
     if row[0] == '"' and row[-1] == '"':
-        return row[1:-1]
-    elif row[0] == "'" and row[-1] == "'":
-        return row[1:-1]
-    elif '"' in row:
-        return row
-    elif "'" in row:
-        #substitute ' with "
-        row = row.replace("'", '"')
-        return row
-    else:
-        return row
+        row = row[1:-1]
+    if row[0] == "'" and row[-1] == "'":
+        row = row[1:-1]
+    if '"' in row:
+        #substitute "" with '
+        row = row.replace('"', "'")
+    return row
 
 def fix_dataset_quotes(opt):
     df = pd.read_csv(opt.data, encoding = "ISO-8859-1")
     # keep only rows without both ' and " at the same time
     search_for = ['"', "'"]
-    df_filtered = df[~df['payload'].str.contains('|'.join(search_for))]
+    df_filtered = df[~df['Payloads'].str.contains('&'.join(search_for))]
 
     #drop duplicates in Payloads attribute
-    df_filtered = df_filtered.drop_duplicates(subset=['payload'])
+    df_filtered = df_filtered.drop_duplicates(subset=['Payloads'])
 
     #wrap rows containing " using ' as delimiter
-    df_filtered['payload'] = df_filtered['payload'].apply(wrap_row_with_quotes)
+    df_filtered['Payloads'] = df_filtered['Payloads'].apply(wrap_row_with_quotes)
 
     df_filtered.to_csv(opt.dest, index=False)
 

@@ -181,21 +181,21 @@ stages:
       md5: ba0dfcb8f031f0c32940ebc443b15915
       size: 42389
   fix_dataset_quotes:
-    cmd: python src/fix_dataset_quotes.py --data data/payload_mixed.csv --dest data/payload_quoted.csv
+    cmd: python src/fix_dataset_quotes.py --data data/Sofia_merged.csv --dest data/Sofia_fixed.csv
     deps:
-    - path: data/payload_mixed.csv
+    - path: data/Sofia_merged.csv
       hash: md5
-      md5: 38ff928ee312b2b5742f306c5e83c29c
-      size: 1996540
+      md5: 63f0714cf2fa0a8bcc04152ea59d1080
+      size: 49219176
     - path: src/fix_dataset_quotes.py
       hash: md5
-      md5: 35844637dc4a304cbd2562f7af7d5c4d
-      size: 1386
+      md5: d127c7690bdcf47aa2442d2808f07d73
+      size: 1305
     outs:
-    - path: data/payload_quoted.csv
+    - path: data/Sofia_fixed.csv
       hash: md5
-      md5: 6686470fd159a686d6fd17d3c08961b0
-      size: 764421
+      md5: de5beecf5723fe1897f4acd2798b25e3
+      size: 13611987
   filter_dataset_with_oracle:
     cmd: python src/filter_xss_with_oracle.py --data data/filtered.csv --dest data/filtered_oracle.csv
       --endpoint http://127.0.0.1:5555/vuln_backend/1.0/endpoint/
@@ -213,3 +213,106 @@ stages:
       hash: md5
       md5: f246c824a0660b1bfd8b883e33175c3c
       size: 4161460
+  merge_log_files:
+    cmd: python src/merge_log_files.py --data data/Sofia --dest data/Sofia_merged.csv
+      --params params.yaml
+    deps:
+    - path: data/Sofia
+      hash: md5
+      md5: 5dafe1a0153ac3144c614ee211c2179a.dir
+      size: 109064099
+      nfiles: 8
+    - path: src/merge_log_files.py
+      hash: md5
+      md5: 91db1e68d3c2203ef4177a58b9906073
+      size: 2730
+    params:
+      params.yaml:
+        merge_logs:
+          payload_column:
+            before: 'Query:'
+            after: Payloads
+          class_column:
+            before: 'Attack:'
+            after: Class
+          class_mapping:
+            'true': Malicious
+            'false': Benign
+    outs:
+    - path: data/Sofia_merged.csv
+      hash: md5
+      md5: 63f0714cf2fa0a8bcc04152ea59d1080
+      size: 49219176
+  balance_dataset:
+    cmd: python src/balance_dataset.py --data data/Sofia_fixed.csv --dest data/Sofia_balanced.csv
+      --params params.yaml
+    deps:
+    - path: data/Sofia_fixed.csv
+      hash: md5
+      md5: de5beecf5723fe1897f4acd2798b25e3
+      size: 13611987
+    - path: src/balance_dataset.py
+      hash: md5
+      md5: a424836c41f12eac12bdf8388578ad21
+      size: 1458
+    params:
+      params.yaml:
+        balance_dataset:
+          class_column: Class
+    outs:
+    - path: data/Sofia_balanced.csv
+      hash: md5
+      md5: 5e284559882c37ecfe740613f59b7307
+      size: 8662418
+  dataset_trainval_test_split_sqli:
+    cmd: python src/dataset_split.py --data data/Sofia_balanced.csv --dest_train data/trainval_sqli.csv
+      --dest_test data/test_sqli.csv --split_arguments dataset_trainval_test_split
+      --params params.yaml
+    deps:
+    - path: data/Sofia_balanced.csv
+      hash: md5
+      md5: 5e284559882c37ecfe740613f59b7307
+      size: 8662418
+    - path: src/dataset_split.py
+      hash: md5
+      md5: c571c3fa613cc9e7fff9d96b40629a6d
+      size: 1610
+    params:
+      params.yaml:
+        dataset_trainval_test_split:
+          train_size: 0.8
+    outs:
+    - path: data/test_sqli.csv
+      hash: md5
+      md5: 9a11ff105a17b81be5fe5a83ba83066d
+      size: 1737894
+    - path: data/trainval_sqli.csv
+      hash: md5
+      md5: 6462808d3946813a26f54d44b4a14776
+      size: 6924539
+  dataset_train_val_split_sqli:
+    cmd: python src/dataset_split.py --data data/trainval_sqli.csv --dest_train data/train_sqli.csv
+      --dest_test data/val_sqli.csv --split_arguments dataset_train_val_split --params
+      params.yaml
+    deps:
+    - path: data/trainval_sqli.csv
+      hash: md5
+      md5: 6462808d3946813a26f54d44b4a14776
+      size: 6924539
+    - path: src/dataset_split.py
+      hash: md5
+      md5: c571c3fa613cc9e7fff9d96b40629a6d
+      size: 1610
+    params:
+      params.yaml:
+        dataset_train_val_split:
+          train_size: 0.8
+    outs:
+    - path: data/train_sqli.csv
+      hash: md5
+      md5: b24f6ac2c7b6f72f98df1bd59fd23839
+      size: 5541725
+    - path: data/val_sqli.csv
+      hash: md5
+      md5: 9f1db5d541198f98d15ac7456ae3f38e
+      size: 1382829

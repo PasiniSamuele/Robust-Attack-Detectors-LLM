@@ -21,3 +21,7 @@
 /synthetic_datasets
 /filtered_oracle.csv
 /Sofia
+/Sofia_merged.csv
+/Sofia_balanced.csv
+/Sofia_fixed.csv
+/papers_sqli

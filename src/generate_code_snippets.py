@@ -6,7 +6,6 @@ from dotenv import dotenv_values
 from langchain.prompts import (
     ChatPromptTemplate,
 )
-from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
 
 from langchain_core.output_parsers import StrOutputParser
 import os
@@ -53,7 +52,7 @@ def generate_code_snippets(opt, env):
             template["input"] = template["input"] +"\n" + f.read()
         if not folder_exists_and_not_empty(opt.db_persist_path):
             print("Creating vectorstore")
-            docs =  build_scientific_papers_loader(opt.papers_folder) if not is_valid_url(opt.rag_source) else build_web_page_loader(opt.rag_source)
+            docs =  build_scientific_papers_loader(opt.rag_source) if not is_valid_url(opt.rag_source) else build_web_page_loader(opt.rag_source)
         else: 
             docs = []
         retriever = build_documents_retriever(docs, db_persist_path=opt.db_persist_path, chunk_size=opt.chunk_size, chunk_overlap=opt.chunk_overlap, embeddings=embeddings)

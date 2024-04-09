@@ -2,7 +2,6 @@ import pandas as pd
 from pydantic.v1 import Field ,BaseModel
 from typing import List
 import pandas as pd
-from sqlalchemy import column
 import os
 import json
 
@@ -85,3 +84,33 @@ def get_df_metrics(summarized_results:dict,
     df_metrics = df_metrics.drop_duplicates(subset = ["top_k", "subset"])
     return df_metrics
     
+def get_accuracy_diff_metrics(runs, datasets):
+    #transform the list in list of dicts where every run is the value for key folder
+    #runs_dict with key params is the content of the json params.json in the folder
+    runs_dicts = [{"folder": run, 
+                  "params": json.load(open(f"{run}/parameters.json"))} for run in runs]
+    
+    datasets_dicts = [{"folder": os.path.join("synthetic_results", '/'.join(dataset.split("/")[2:-1])), 
+                      "params": json.load(open(f"{dataset}/parameters.json"))} for dataset in datasets]
+    new_runs = []
+    for dataset_dict in datasets_dicts:
+        if dataset_dict["params"]["examples_per_class"] == 0:
+            dataset_dict["name"] =  f'{dataset_dict["params"]["model_name"]}_{dataset_dict["params"]["temperature"]}_{dataset_dict["params"]["generation_mode"]}'
+        else:
+            dataset_dict["name"] =  f'{dataset_dict["params"]["model_name"]}_{dataset_dict["params"]["temperature"]}_{dataset_dict["params"]["generation_mode"]}_{dataset_dict["params"]["examples_per_class"]}'
+        for run_dict in runs_dicts:
+            synth_results = json.load(open(f"{run_dict['folder']}/{dataset_dict['folder']}/results.json"))
+            #get keys that starts with top_ in the values of synth_results['top_k_metrics']
+            top_ks = [k for k in synth_results['top_k_metrics'].keys() if k.startswith("top_")]
+            for k in top_ks:
+                new_dict = {
+                    "model": run_dict["params"]['model_name'],
+                    "temperature": run_dict["params"]['temperature'],
+                    "generation_mode": run_dict["params"]['generation_mode'] if run_dict["params"]["examples_per_class"] == 0 else f"{run_dict['params']['generation_mode']}_{run_dict['params']['examples_per_class']}",
+                    "top_k": int(k.split('_')[-1]),
+                    "accuracy_diff": synth_results['top_k_metrics'][k]['accuracy_diff'],
+                    "avg_std": synth_results['synthetic_dataset']['avg_std_accuracy'][k]['avg_std_accuracy'],
+                    "synth_dataset_name": dataset_dict["name"]
+                }    
+                new_runs.append(new_dict)
+    return pd.DataFrame(new_runs)        

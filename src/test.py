@@ -74,7 +74,7 @@ def add_parse_arguments(parser):
     parser.add_argument('--prompt_parameters', type=str, default="data/prompt_parameters/empty.yaml", help='Prompt parameters file')
     parser.add_argument('--test_folder', type=str, default='test', help='Folder to save test results')
     parser.add_argument('--model_name', type=str, default='gpt-4-0125-preview', help='Model')
-    parser.add_argument('--temperature', type=float, default=0.0, help='Temperature')
+    parser.add_argument('--temperature', type=float, default=1.0, help='Temperature')
     parser.add_argument('--generation_mode', type=str, default="rag_few_shot", help='Generation Mode')
     parser.add_argument('--examples_per_class', type=int, default=5, help='Number of examples per class')
     parser.add_argument('--seed', type=int, default=156, help='Seed')

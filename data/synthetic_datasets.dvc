@@ -1,6 +1,6 @@
 outs:
-- md5: 3dab6f2e5342dd49a8c10df2dba98ff6.dir
-  size: 183718
-  nfiles: 46
+- md5: 00355ffb17b27d06f059c798fed60b67.dir
+  size: 672533
+  nfiles: 175
   hash: md5
   path: synthetic_datasets

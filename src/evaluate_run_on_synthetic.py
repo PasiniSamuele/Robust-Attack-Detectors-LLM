@@ -57,7 +57,7 @@ def evaluate_synth_run(opt):
                                             parameters["examples_per_class"],
                                             parameters["temperature"],
                                             parameters["seed"])
-    evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
+    #evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
 
     subfolders = get_exp_subfolders(opt.run)
     summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
@@ -66,8 +66,10 @@ def evaluate_synth_run(opt):
 
     if opt.plot:
         df_metrics = get_df_metrics(summarized_results, opt.top_k, dataset_size)
+        
         experiment_std_synth_plot(df_metrics, summary_dir)
         experiment_acc_diff_synth_plot(df_metrics, summary_dir)
+        
 
 def add_parse_arguments(parser):
     #run parameters
