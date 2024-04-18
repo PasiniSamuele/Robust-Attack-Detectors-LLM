@@ -1,26 +1,27 @@
+import json
 from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
-from utils.utils import load_yaml, init_argument_parser, sanitize_output, fill_default_parameters, save_parameters_file, save_input_prompt_file, is_valid_url
-from utils.path_utils import create_folder_for_experiment, folder_exists_and_not_empty
-from utils.synthetic_dataset_utils import XSS_dataset, fill_df, save_subset_of_df
+from utils.utils import load_yaml, init_argument_parser, fill_default_parameters, save_parameters_file, save_input_prompt_file, is_valid_url
+from utils.path_utils import create_folder_for_experiment, folder_exists_and_not_empty, get_last_run
+from utils.synthetic_dataset_utils import XSS_dataset, save_subset_of_df
 from dotenv import dotenv_values
 from langchain.prompts import (
     SystemMessagePromptTemplate,
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
 )
-from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
 from langchain.output_parsers import PydanticOutputParser
 
-from langchain_core.output_parsers import StrOutputParser
 import os
 import random
 import numpy as np
 from utils.few_shot_utils import create_few_shot
 from utils.rag_utils import build_scientific_papers_loader, build_documents_retriever, build_web_page_loader, format_docs
-
-
+import signal
+from utils.synthetic_dataset_utils import FailureExpection, fill_df, TimeoutException
+import multiprocessing 
 def generate_synthetic_dataset(opt, env):
+    
     #fix seed if it is not None
     if opt.seed is not None:
         random.seed(opt.seed)
@@ -83,9 +84,13 @@ def generate_synthetic_dataset(opt, env):
     #run experiments
     i = 0
     failures = 0
+    failed_subsets = 0
+    
+
     while i < opt.experiments:
         print(f"Experiment {i}")
         try:
+            
             df= fill_df(chain, prompt_parameters)
             save_file = os.path.join(experiment_folder, f"exp_{i}.csv")
             df.to_csv(save_file, index=False)
@@ -93,15 +98,36 @@ def generate_synthetic_dataset(opt, env):
                 save_subset_of_df(save_file, s)
             i = i + 1
             failures = 0
-        except Exception as e:
+        except TimeoutException:
+            print("Experiment is over")
+            signal.alarm(0)
+
+            failed_subsets = failed_subsets + (opt.experiments - i)
+            break
+
+        except FailureExpection as e:
             #print(e)
             print("Experiment failed, try again")
             failures = failures + 1
             if failures > 10:
                 print("Too many failures, moving to next experiment")
                 i = i + 1
+                failed_subsets = failed_subsets + 1
                 continue
             continue
+        
+    
+    results = {
+        "experiments": opt.experiments,
+        "failed_experiments": failed_subsets,
+        "successful_experiments": opt.experiments - failed_subsets,
+        "success": True if failed_subsets == 0 else False
+
+    }
+    #write json file
+    json_file = os.path.join(experiment_folder, opt.results_file_name)
+    with open(json_file, 'w') as f:
+        json.dump(results, f)
         
 
 def add_parse_arguments(parser):
@@ -121,6 +147,8 @@ def add_parse_arguments(parser):
     parser.add_argument('--experiments_folder', type=str, default='data/synthetic_datasets', help='experiments folder')
     parser.add_argument('--experiments', type=int, default=5, help= 'number of experiments to run')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the parameters file')
+    parser.add_argument('--results_file_name', type=str, default='results.json', help='name of the results file')
+
     parser.add_argument('--input_prompt_file_name', type=str, default='prompt.txt', help='name of the input prompt file')
     parser.add_argument('--subset', type=int, action = 'append', help='subset of the experiments to run')
 
@@ -147,13 +175,34 @@ def add_parse_arguments(parser):
     parser.add_argument('--chunk_size', type=int, default=1000, help='chunk size')
     parser.add_argument('--chunk_overlap', type=int, default=200, help='chunk overlap')
 
+    parser.add_argument('--timeout', type=int, default=9000, help='timeout for the experiments in seconds')
+
     return parser
     
 
 def main():
     opt = init_argument_parser(add_parse_arguments)
     env = dotenv_values()
-    generate_synthetic_dataset(opt, env)
+    #generate_synthetic_dataset(opt, env)
+    #print(opt.timeout)    
+    p = multiprocessing.Process(target=generate_synthetic_dataset, args=(opt, env))
+    p.start()
+
+    p.join(opt.timeout)
+    if p.is_alive():
+        print("Timeout")
+        p.terminate()
+        p.join()
+        results = {
+        "experiments": opt.experiments,
+        "success": False 
+
+        }
+        #write json file
+        experiment_folder = get_last_run(opt)
+        json_file = os.path.join(experiment_folder, opt.results_file_name)
+        with open(json_file, 'w') as f:
+            json.dump(results, f)
 
 if __name__ == '__main__':
     main()

@@ -6,6 +6,7 @@
         "**/.venv/**",
         "**/experiments/**",
         "**/plots/**",
+        "**/data/synthetic_datasets/**",
 
     ]
 }

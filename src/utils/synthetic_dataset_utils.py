@@ -5,6 +5,10 @@ import pandas as pd
 import os
 import json
 
+class FailureExpection(Exception):
+    pass
+class TimeoutException(Exception):
+    pass
 class XSS_row(BaseModel):
     Payloads: str = Field(description="a string representing an http get request with payload")
     Class: str = Field(description="a string representing the class of the http get request, it is Malicious if the http get request contains an xss attack, otherwise it is Benign")
@@ -28,6 +32,7 @@ def fill_df(chain, prompt_parameters):
             print("Filled", malicious_rows, "malicious rows and", benign_rows, "benign rows, new generation")
             response = chain.invoke(prompt_parameters)
             new_df = response.to_df()
+  
             #print(new_df)
             new_df_malicious_rows = len(new_df[new_df["Class"] == "Malicious"])
             new_df_benign_rows = len(new_df[new_df["Class"] == "Benign"])
@@ -45,14 +50,17 @@ def fill_df(chain, prompt_parameters):
             benign_rows = len(df[df["Class"] == "Benign"])
             failures = 0
 
+        except TimeoutException:
+            raise TimeoutException
         except Exception as e:
             print("Partial filling failed, try again")
             print(e)
             failures = failures + 1
             if failures > 10:
                 print("Filling failed, moving to new generation")
-                raise e
+                raise FailureExpection
             continue
+        
     return df
 
 def save_subset_of_df(file, subset):
