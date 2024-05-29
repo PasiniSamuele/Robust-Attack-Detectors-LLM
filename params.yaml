@@ -18,5 +18,9 @@ merge_logs:
     "false": Benign
 balance_dataset:
   class_column: Class
+fix_dataset_quotes:
+  seed: 156
+  min_placeholder_len: 5
+  sample_size_placeholders: 5000
 
 

@@ -4,10 +4,8 @@ from argparse import Namespace
 import json
 from utils.path_utils import get_experiment_folder, from_file_to_name, get_exp_subfolders, get_subfolders
 import os
-from utils.evaluation_utils import summarize_synth_results
+from utils.evaluation_utils import summarize_synth_results, summarize_synth_test_results
 from evaluate_run import evaluate_run
-from utils.plot_utils import experiment_std_synth_plot, experiment_acc_diff_synth_plot
-from utils.synthetic_dataset_utils import get_df_metrics
 from ruamel.yaml import YAML
 
 def synth_eval_run(dataset:int,
@@ -34,8 +32,8 @@ def evalaute_synth_dataset(n_datasets:str,
         subset_folders = get_subfolders(opt.dataset_folder)
         #keep only last folder name
         subset_folders = [f.split("/")[-1] for f in subset_folders]
-        for subfolder in subset_folders:
-            synth_eval_run(i, exp_folder, opt, result_file_name, subfolder)
+        # for subfolder in subset_folders:
+        #     synth_eval_run(i, exp_folder, opt, result_file_name, subfolder)
 
 def evaluate_synth_run(opt):
     #open parameters file
@@ -58,18 +56,28 @@ def evaluate_synth_run(opt):
                                             parameters["temperature"],
                                             parameters["seed"])
     #evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
-
+    file_to_check = os.path.join(opt.run, exp_folder, opt.result_file_name)
+    #if the file do not exists
+    if not os.path.exists(file_to_check):
+        evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
+        subfolders = get_exp_subfolders(opt.run)
+        summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
+    #open file and check if it contains the key "single_dataset_results"
+    with open(file_to_check) as f:
+        results = json.load(f)
+        if "single_dataset_results" not in results:
+            evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
+            subfolders = get_exp_subfolders(opt.run)
+            summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
+            
+    # if False:
     subfolders = get_exp_subfolders(opt.run)
-    summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
-
-    summary_dir = os.path.join(opt.run, exp_folder)
-
-    if opt.plot:
-        df_metrics = get_df_metrics(summarized_results, opt.top_k, dataset_size)
-        
-        experiment_std_synth_plot(df_metrics, summary_dir)
-        experiment_acc_diff_synth_plot(df_metrics, summary_dir)
-        
+    #summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
+    synth_results_file = os.path.join(opt.run, exp_folder, opt.result_file_name)
+    dest_test = os.path.join(opt.run, exp_folder, f"{opt.test_results_file_name.split('.')[0]}.csv")
+    dataset_params = os.path.join(opt.dataset_folder, "parameters.json")
+    print(opt.run, exp_folder)
+    summarize_synth_test_results(opt.run, opt.test_results_file_name, synth_results_file, dest_test, opt.top_k, n_datasets, opt.dataset_folder, dataset_params)
 
 def add_parse_arguments(parser):
     #run parameters
@@ -83,6 +91,8 @@ def add_parse_arguments(parser):
     #evaluation parameters
     parser.add_argument('--isolated_execution', type=bool, default=False, help='if true, the evaluation will be executed in a separate docker environment')
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
+    parser.add_argument('--test_results_file_name', type=str, default='test_results.json', help='name of the results file')
+
     parser.add_argument('--top_k_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
     parser.add_argument('--top_k', type=int, action='append', help='top_k value to be considered for the top_k_metric, you can append more than one')
 

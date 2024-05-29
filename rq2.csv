@@ -1,0 +1,4 @@
+experiment,dataset,top_1_acc_diff,top_3_acc_diff,top_5_acc_diff,top_10_acc_diff,top_15_acc_diff,avg_accuracy,top_1_acc,top_3_acc,top_5_acc,top_10_acc,top_15_acc
+gpt-4-0125-preview_0.0_rag_few_shot_5,gpt-4-0125-preview_1.0_rag_few_shot_5,0.097,0.102,0.101,0.098,0.083,0.920,0.882,0.877,0.877,0.881,0.886
+gpt-4-0125-preview_0.5_few_shot_3,gpt-4-0125-preview_1.0_rag_few_shot_5,0.131,0.103,0.082,0.052,0.058,0.700,0.853,0.864,0.882,0.882,0.850
+gpt-4-0125-preview_1.0_zero_shot_0,gpt-4-0125-preview_1.0_rag_few_shot_5,0.136,0.140,0.104,0.032,0.024,0.640,0.838,0.827,0.840,0.851,0.800

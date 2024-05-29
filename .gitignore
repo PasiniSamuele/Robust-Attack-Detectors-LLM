@@ -166,3 +166,5 @@ poetry.lock
 /plots
 /experiments_sap
 /flowcharts
+/plots_test
+/ranking_dataset_output

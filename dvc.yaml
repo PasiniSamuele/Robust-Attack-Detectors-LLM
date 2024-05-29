@@ -49,10 +49,13 @@ stages:
     - data/Sofia_merged.csv
 
   fix_dataset_quotes:
-    cmd: python src/fix_dataset_quotes.py --data data/Sofia_merged.csv --dest data/Sofia_fixed.csv
+    cmd: python src/fix_dataset_quotes.py --data data/Sofia_merged.csv --dest data/Sofia_fixed.csv --placeholders_file data/placeholders.txt --params params.yaml
     deps:
     - data/Sofia_merged.csv
     - src/fix_dataset_quotes.py
+    - data/placeholders.txt
+    params:
+    - fix_dataset_quotes
     outs:
     - data/Sofia_fixed.csv
 

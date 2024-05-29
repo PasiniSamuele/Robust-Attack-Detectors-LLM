@@ -1,5 +1,4 @@
 from argparse import Namespace
-import re
 import pandas as pd
 import seaborn as sn
 import os 
@@ -7,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from typing import Tuple
 import Levenshtein
-from utils.path_utils import  get_exp_subfolders, get_not_exp_subfolders
+from utils.path_utils import  get_exp_subfolders, get_not_exp_subfolders, get_run_parameters
 import json
 from utils.utils import  NpEncoder
 
@@ -202,12 +201,12 @@ def summarize_synth_subfolder_results(subfolder:str,
         exp_folder_in_subfolder =os.path.join(subfolder, exp_folder)
         summarized_results = summarize_synth_subset_results(subfolder, exp_folder, result_file_name, n_datasets, top_k_metric)
         #list subfolders in the experiment folder
-        subsets = get_not_exp_subfolders(exp_folder_in_subfolder)
-        #filter out keeping only last folder
-        subsets = list(map(lambda x: x.split("/")[-1], subsets))
-        summarized_results["subsets"] = dict()
-        for subset in subsets:
-            summarized_results["subsets"][subset] = summarize_synth_subset_results(subfolder, exp_folder, result_file_name, n_datasets, top_k_metric, subset)
+        # subsets = get_not_exp_subfolders(exp_folder_in_subfolder)
+        # #filter out keeping only last folder
+        # subsets = list(map(lambda x: x.split("/")[-1], subsets))
+        # summarized_results["subsets"] = dict()
+        # for subset in subsets:
+        #     summarized_results["subsets"][subset] = summarize_synth_subset_results(subfolder, exp_folder, result_file_name, n_datasets, top_k_metric, subset)
 
         return summarized_results
 
@@ -219,6 +218,7 @@ def summarize_synth_subset_results_on_synth(single_results_syn:list,
         subset_results = list(map(lambda x: x["subsets"][str(subset)],single_results_syn))
     else:
         subset_results = single_results_syn
+
     summarized_results = summarize_results(subset_results, top_k_metric, top_k) 
     summarized_results["avg_std_accuracy"] = get_avg_std(subset_results, "accuracy")
     return summarized_results
@@ -230,8 +230,8 @@ def summarize_synth_results_on_synth(single_results_syn:list,
 
     summarized_results = summarize_synth_subset_results_on_synth(single_results_syn, top_k_metric, top_k)
     summarized_results["subsets"] = dict()
-    for subset in subsets:
-        summarized_results["subsets"][subset] = summarize_synth_subset_results_on_synth(single_results_syn, top_k_metric, top_k, subset)
+    # for subset in subsets:
+    #     summarized_results["subsets"][subset] = summarize_synth_subset_results_on_synth(single_results_syn, top_k_metric, top_k, subset)
     return summarized_results
 
 def summarize_synth_results_on_top_k(single_results_syn:list,
@@ -245,11 +245,11 @@ def summarize_synth_results_on_top_k(single_results_syn:list,
                                                                      top_k)
 
     summarized_results["subsets"] = dict()
-    for k in subsets:
-        summarized_results["subsets"][str(k)] = get_results_from_synthetic(list(map(lambda x: x["subsets"][str(k)],single_results_syn)), 
-                                                                                         single_results_val, 
-                                                                                         top_k_metric, 
-                                                                                         top_k)
+    # for k in subsets:
+    #     summarized_results["subsets"][str(k)] = get_results_from_synthetic(list(map(lambda x: x["subsets"][str(k)],single_results_syn)), 
+    #                                                                                      single_results_val, 
+    #                                                                                      top_k_metric, 
+    #                                                                                      top_k)
     return summarized_results
 
 def summarize_synth_results(subfolders:list,
@@ -261,6 +261,7 @@ def summarize_synth_results(subfolders:list,
     subsets = get_not_exp_subfolders(os.path.join(subfolders[0], exp_folder))
     #filter subset keeping only last folder
     subsets = list(map(lambda x: x.split("/")[-1], subsets))
+    single_dataset_results = get_single_dataset_exp_results(subfolders, exp_folder, n_datasets, opt.result_file_name, opt.top_k)
 
     for subfolder in subfolders:
         exp_folder_in_subfolder = os.path.join(subfolder, exp_folder)
@@ -273,14 +274,16 @@ def summarize_synth_results(subfolders:list,
     #print('\n', subfolders[0], '\n',exp_folder, '\n',opt.result_file_name)
 
     single_results_syn = list(map(lambda x: json.load(open(os.path.join(x, exp_folder,opt.result_file_name))), subfolders))
+    
  
-    summarized_results["synthetic_dataset"] = summarize_synth_results_on_synth(single_results_syn, opt.top_k_metric, opt.top_k, subsets)
+    summarized_results["synthetic_dataset"] = summarize_synth_results_on_synth(single_results_syn, opt.top_k_metric, opt.top_k, None)
 
     single_results_val = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
     summarized_results["validation_dataset"] = summarize_results(single_results_val, opt.top_k_metric, opt.top_k)  
-    
-    summarized_results["top_k_metrics"] = summarize_synth_results_on_top_k(single_results_syn, single_results_val, opt.top_k_metric, opt.top_k, subsets)
+    summarized_results["single_dataset_results"] = single_dataset_results
 
+    summarized_results["top_k_metrics"] = summarize_synth_results_on_top_k(single_results_syn, single_results_val, opt.top_k_metric, opt.top_k, None)
+    summarized_results['top_k_metrics_per_dataset'] = summarize_synth_results_on_top_k_per_single_dataset(single_dataset_results, single_results_val, opt.top_k_metric, opt.top_k, n_datasets)
     summary_dir = os.path.join(opt.run, exp_folder)
     filename = os.path.join(summary_dir, opt.result_file_name)
     os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -288,3 +291,119 @@ def summarize_synth_results(subfolders:list,
         json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
 
     return summarized_results
+
+def get_single_dataset_exp_results(subfolders, exp_folder, n_datasets, file_name, top_ks):
+    #print(subfolders)
+    results = dict()
+    for dataset in range(n_datasets):
+        results[f"dataset_{dataset}"] = {}
+        results[f"dataset_{dataset}"]["accuracies"] = {}
+        for subfolder in subfolders:
+            exp_folder_in_subfolder = os.path.join(subfolder, exp_folder)
+            content = json.load(open(os.path.join(exp_folder_in_subfolder, f"exp_{dataset}", file_name)))
+            if not content['failed']:
+                results[f"dataset_{dataset}"]["accuracies"][content['experiment']] = content['results']['accuracy']
+        for top_k in top_ks:
+            #get the keys associated with the k highest accuracies
+            results[f"dataset_{dataset}"][str(top_k)] = {}
+            results[f"dataset_{dataset}"][str(top_k)]["experiments"] = sorted(results[f"dataset_{dataset}"]["accuracies"], key=results[f"dataset_{dataset}"]["accuracies"].get, reverse=True)[:top_k]
+            #results[f"dataset_{dataset}"][str(top_k)]["accuracy"] = sum([results[f"dataset_{dataset}"]["accuracies"][exp] for exp in results[f"dataset_{dataset}"][str(top_k)]["experiments"]]) / top_k
+    return results
+
+def summarize_synth_results_on_top_k_per_single_dataset(syn_results, single_results_val, top_k_metric, top_k, n_datasets):
+    results = dict()
+    successful_experiments = list(filter(lambda x: not x["failed"], single_results_val))
+    #top_k.append(min(len(successful_experiments), len(successful_syn_experiments)))
+    #print(successful_syn_experiments)
+    for top in top_k:
+        results[f"top_{top}"] = {}
+        for dataset in range(n_datasets):
+            results[f"top_{top}"][f"dataset_{dataset}"] = {}
+            names = syn_results[f"dataset_{dataset}"][str(top)]["experiments"]
+            exps = get_results_from_name(successful_experiments, names)
+        
+            all_best_exps = sorted(successful_experiments, key=lambda x: x["results"][top_k_metric], reverse=True)
+            best_exps = all_best_exps[:top]
+            val_top_k_results = get_top_k_results(best_exps)
+            best_exps_names = list(map(lambda x: x["experiment"], best_exps))
+            results[f"top_{top}"][f"dataset_{dataset}"] = get_top_k_results(exps)
+            results[f"top_{top}"][f"dataset_{dataset}"]["distance"] = list_distance(names, best_exps_names)
+            avg_accuracy = sum([ex["results"]["accuracy"] for ex in exps]) / top
+            results[f"top_{top}"][f"dataset_{dataset}"]["accuracy_diff"] = abs(val_top_k_results["accuracy"] - avg_accuracy)
+
+            #find the keys of exps in all_best_exps
+            top_indexes = list(map(lambda x: all_best_exps.index(x), exps))
+            results[f"top_{top}"][f"dataset_{dataset}"]["indexes_sum"] = sum(top_indexes)
+    return results
+
+def summarize_synth_test_results(run_folder, test_results_file_name, synth_results, dest, top_ks, n_datasets, synth_datasets_root, dataset_params):
+    #read json files
+    synth_results = json.load(open(synth_results))
+    subfolders = get_exp_subfolders(run_folder)
+
+    #map subfolders to a dict with the name of the folder as key and the accuracy in the json file as value
+    subfolders_dict = {}
+    for subfolder in subfolders:
+        content = json.load(open(os.path.join(subfolder, test_results_file_name)))
+        if not content['failed']:
+            subfolders_dict[subfolder.split('/')[-1]] = content["results"]["accuracy"]
+    #open dataset params json file
+    dataset_dict = json.load(open(dataset_params))
+    if dataset_dict["examples_per_class"] == 0:
+        name =  f'{dataset_dict["model_name"]}_{dataset_dict["temperature"]}_{dataset_dict["generation_mode"]}'
+    else:
+        name =  f'{dataset_dict["model_name"]}_{dataset_dict["temperature"]}_{dataset_dict["generation_mode"]}_{dataset_dict["examples_per_class"]}'
+    model_parameters = get_run_parameters(run_folder)
+    df = pd.DataFrame(columns = ['top_k', 'dataset', 'accuracy', 'accuracy_diff', 'dataset_index', 'task', 'template', 'prompt_parameters', 'model_name', 'generation_mode', 'examples_per_class', 'temperature', 'seed'])
+    for top_k in top_ks:
+        #get the highet top_k values in the values of subfolder dicts
+        best_top_k = sorted(subfolders_dict, key=subfolders_dict.get, reverse=True)[:top_k]
+        #average accuracy of the top_k experiments
+        avg_accuracy = sum([subfolders_dict[exp] for exp in best_top_k if exp in subfolders_dict.keys()]) / top_k
+        for dataset in range(n_datasets):
+            experiments = synth_results['single_dataset_results'][f"dataset_{dataset}"][str(top_k)]["experiments"]
+            #get the avg accuracy of the top_k experiments
+            avg_accuracy_syn = sum([subfolders_dict[exp] for exp in experiments if exp in subfolders_dict.keys()]) / top_k
+            acc_diff = abs(avg_accuracy - avg_accuracy_syn)
+            row = {
+                "top_k": top_k,
+                "dataset": name,
+                "accuracy": avg_accuracy_syn,
+                "accuracy_diff": acc_diff,
+                "dataset_index": str(dataset),
+                "task":model_parameters["task"],
+                "template":model_parameters["template"],
+                "prompt_parameters":model_parameters["prompt_parameters"],
+                "model_name":model_parameters["model"],
+                "generation_mode":model_parameters["generation_mode"],
+                "examples_per_class":model_parameters["n_few_shot"],
+                "temperature":model_parameters["temperature"],
+                "seed":model_parameters["seed"]
+            }
+            df = pd.concat([df, pd.DataFrame([row.values()], columns=df.columns)], ignore_index=True)
+    print(dest)
+    df.to_csv(dest, index=False)
+
+def get_winner(df, criterion, query_on_functions = None):
+    if query_on_functions is not None:
+        df = df.query(query_on_functions)
+    #get all the values of the criterion column
+    values = df[f"dataset_{criterion}"].unique()
+    new_df = pd.DataFrame(columns = ["experiment", criterion, "acc_diff"])
+    results = {}
+    for value in values:
+        results[value] = 0
+    for exp in df["experiment"].unique():
+        exp_results = {}
+        exp_df = df.query(f"experiment == '{exp}'")
+        for value in values:
+            exp_results[value] = exp_df.query(f"dataset_{criterion} == '{value}'")["accuracy_diff"].mean()
+        #get the key with the lower acc diff in exp_results
+        best_key = min(exp_results, key=exp_results.get)
+        new_row = {"experiment":exp,
+                   criterion:best_key,
+                   "acc_diff":exp_results[best_key]}
+        new_df = pd.concat([new_df, pd.DataFrame(new_row, index=[1])])
+        results[best_key] += 1
+    return results, new_df
+

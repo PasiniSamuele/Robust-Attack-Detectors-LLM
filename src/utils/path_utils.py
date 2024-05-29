@@ -1,6 +1,5 @@
 import os
 import json
-import re
 
 def from_file_to_name(file)->str:
     return file.split('/')[-1].split('.')[0]
@@ -231,3 +230,22 @@ def from_folder_to_top_k_subset__accuracy_std(folder:str, synthetic_dataset:str,
     results = [r['subsets'][subset]['results']['accuracy_std'] for r in results]
 
     return results
+
+def get_run_parameters(run_folder):
+    params = dict()
+    parts = run_folder.split('/')
+    list_elements = ["task", "template", "prompt_parameters", "model", "generation_mode", "n_few_shot", "temperature", "seed"]
+    #get the part starting with elements
+    for el in list_elements:
+        part_list = list(filter(lambda x: x.startswith(el), parts))
+        if part_list:
+            part = part_list[0]
+            params[el] = part.split(f'{el}_')[-1]
+        else:
+
+            params[el] = 0
+
+    return params
+
+
+  

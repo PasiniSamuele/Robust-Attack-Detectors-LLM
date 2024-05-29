@@ -1,7 +1,6 @@
 import pandas as pd
 import seaborn as sns
-import os
-from utils.path_utils import from_folder_to_accuracy_list,from_folder_to_top_k_subset_experiments, from_folder_to_subsets, from_folder_to_success,from_folder_to_top_k_experiments, get_list_of_synth_results, from_folder_to_top_k
+from utils.path_utils import from_folder_to_accuracy_list,from_folder_to_success,get_list_of_synth_results
 from utils.utils import init_argument_parser
 from utils.plot_utils import generate_plots_config, model_temperature_plots, n_examples_plots
 import warnings
@@ -48,48 +47,48 @@ def generate_plots(opt):
         for model_temperature in df["model_temperature"].unique():
             print(f"Model: {model_temperature}")
             model_temperature_plots(df, opt.plots_folder, model_temperature, plot_configs)
-            for dataset in synthetic_datasets:
-                print(f"Synthetic Dataset: {dataset}")
+            # for dataset in synthetic_datasets:
+            #     print(f"Synthetic Dataset: {dataset}")
 
-                df_dataset = df[df[dataset] == True]
-                #drop duplicates considering model_temperature, generation_mode and examples_per_class
-                df_dataset = df_dataset.drop_duplicates(subset = ["model_temperature", "generation_mode", "examples_per_class"])
+            #     df_dataset = df[df[dataset] == True]
+            #     #drop duplicates considering model_temperature, generation_mode and examples_per_class
+            #     df_dataset = df_dataset.drop_duplicates(subset = ["model_temperature", "generation_mode", "examples_per_class"])
 
-                #open json file corresponding to the dataset in the folder and get top_k indexes, and top_k experiments
-                df_dataset['top_k_metrics'] = df_dataset['folder'].map(lambda x: from_folder_to_top_k(x, dataset))
-                top_ks_metrics = set()
-                for metric in df_dataset["top_k_metrics"]:
-                    top_ks_metrics.update(metric)
-                df_dataset = df_dataset.drop(columns = ["top_k_metrics"])
+            #     #open json file corresponding to the dataset in the folder and get top_k indexes, and top_k experiments
+            #     df_dataset['top_k_metrics'] = df_dataset['folder'].map(lambda x: from_folder_to_top_k(x, dataset))
+            #     top_ks_metrics = set()
+            #     for metric in df_dataset["top_k_metrics"]:
+            #         top_ks_metrics.update(metric)
+            #     df_dataset = df_dataset.drop(columns = ["top_k_metrics"])
 
-                for top_k_metric in top_ks_metrics:
-                    df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_experiments(x, dataset, top_k_metric))
-                    print(f"Top K: {top_k_metric}")
-                    df_dataset_top_k = df_dataset.copy()
-                    df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
-                    df_dataset_top_k = df_dataset_top_k.explode('accuracy')
-                    df_dataset_top_k.to_csv("df_dataset_top_k.csv")
+            #     for top_k_metric in top_ks_metrics:
+            #         df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_experiments(x, dataset, top_k_metric))
+            #         print(f"Top K: {top_k_metric}")
+            #         df_dataset_top_k = df_dataset.copy()
+            #         df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
+            #         df_dataset_top_k = df_dataset_top_k.explode('accuracy')
+            #         df_dataset_top_k.to_csv("df_dataset_top_k.csv")
                     
-                    #df_dataset = df_dataset.reset_index(drop=False)
-                    #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
-                    model_temperature_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,top_k_metric), model_temperature, plot_configs)
-                df_dataset['subsets'] = df_dataset['folder'].map(lambda x: from_folder_to_subsets(x, dataset))
-                subsets = set()
-                for subset in df_dataset["subsets"]:
-                    subsets.update(subset)
-                df_dataset = df_dataset.drop(columns = ["subsets"])
-                for subset in subsets:
-                    print(f"Subset: {subset}")
-                    for top_k_metric in top_ks_metrics:
-                        print(f"Top K: {top_k_metric}")
-                        df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_subset_experiments(x, dataset, top_k_metric, subset))
+            #         #df_dataset = df_dataset.reset_index(drop=False)
+            #         #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
+            #         model_temperature_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,top_k_metric), model_temperature, plot_configs)
+                # df_dataset['subsets'] = df_dataset['folder'].map(lambda x: from_folder_to_subsets(x, dataset))
+                # subsets = set()
+                # for subset in df_dataset["subsets"]:
+                #     subsets.update(subset)
+                # df_dataset = df_dataset.drop(columns = ["subsets"])
+                # for subset in subsets:
+                #     print(f"Subset: {subset}")
+                #     for top_k_metric in top_ks_metrics:
+                #         print(f"Top K: {top_k_metric}")
+                #         df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_subset_experiments(x, dataset, top_k_metric, subset))
                     
-                        df_dataset_top_k = df_dataset.copy()
-                        df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
-                        df_dataset_top_k = df_dataset_top_k.explode('accuracy')
-                        #df_dataset = df_dataset.reset_index(drop=False)
-                        #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
-                        model_temperature_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,"subsets",subset,top_k_metric), model_temperature, plot_configs)
+                #         df_dataset_top_k = df_dataset.copy()
+                #         df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
+                #         df_dataset_top_k = df_dataset_top_k.explode('accuracy')
+                #         #df_dataset = df_dataset.reset_index(drop=False)
+                #         #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
+                #         model_temperature_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,"subsets",subset,top_k_metric), model_temperature, plot_configs)
 
 
 
@@ -98,53 +97,53 @@ def generate_plots(opt):
             print(f"N_examples: {n_examples}")
             n_examples_plots(df, opt.plots_folder, n_examples, plot_configs)
             
-            for dataset in synthetic_datasets:
-                print(f"Synthetic Dataset: {dataset}")
+            # for dataset in synthetic_datasets:
+            #     print(f"Synthetic Dataset: {dataset}")
 
-                df_dataset = df[df[dataset] == True]
-                #drop duplicates considering model_temperature, generation_mode and examples_per_class
-                df_dataset = df_dataset.drop_duplicates(subset = ["model_temperature", "generation_mode", "examples_per_class"])
+            #     df_dataset = df[df[dataset] == True]
+            #     #drop duplicates considering model_temperature, generation_mode and examples_per_class
+            #     df_dataset = df_dataset.drop_duplicates(subset = ["model_temperature", "generation_mode", "examples_per_class"])
 
-                #open json file corresponding to the dataset in the folder and get top_k indexes, and top_k experiments
-                df_dataset['top_k_metrics'] = df_dataset['folder'].map(lambda x: from_folder_to_top_k(x, dataset))
-                top_ks_metrics = set()
-                for metric in df_dataset["top_k_metrics"]:
-                    top_ks_metrics.update(metric)
-                df_dataset = df_dataset.drop(columns = ["top_k_metrics"])
-                for top_k_metric in top_ks_metrics:
-                    df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_experiments(x, dataset, top_k_metric))
-                    print(f"Top K: {top_k_metric}")
-                    df_dataset_top_k = df_dataset.copy()
-                    df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
-                    df_dataset_top_k = df_dataset_top_k.explode('accuracy')
-                    df_dataset_top_k.to_csv("df_dataset_top_k.csv")
+            #     #open json file corresponding to the dataset in the folder and get top_k indexes, and top_k experiments
+            #     df_dataset['top_k_metrics'] = df_dataset['folder'].map(lambda x: from_folder_to_top_k(x, dataset))
+            #     top_ks_metrics = set()
+            #     for metric in df_dataset["top_k_metrics"]:
+            #         top_ks_metrics.update(metric)
+            #     df_dataset = df_dataset.drop(columns = ["top_k_metrics"])
+            #     for top_k_metric in top_ks_metrics:
+            #         df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_experiments(x, dataset, top_k_metric))
+            #         print(f"Top K: {top_k_metric}")
+            #         df_dataset_top_k = df_dataset.copy()
+            #         df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
+            #         df_dataset_top_k = df_dataset_top_k.explode('accuracy')
+            #         df_dataset_top_k.to_csv("df_dataset_top_k.csv")
                     
 
-                    n_examples_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,top_k_metric), n_examples, plot_configs)
+            #         n_examples_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,top_k_metric), n_examples, plot_configs)
                 
-                df_dataset['subsets'] = df_dataset['folder'].map(lambda x: from_folder_to_subsets(x, dataset))
-                subsets = set()
-                for subset in df_dataset["subsets"]:
-                    subsets.update(subset)
-                df_dataset = df_dataset.drop(columns = ["subsets"])
-                for subset in subsets:
-                    print(f"Subset: {subset}")
-                    for top_k_metric in top_ks_metrics:
-                        print(f"Top K: {top_k_metric}")
-                        df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_subset_experiments(x, dataset, top_k_metric, subset))
+                # df_dataset['subsets'] = df_dataset['folder'].map(lambda x: from_folder_to_subsets(x, dataset))
+                # subsets = set()
+                # for subset in df_dataset["subsets"]:
+                #     subsets.update(subset)
+                # df_dataset = df_dataset.drop(columns = ["subsets"])
+                # for subset in subsets:
+                #     print(f"Subset: {subset}")
+                #     for top_k_metric in top_ks_metrics:
+                #         print(f"Top K: {top_k_metric}")
+                #         df_dataset[top_k_metric] = df_dataset["folder"].map(lambda x: from_folder_to_top_k_subset_experiments(x, dataset, top_k_metric, subset))
                     
-                        df_dataset_top_k = df_dataset.copy()
-                        df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
-                        df_dataset_top_k = df_dataset_top_k.explode('accuracy')
-                        #df_dataset = df_dataset.reset_index(drop=False)
-                        #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
-                        n_examples_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,"subsets",subset,top_k_metric), n_examples, plot_configs)
+                #         df_dataset_top_k = df_dataset.copy()
+                #         df_dataset_top_k["accuracy"] = df_dataset_top_k.apply(lambda x: from_folder_to_accuracy_list(x["folder"], x[top_k_metric]) , axis = 1)
+                #         df_dataset_top_k = df_dataset_top_k.explode('accuracy')
+                #         #df_dataset = df_dataset.reset_index(drop=False)
+                #         #print(opt.plots_folder + os.path.join(dataset,top_k_metric))
+                #         n_examples_plots(df_dataset_top_k, opt.plots_folder + os.path.join(dataset,"subsets",subset,top_k_metric), n_examples, plot_configs)
 
 
 def add_parse_arguments(parser):
     #general parameters
-    parser.add_argument('--summary_file', type=str, default="experiments/task_detect_xss_simple_prompt/experiments_summary.csv", help='Summary file')
-    parser.add_argument('--plots_folder', type=str, default='plots/detect_xss_simple_prompt', help='Folder to save plots')
+    parser.add_argument('--summary_file', type=str, default="experiments/task_detect_xss_simple_prompt/experiments_summary_test.csv", help='Summary file')
+    parser.add_argument('--plots_folder', type=str, default='plots_test/rq1/', help='Folder to save plots')
     parser.add_argument('--minimum_success_rate', type=float, default=0.1, help='Minimum success rate to print the plot')
 
     #plot parameters
