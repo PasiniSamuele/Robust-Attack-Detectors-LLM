@@ -47,7 +47,6 @@ def get_experiment_folder(base_folder:str,
 
 def get_last_run_number(experiment_folder:str, default:int = -1)->int:
     subfolders = get_subfolders(experiment_folder)
-    print(subfolders)
     runs_numbers = list(map(lambda x: int(x.split('/')[-1].split('_')[1]), subfolders))
     return max(runs_numbers, default=default) 
 

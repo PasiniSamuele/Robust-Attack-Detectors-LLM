@@ -40,7 +40,7 @@ def create_plots_winners(df, save_folder, param):
 
         ax = sns.countplot(data=winner_df, x=param, order = criterion_values, palette = "hls")
     elif(param == "temperature"):
-        criterion_values = list(filter(lambda x: x in df["temperature"].unique(),["0.0", "0.5", "1.0"]))
+        criterion_values = list(filter(lambda x: x in winner_df["temperature"].unique(),["0.0", "0.5", "1.0"]))
         winners = winners[list(map(lambda x:str(x),criterion_values))]
 
         ax = sns.countplot(data=winner_df, x=param, order = criterion_values, palette = "hls")

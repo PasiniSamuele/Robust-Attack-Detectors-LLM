@@ -32,6 +32,11 @@ langchainhub = "^0.1.14"
 levenshtein = "^0.25.0"
 requests = "^2.31.0"
 zss = "^1.2.0"
+validators = "^0.28.3"
+nltk = "^3.8.1"
+scikit-learn = "^1.5.0"
+tensorboard = "^2.16.2"
+torch-tb-profiler = "^0.4.3"
 
 
 [tool.poetry.group.dev.dependencies]
