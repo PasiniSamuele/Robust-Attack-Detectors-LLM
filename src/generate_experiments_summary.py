@@ -32,7 +32,7 @@ def generate_experiments_summary(opt):
         #merge the two dictionaries
         results_dict.update(parameters_dict)
         #if the run is None, set it to the folder name
-        if results_dict['run'] is None:
+        if 'run' not in results_dict.keys() or results_dict['run'] is None:
             results_dict['run'] = folder.split('/')[-1]
         results_dict['folder'] = folder
         to_remove_list = []

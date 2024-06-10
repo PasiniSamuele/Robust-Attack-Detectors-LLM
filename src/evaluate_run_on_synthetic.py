@@ -55,18 +55,20 @@ def evaluate_synth_run(opt):
                                             parameters["examples_per_class"],
                                             parameters["temperature"],
                                             parameters["seed"])
+    print(opt.run, exp_folder)
+
     #evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
     file_to_check = os.path.join(opt.run, exp_folder, opt.result_file_name)
     #if the file do not exists
     if not os.path.exists(file_to_check):
-        evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
+        #evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
         subfolders = get_exp_subfolders(opt.run)
         summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
     #open file and check if it contains the key "single_dataset_results"
     with open(file_to_check) as f:
         results = json.load(f)
         if "single_dataset_results" not in results:
-            evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
+            #evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
             subfolders = get_exp_subfolders(opt.run)
             summarized_results = summarize_synth_results(subfolders, n_datasets, exp_folder, opt)
             
@@ -76,7 +78,6 @@ def evaluate_synth_run(opt):
     synth_results_file = os.path.join(opt.run, exp_folder, opt.result_file_name)
     dest_test = os.path.join(opt.run, exp_folder, f"{opt.test_results_file_name.split('.')[0]}.csv")
     dataset_params = os.path.join(opt.dataset_folder, "parameters.json")
-    print(opt.run, exp_folder)
     summarize_synth_test_results(opt.run, opt.test_results_file_name, synth_results_file, dest_test, opt.top_k, n_datasets, opt.dataset_folder, dataset_params)
 
 def add_parse_arguments(parser):
