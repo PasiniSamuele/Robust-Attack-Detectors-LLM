@@ -22,13 +22,13 @@ def create_experiment(row):
     return row
 
 test_results_file_old_sap = "old_experiments_sap/task_detect_xss_simple_prompt/experiments_summary_test.csv"
-test_results_file_sap = "new_experiments_sap/task_detect_xss_simple_prompt/experiments_summary_test.csv"
+test_results_file_sap = "new_experiments_sap/task_detect_xss_simple_prompt/template_create_function_readable/prompt_parameters_empty/experiments_summary_test.csv"
 test_results_file = "experiments/task_detect_xss_simple_prompt/experiments_summary_test.csv"
 test_synth_results_file = "experiments/task_detect_xss_simple_prompt/test_results_synth.csv"
 test_synth_results_file_sap = "new_experiments_sap/task_detect_xss_simple_prompt/test_results_synth_sap.csv"
 
 gen_rq1 = True
-gen_rq2 = False
+gen_rq2 = True
 
 rq1_large_file = "rq1_large.csv"
 rq1_file = "rq1.csv"

@@ -175,3 +175,6 @@ data/synthetic_datasets_sap
 /rq1_plots
 /rq1_large.csv
 /rq1.csv
+/rq1_large_sqli.csv
+/rq1_sqli.csv
+/rq1_plots_sqli
