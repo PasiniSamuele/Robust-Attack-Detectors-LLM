@@ -170,3 +170,8 @@ poetry.lock
 /ranking_dataset_output
 /new_experiments_sap
 /old_experiments_sap
+data/synthetic_datasets_sap
+/rq2_plots
+/rq1_plots
+/rq1_large.csv
+/rq1.csv

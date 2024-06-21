@@ -116,7 +116,7 @@ def add_parse_arguments(parser):
 
 
     #hf parameters
-    parser.add_argument('--hf_max_new_tokens', type=int, default=400, help='max new tokens for hf model')
+    parser.add_argument('--hf_max_new_tokens', type=int, default=1000, help='max new tokens for hf model')
     parser.add_argument('--hf_load_in_4bit', type=bool, default=True, help='load in 4 bit for hf model (qlora quantization)')
 
     #reproducibility
