@@ -5,7 +5,9 @@ import json
 import numpy as np
 
 def select_best_experiment(opt):
-    df = pd.read_csv(opt.summary_file)
+    df = pd.concat([pd.read_csv(opt.summary_file), pd.read_csv(opt.summary_file_sap)])
+    #reset index
+    df.reset_index(drop=False, inplace=True)
     #get the row with maximum accuracy
     df_best = df.loc[df['accuracy'].idxmax()]
 
@@ -53,7 +55,12 @@ def select_best_experiment(opt):
     
                 
         folder_data = os.path.join(opt.synthetic_dataset_folder, best_k_result["folder"].split(f"{opt.synthetic_results_folder}/")[-1], "run_0", opt.parameters_file_name)
-        parameters = json.load(open(folder_data))
+        try:
+            parameters = json.load(open(folder_data))
+        except:
+            folder_data = os.path.join(opt.synthetic_dataset_folder_sap, best_k_result["folder"].split(f"{opt.synthetic_results_folder}/")[-1], "run_0", opt.parameters_file_name)
+            parameters = json.load(open(folder_data))
+
         top_k_results[f"top_{k}"] = {
             "results": best_k_result,
             "model_name": parameters["model_name"],
@@ -71,6 +78,7 @@ def select_best_experiment(opt):
         test_results = pd.read_csv(os.path.join(validation_results["top_k_results"][f"top_{k}"]["results"]["folder"], f"{opt.test_results_file_name.split('.')[0]}.csv"))
         #filter the results keeping only the values with top_k = k
         test_results = test_results[test_results["top_k"] == k]
+
         #avg the accuracies
         test_results_dict["top_k_metrics"][f"top_{k}_accuracy"] = test_results["accuracy"].mean()
     
@@ -87,8 +95,11 @@ def select_best_experiment(opt):
 def add_parse_arguments(parser):
 
     parser.add_argument('--summary_file', type=str, default='experiments/task_detect_xss_simple_prompt/experiments_summary.csv', help='summary file')
+    parser.add_argument('--summary_file_sap', type=str, default='new_experiments_sap/task_detect_xss_simple_prompt/template_create_function_readable/experiments_summary.csv', help='summary file')
+
     parser.add_argument('--synthetic_results_folder', type=str, default='synthetic_results', help='folder with synthetic results')
     parser.add_argument('--synthetic_dataset_folder', type=str, default='data/synthetic_datasets', help='folder with synthetic datasets')
+    parser.add_argument('--synthetic_dataset_folder_sap', type=str, default='data/synthetic_datasets_sap', help='folder with synthetic datasets')
 
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the file containing the parameters')
     parser.add_argument('--results_file_name', type=str, default='results.json', help='name of the file containing the results')

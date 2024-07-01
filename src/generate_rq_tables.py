@@ -22,11 +22,11 @@ def create_experiment(row):
     return row
 
 test_results_file_old_sap = "old_experiments_sap/task_detect_xss_simple_prompt/experiments_summary_test.csv"
-test_results_file_sap = "new_experiments_sap/task_detect_xss_simple_prompt/template_create_function_readable/prompt_parameters_empty/experiments_summary_test.csv"
-test_results_file = "experiments/task_detect_xss_simple_prompt/experiments_summary_test.csv"
-test_synth_results_file = "experiments/task_detect_xss_simple_prompt/test_results_synth.csv"
-test_synth_results_file_sap = "new_experiments_sap/task_detect_xss_simple_prompt/test_results_synth_sap.csv"
+test_results_file_sap = "new_experiments_sap/task_detect_xss_simple_prompt/template_create_function_readable/experiments_summary_test.csv"
+test_results_file_sap_open_source = "new_experiments_sap_open_source/task_detect_xss_simple_prompt/template_create_function_readable/experiments_summary_test.csv"
 
+test_results_file = "experiments/task_detect_xss_simple_prompt/experiments_summary_test.csv"
+test_synth_results_file = "test_results_synth_merged.csv"
 gen_rq1 = True
 gen_rq2 = True
 
@@ -40,7 +40,22 @@ rq1_plot_folder = "rq1_plots"
 rq2_plot_folder = "rq2_plots"
 
 
-df = pd.concat([pd.read_csv(test_results_file),pd.read_csv(test_results_file_sap)])
+df = pd.concat([pd.read_csv(test_results_file),pd.read_csv(test_results_file_sap), pd.read_csv(test_results_file_sap_open_source)])
+df["experiment"] = df["model_name"]+"_"+df["temperature"].astype(str)+"_"+df["generation_mode"]+"_"+df["examples_per_class"].astype(str)
+df["model_temperature"] = df["model_name"]+"_"+df["temperature"].astype(str)
+
+
+#keep only columns with  "gpt-4" in model_temperature or "opus" in model_temperature or "sonnet" in model_temperature or "gpt-4" in model_temperature or "gcp" in model_temperature or "llama3"  in model_temperature or "mixtral-8x7b"  in model_temperature:
+df = df[df["model_temperature"].str.contains("gpt-4|opus|sonnet|gpt-4|gcp|llama3|mixtral-8x7b", regex=True)]
+
+#drop_columns with model_temperature == "gcp-chat-bison-001_0.0" or model_temperature == "anthropic-claude-3-sonnet_0.0" or model_temperature == "mixtral-8x7b-instruct-v01_0.0" or model_temperature == "llama3-70b-instruct_0.0"
+df = df[~df["model_temperature"].isin(["gcp-chat-bison-001_0.0","anthropic-claude-3-sonnet_0.0","mixtral-8x7b-instruct-v01_0.0","llama3-70b-instruct_0.0"])]
+
+best_exp_global = df[df["accuracy"]==df["accuracy"].max()]["experiment"].values[0]
+worst_exp_global = df[df["accuracy"]==df["accuracy"].min()]["experiment"].values[0]
+#keep the 3 closest cases to the mean of the avg_acc_diff
+middle_case_global = df.iloc[(df["accuracy"]-df["accuracy"].mean()).abs().argsort()[:3]]["experiment"].values
+
 
 if gen_rq1:
     #df = pd.concat([pd.read_csv(test_results_file),pd.read_csv(test_results_file_sap)])
@@ -50,7 +65,6 @@ if gen_rq1:
     new_columns.extend(list(map(lambda x:f"no_rag_{x}",examples_values)))
     new_columns.extend(list(map(lambda x:f"rag_{x}",examples_values)))
     new_df = pd.DataFrame(columns=new_columns)
-    df["model_temperature"] = df["model_name"]+"_"+df["temperature"].astype(str)
     df = df.sort_values(by=["model_temperature"])
     success_improvement_df = pd.DataFrame(columns=["model_temperature","examples_per_class","success_improvement"])
     rag_improvement_df = pd.DataFrame(columns=["model_temperature","examples_per_class","rag_improvement"])
@@ -58,10 +72,10 @@ if gen_rq1:
 
     for model_temperature in df["model_temperature"].unique():
         #keep only the model_temperature with gpt-4 or claude-3
-        if "gpt-4" not in model_temperature and "claude-3" not in model_temperature and "gpt-4" not in model_temperature and "gcp" not in model_temperature:
+        if "gpt-4" not in model_temperature and "claude-3" not in model_temperature and "gpt-4" not in model_temperature and "gcp" not in model_temperature and "llama3" not in model_temperature and "mixtral-8x7b" not in model_temperature:
             continue
         df_model_temperature = df[df["model_temperature"]==model_temperature]
-        if model_temperature == "gcp-chat-bison-001_0.0" or model_temperature == "anthropic-claude-3-sonnet_0.0":   #bison and sonnet working only with higher temperature
+        if model_temperature == "gcp-chat-bison-001_0.0" or model_temperature == "anthropic-claude-3-sonnet_0.0" or model_temperature == "mixtral-8x7b-instruct-v01_0.0" or model_temperature == "llama3-70b-instruct_0.0":   #bison, sonnet, mistral and llama working only with higher temperature
             continue
         new_row = {"model_temperature":model_temperature}
         for examples_per_class in examples_values:
@@ -124,6 +138,7 @@ if gen_rq1:
     #keep the 3 closest cases to the mean of the avg_acc_diff
     middle_case = new_df.iloc[(new_df["avg_acc_diff"]-new_df["avg_acc_diff"].mean()).abs().argsort()[:3]]["model_temperature"].values
 
+
     #keep only rows with best exp, middle_case and worst_exp
     to_keep = [best_exp]
     to_keep.extend(middle_case)
@@ -179,8 +194,8 @@ if gen_rq1:
 if gen_rq2:
     df = df.apply(create_experiment, axis=1)
 
-    df_synth = pd.concat([pd.read_csv(test_synth_results_file),pd.read_csv(test_synth_results_file_sap)])
-    df_synth["experiment"] = df_synth["model_name"]+"_"+df_synth["temperature"].astype(str) + "_"+df_synth["generation_mode"]+"_"+df_synth["examples_per_class"].astype(str)
+    df_synth = pd.read_csv(test_synth_results_file)
+    df_synth = df_synth[df_synth["accuracy"] != 0]
     top_ks = set(df_synth["top_k"].values.tolist())
 
     new_columns = ["experiment", "dataset"]
@@ -188,16 +203,16 @@ if gen_rq2:
     new_columns.append("avg_accuracy")
     new_columns.extend(list(map(lambda x:f"top_{x}_acc",top_ks)))
 
-    experiments_to_keep = [best_exp,middle_case[0],worst_exp]
+    experiments_to_keep = [best_exp_global,middle_case_global[0],worst_exp_global]
     new_df_synth = pd.DataFrame(columns=new_columns)
     big_df_synth = pd.DataFrame(columns=new_columns)
 
     plots_df = pd.DataFrame()
-    print(df_synth.head())
-    for experiment in experiments_to_keep:
+    for experiment in df_synth.experiment.unique():
+        if  "gcp-chat-bison-001_0.0" in experiment or "gpt-3.5" in experiment or "anthropic-claude-3-sonnet_0.0" in experiment or "mixtral-8x7b-instruct-v01_0.0" in experiment or "llama3-70b-instruct_0.0" in experiment:   #bison, sonnet, mistral and llama working only with higher temperature
+            continue
         print(experiment)
         df_keep = df_synth[df_synth["experiment"]==experiment]
-        df_keep = df_keep.apply(from_dataset_to_splits,axis=1)
         df_keep = df_keep.sort_values(by=["dataset_model", "dataset_temperature", "dataset_generation_mode", "dataset_examples_per_class"])
         for dataset in df_keep["dataset"].unique():
             df_dataset = df_keep[df_keep["dataset"]==dataset]
@@ -209,17 +224,16 @@ if gen_rq2:
                 new_row[f"top_{top_k}_acc"] = df_top["accuracy"].mean()
                 new_row["avg_accuracy"] = df[df["experiment"]==experiment]["accuracy"].mean()
             big_df_synth = pd.concat([big_df_synth,pd.DataFrame(new_row,index=[0])])
-
+    big_df_synth.to_csv("big.csv")
+    
     def get_avg_acc_diff(row, top_ks):
         cumulative_acc_diff = 0
         for top_k in top_ks:
             cumulative_acc_diff += row[f"top_{top_k}_acc_diff"]
         row["avg_acc_diff"] = cumulative_acc_diff/len(top_ks)
         return row
-
     for experiment in experiments_to_keep:
         df_keep = df_synth[df_synth["experiment"]==experiment]
-        df_keep = df_keep.apply(from_dataset_to_splits,axis=1)
 
         df_keep = df_keep.sort_values(by=["dataset_model", "dataset_temperature", "dataset_generation_mode", "dataset_examples_per_class"])
         exp_in_dataset = big_df_synth[big_df_synth["experiment"]==experiment]
@@ -248,10 +262,15 @@ if gen_rq2:
 
 
     df_keep = df_synth.copy()
-    df_keep = df_keep.apply(from_dataset_to_splits,axis=1)
-
+    #df_keep = df_keep.apply(from_dataset_to_splits,axis=1)
+    top_ks = [1,3,5]
     df_keep = df_keep.sort_values(by=["dataset_model", "dataset_temperature", "dataset_generation_mode", "dataset_examples_per_class"])
-    for experiment in df_keep["experiment"].unique():
+    
+    for experiment in df_synth.experiment.unique():
+        #if experiment does not contain one of gpt-4, bison, opus, sonnet,  llama3, mixtral-8x7b continue
+        if "gpt-4" not in experiment and "bison" not in experiment and "opus" not in experiment and "sonnet" not in experiment and "llama3" not in experiment and "mixtral-8x7b" not in experiment:
+            continue
+
         df_keep_exp = df_keep[df_keep["experiment"]==experiment]
         for dataset in df_keep_exp["dataset"].unique():
             df_dataset = df_keep_exp[df_keep_exp["dataset"]==dataset]

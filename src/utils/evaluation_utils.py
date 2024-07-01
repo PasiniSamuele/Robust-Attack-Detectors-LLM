@@ -362,9 +362,11 @@ def summarize_synth_test_results(run_folder, test_results_file_name, synth_resul
         avg_accuracy = sum([subfolders_dict[exp] for exp in best_top_k if exp in subfolders_dict.keys()]) / top_k
         for dataset in range(n_datasets):
             experiments = synth_results['single_dataset_results'][f"dataset_{dataset}"][str(top_k)]["experiments"]
+            to_subtract = max(1, top_k -len([exp for exp in experiments if exp not in subfolders_dict.keys()]))
             #get the avg accuracy of the top_k experiments
-            avg_accuracy_syn = sum([subfolders_dict[exp] for exp in experiments if exp in subfolders_dict.keys()]) / top_k
+            avg_accuracy_syn = sum([subfolders_dict[exp] for exp in experiments if exp in subfolders_dict.keys()]) / to_subtract
             acc_diff = abs(avg_accuracy - avg_accuracy_syn)
+
             row = {
                 "top_k": top_k,
                 "dataset": name,

@@ -9,7 +9,7 @@
 	"--network=host",
 	"--gpus", "all"],
 	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
 		//"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
 	],
 	"customizations": {
@@ -39,6 +39,6 @@
 	// "customizations": {},
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	 //"remoteUser": "vscode"
+	// "remoteUser": "vscode"
 }
 

@@ -9,10 +9,9 @@ file = "plots_rq2.csv"
 
 plots_df = pd.read_csv(file)
 
-#keep only experiments of gpt4
-plots_df = plots_df[plots_df["experiment"].str.contains("gpt-4")]
-
-top_ks = [1,3,5,10,15]
+#keep only experiments of gpt4, bison, opus, sonnet, llama or mixtral
+plots_df = plots_df[plots_df['experiment'].str.contains("gpt-4|bison|sonnet|opus|llama3|mixtral-8x7b")]
+top_ks = [1,3,5]
 sns.set_theme(style="whitegrid")
 plt.figure(figsize=(10, 10))
 

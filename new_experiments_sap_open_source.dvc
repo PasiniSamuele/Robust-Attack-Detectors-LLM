@@ -1,0 +1,6 @@
+outs:
+- md5: 3778a0485dd775cc962abe4662803ea7.dir
+  size: 3225002
+  nfiles: 2016
+  hash: md5
+  path: new_experiments_sap_open_source

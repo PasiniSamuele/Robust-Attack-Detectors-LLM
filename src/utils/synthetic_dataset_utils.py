@@ -19,7 +19,18 @@ class XSS_dataset(BaseModel):
 
     def to_df(self) -> pd.DataFrame:
         return pd.DataFrame([row.dict() for row in self.dataset])
+
+class SQLi_row(BaseModel):
+    Payloads: str = Field(description="a string representing a SQL query")
+    Class: str = Field(description="a string representing the class of the SQL query, it is Malicious if the query contains a SQL injection attack, otherwise it is Benign")
+
     
+class SQLi_dataset(BaseModel):
+    dataset: List[SQLi_row]
+
+    def to_df(self) -> pd.DataFrame:
+        return pd.DataFrame([row.dict() for row in self.dataset])
+     
 
 def fill_df(chain, prompt_parameters):
     n_lines = prompt_parameters["rows"]
