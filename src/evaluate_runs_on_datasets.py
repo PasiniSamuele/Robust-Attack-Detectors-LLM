@@ -6,7 +6,7 @@ import pandas as pd
 import concurrent.futures
 
 #experiments_root = "experiments/task_detect_xss_simple_prompt/template_create_function_readable"
-experiments_root = "new_experiments_sap_sqli/task_detect_sqli_extended/template_create_function_readable"
+experiments_root = "experiments/task_detect_sqli_extended/template_create_function_readable"
 
 #find all folders named run_0 recursively inside experiments_root
 runs = []
@@ -15,7 +15,7 @@ for root, dirs, files in os.walk(experiments_root):
         if dir.startswith("run_0"):
             runs.append(os.path.join(root, dir))
 #datasets_root = "data/synthetic_datasets_sap/task_detect_xss_simple_prompt/template_create_synthetic_dataset/prompt_parameters_medium_dataset/"
-datasets_root = "data/synthetic_datasets/task_detect_sqli_extended/template_create_synthetic_dataset/prompt_parameters_medium_dataset/"
+datasets_root = "data/synthetic_datasets_sap_sqli/task_detect_sqli_extended/template_create_synthetic_dataset/prompt_parameters_medium_dataset/"
 
 #find all folders named run_0 recursively inside datasets_root
 pool = concurrent.futures.ThreadPoolExecutor(max_workers=3)

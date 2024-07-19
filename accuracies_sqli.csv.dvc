@@ -1,0 +1,5 @@
+outs:
+- md5: 7920d9909aa354c5bb1ce5a06469a65f
+  size: 213842
+  hash: md5
+  path: accuracies_sqli.csv

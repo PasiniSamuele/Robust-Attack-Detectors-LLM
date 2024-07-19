@@ -258,7 +258,7 @@ def summarize_synth_results(subfolders:list,
                             opt:Namespace)->dict:
     
 
-    subsets = get_not_exp_subfolders(os.path.join(subfolders[0], exp_folder))
+    subsets = get_not_exp_subfolders(os.path.join(subfolders[0], exp_folder)) if len(subfolders)> 0 else []
     #filter subset keeping only last folder
     subsets = list(map(lambda x: x.split("/")[-1], subsets))
     single_dataset_results = get_single_dataset_exp_results(subfolders, exp_folder, n_datasets, opt.result_file_name, opt.top_k)

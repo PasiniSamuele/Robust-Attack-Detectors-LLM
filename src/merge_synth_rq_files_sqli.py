@@ -1,21 +1,27 @@
 import pandas as pd
 import os
-test_synth_results_root = "experiments/task_detect_sqli_extended/template_create_function_readable/prompt_parameters_empty"
-#test_synth_results_root_sap = "new_experiments_sap/task_detect_xss_simple_prompt/template_create_function_readable/prompt_parameters_empty"
-#test_synth_results_root_sap_open = "new_experiments_sap_open_source/task_detect_xss_simple_prompt/template_create_function_readable/prompt_parameters_empty"
-runs = []
-for root, dirs, files in os.walk(test_synth_results_root):
-    for dir in dirs:
-        if dir.startswith("run_0"):
-            runs.append(os.path.join(root, dir))
+# test_synth_results_root = "experiments/task_detect_sqli_extended/template_create_function_readable/prompt_parameters_empty"
+# test_synth_results_root_sap = "new_experiments_sap_sqli/task_detect_sqli_extended/template_create_function_readable/prompt_parameters_empty"
+# #test_synth_results_root_sap_open = "new_experiments_sap_open_source/task_detect_xss_simple_prompt/template_create_function_readable/prompt_parameters_empty"
+# runs = []
+# for root, dirs, files in os.walk(test_synth_results_root):
+#     for dir in dirs:
+#         if dir.startswith("run_0"):
+#             runs.append(os.path.join(root, dir))
 # for root, dirs, files in os.walk(test_synth_results_root_sap):
 #     for dir in dirs:
 #         if dir.startswith("run_0"):
 #             runs.append(os.path.join(root, dir))
-# for root, dirs, files in os.walk(test_synth_results_root_sap_open):
+# # for root, dirs, files in os.walk(test_synth_results_root_sap_open):
 #     for dir in dirs:
 #         if dir.startswith("run_0"):
 #             runs.append(os.path.join(root, dir))
+
+runs_file = "runs_sqli.txt"
+runs = []
+with open(runs_file, "r") as f:
+    for line in f:
+        runs.append(line.strip())
 def from_dataset_to_splits(row):
    dataset = row["dataset"]
    #check in dataset ends with zero_shot or rag
@@ -35,11 +41,17 @@ def create_experiment(row):
     return row
 merge_path = "test_results_synth_merged_sqli.csv"
 df_synth = pd.DataFrame()
-for run in runs:
-    for root, dirs, files in os.walk(run):
-        for file in files:
-            if file == "test_results.csv":
-                df_synth = pd.concat([df_synth, pd.read_csv(os.path.join(root, file))])
+# for run in runs:
+#     for root, dirs, files in os.walk(run):
+#         for file in files:
+#             if file == "test_results.csv":
+#                 df_synth = pd.concat([df_synth, pd.read_csv(os.path.join(root, file))])
+
+test_results_file = "test_results_sqli.txt"
+#open the text file and for every line execute pd.read_csv contcatenating the results to the df_synth
+with open(test_results_file, "r") as f:
+    for line in f:
+        df_synth = pd.concat([df_synth, pd.read_csv(line.strip())])
 df_synth["experiment"] = df_synth["model_name"]+"_"+df_synth["temperature"].astype(str) + "_"+df_synth["generation_mode"]+"_"+df_synth["examples_per_class"].astype(str)
 df_synth = df_synth.apply(from_dataset_to_splits,axis=1)
 

@@ -193,3 +193,8 @@ data/synthetic_datasets_sap
 /plots_rq2_sqli.csv
 /big.csv
 /accuracies.json
+/data/synthetic_datasets_sap_sqli
+/accuracies_sqli.csv
+/big_sqli.csv
+/accuracies.csv
+/test_results_synth_sqli_sap.csv

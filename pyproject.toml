@@ -39,6 +39,7 @@ tensorboard = "^2.16.2"
 torch-tb-profiler = "^0.4.3"
 sentence-transformers = "2.2.2"
 instructorembedding = "^1.0.1"
+statannot = "^0.2.3"
 
 
 [tool.poetry.group.dev.dependencies]
