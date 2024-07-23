@@ -198,3 +198,9 @@ data/synthetic_datasets_sap
 /big_sqli.csv
 /accuracies.csv
 /test_results_synth_sqli_sap.csv
+/rq1_f2.csv
+/rq1_large_f2.csv
+/rq1_plots_f2
+/rq1_plots_f2_sqli
+/rq1_f2_sqli.csv
+/rq1_large_f2_sqli.csv

@@ -35,6 +35,8 @@ rq1_file = "rq1_sqli.csv"
 rq1_large_file = "rq1_large_sqli.csv"
 
 rq2_file = "rq2_sqli.csv"
+rq2_filf2 = "rq2_f2_sqli.csv"
+
 
 rq1_plot_folder = "rq1_plots_sqli"
 rq2_plot_folder = "rq2_plots_sqli"
@@ -148,9 +150,39 @@ if gen_rq1:
 
     new_df_reduced.to_csv(rq1_file,index=False,float_format='%.3f')
     sns.set_theme(style="whitegrid")
+    rag_improvement_df_gb = rag_improvement_df.groupby("model_temperature").mean().reset_index()[["model_temperature", "rag_improvement"]]
+
+    rag_improvement_df_gb = rag_improvement_df_gb.sort_values(by=["rag_improvement"])
 
     os.makedirs(rq1_plot_folder, exist_ok=True)
     plt.figure(figsize=(10, 10))
+    rag_improvement_df_gb = rag_improvement_df_gb.replace({"anthropic-claude-3-opus":"OPUS",
+                                                            "anthropic-claude-3-sonnet": "SONNET",
+                                                            "gcp-chat-bison-001":"PALM",
+                                                            "gpt-4-0125-preview":"GPT-4T",
+                                                            "gpt-4-1106-preview":"GPT-4",
+                                                            "llama3-70b-instruct":"LLAMA",
+                                                            "mixtral-8x7b-instruct-v01":"MIXTRAL"                   
+                                                            },
+                                                                                        regex = True)
+
+    ax = sns.barplot(data=rag_improvement_df_gb, x = "model_temperature", y = "rag_improvement", palette = sns.color_palette(palette='PuBu', n_colors = len(rag_improvement_df_gb)))
+    # ax.figure.set_size_inches(9,8)
+    #ax.set_title(f"Improvement of Avg Accuracy using RAG", fontsize=22) 
+    ax.set_ylabel("AVG Accuracy Difference", fontsize=28)
+    ax.set_xlabel("Model-Temperature pairs", fontsize=28)
+    #rotate x_ticks
+    plt.xticks(rotation=60)
+    #ax.set_yticks(np.arange(-0.4,0.5, 0.1))
+    #set the font size of ytickes to 19
+    #ax.tick_params(axis='y', labelsize=25)
+    # [single_ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) for single_ax in ax.axes.flat]
+    # [single_ax.set_xlim(-0.1,0.5) for single_ax in ax.axes.flat]
+    # [single_ax.set_xticks(range(-0.1,0.5, 0.05)) for single_ax in ax.axes.flat]
+    plt.tight_layout()
+    plt.savefig(os.path.join(rq1_plot_folder,f"rag_improvement_hist.pdf"), transparent=True)
+    plt.close()
+    
     ax = sns.violinplot(data=rag_improvement_df, y=f"rag_improvement", color = "blue",  linewidth = 2, fill = True, alpha = 0.6)
     # ax.figure.set_size_inches(9,8)
     #ax.set_title(f"Improvement of Avg Accuracy using RAG", fontsize=22) 
@@ -219,12 +251,16 @@ if gen_rq2:
         for dataset in df_keep["dataset"].unique():
             df_dataset = df_keep[df_keep["dataset"]==dataset]
             new_row = {"experiment":experiment,"dataset":dataset}
+            print(df[df["experiment"]==experiment].head())
             #group by top_k and avg the accuracy and acc_diff
             for top_k in top_ks:
                 df_top = df_dataset[df_dataset["top_k"]==top_k]
                 new_row[f"top_{top_k}_acc_diff"] = df_top["accuracy_diff"].mean()
                 new_row[f"top_{top_k}_acc"] = df_top["accuracy"].mean()
-                new_row["avg_accuracy"] = df[df["experiment"]==experiment]["accuracy"].mean()
+                new_row[f"top_{top_k}_f2"] = df_top["f2"].mean()
+
+                new_row["avg_f2"] = df[df["experiment"]==experiment]["f2"].mean()
+                
             big_df_synth = pd.concat([big_df_synth,pd.DataFrame(new_row,index=[0])])
     big_df_synth.to_csv("big_sqli.csv")
     
@@ -260,9 +296,41 @@ if gen_rq2:
                 new_row[f"top_{top_k}_acc"] = df_top["accuracy"].mean()
                 new_row[f"top_{top_k}_acc_diff"] = df_top["accuracy_diff"].mean()
                 new_row[f"top_{top_k}_acc_improvement"] = df_top["accuracy"].mean() - df[df["experiment"]==experiment]["accuracy"].mean()
+
             new_df_synth = pd.concat([new_df_synth,pd.DataFrame(new_row,index=[0])])
 
     new_df_synth.to_csv(rq2_file,index=False, float_format='%.3f')
+
+    for experiment in experiments_to_keep:
+        df_keep = df_synth[df_synth["experiment"]==experiment]
+
+        df_keep = df_keep.sort_values(by=["dataset_model", "dataset_temperature", "dataset_generation_mode", "dataset_examples_per_class"])
+        exp_in_dataset = big_df_synth[big_df_synth["experiment"]==experiment]
+        exp_in_dataset = exp_in_dataset.apply(get_avg_acc_diff, axis=1, top_ks=top_ks)
+        #select the row with the lowest avg_acc_diff
+        best_dataset = exp_in_dataset[exp_in_dataset["avg_acc_diff"]==exp_in_dataset["avg_acc_diff"].min()]["dataset"].values[0]
+        #select the row with the highest avg_acc_diff
+        worst_dataset = exp_in_dataset[exp_in_dataset["avg_acc_diff"]==exp_in_dataset["avg_acc_diff"].max()]["dataset"].values[0]
+        #get the mean of all the avg_acc_diff
+        avgerage_acc_diff = exp_in_dataset["avg_acc_diff"].mean()
+        #select the row with the closes avg_acc_diff to average_acc_diff
+        avg_dataset = exp_in_dataset.iloc[(exp_in_dataset["avg_acc_diff"]-avgerage_acc_diff).abs().argsort()[:1]]["dataset"].values[0]
+        datasets_to_keep = [best_dataset,avg_dataset,worst_dataset]
+        for dataset in datasets_to_keep:
+            df_dataset = df_keep[df_keep["dataset"]==dataset]
+            new_row = {"experiment":experiment,"dataset":dataset}
+            new_row["avg_f2"] = df[df["experiment"]==experiment]["f2"].mean()
+
+            #group by top_k and avg the accuracy and acc_diff
+            for top_k in top_ks:
+                df_top = df_dataset[df_dataset["top_k"]==top_k]
+                new_row[f"top_{top_k}_acc"] = df_top["accuracy"].mean()
+                new_row[f"top_{top_k}_f2"] = df_top["f2"].mean()
+                new_row[f"top_{top_k}_f2_improvement"] = df_top["f2"].mean() - df[df["experiment"]==experiment]["f2"].mean()
+
+            new_df_synth = pd.concat([new_df_synth,pd.DataFrame(new_row,index=[0])])
+
+    new_df_synth.to_csv(rq2_file_f2,index=False, float_format='%.3f')
 
 
     df_keep = df_synth.copy()
@@ -289,6 +357,28 @@ if gen_rq2:
                 new_row[f"top_{top_k}_acc"] = df_top["accuracy"].mean()
                 new_row[f"top_{top_k}_acc_diff"] = df_top["accuracy_diff"].mean()
                 new_row[f"top_{top_k}_acc_improvement"] = df_top["accuracy"].mean() - df[df["experiment"]==experiment]["accuracy"].mean()
+
+            plots_df = pd.concat([plots_df,pd.DataFrame(new_row,index=[0])])
+    plots_df.to_csv("plots_rq2_sqli_f2.csv",index=False, float_format='%.3f')
+
+    for experiment in df_synth.experiment.unique():
+        #if experiment does not contain one of gpt-4, bison, opus, sonnet,  llama3, mixtral-8x7b continue
+        if "gpt-4" not in experiment and "bison" not in experiment and "opus" not in experiment and "sonnet" not in experiment and "llama3" not in experiment and "mixtral-8x7b" not in experiment:
+            continue
+        if  "gcp-chat-bison-001_0.0" in experiment or "gcp-chat-bison-001_0.5" in experiment or "gpt-3.5" in experiment or "anthropic-claude-3-sonnet_0.0" in experiment or "mixtral-8x7b-instruct-v01_0.0" in experiment or "llama3-70b-instruct_0.0" in experiment:   #bison, sonnet, mistral and llama working only with higher temperature
+            continue
+
+        df_keep_exp = df_keep[df_keep["experiment"]==experiment]
+        for dataset in df_keep_exp["dataset"].unique():
+            df_dataset = df_keep_exp[df_keep_exp["dataset"]==dataset]
+            new_row = {"experiment":experiment,"dataset":dataset}
+            #group by top_k and avg the accuracy and acc_diff
+            new_row["avg_f2"] = df[df["experiment"]==experiment]["f2"].mean()
+
+            for top_k in top_ks:
+                df_top = df_dataset[df_dataset["top_k"]==top_k]
+                new_row[f"top_{top_k}_f2"] = df_top["f2"].mean()
+                new_row[f"top_{top_k}_f2_improvement"] = df_top["f2"].mean() - df[df["experiment"]==experiment]["f2"].mean()
 
             plots_df = pd.concat([plots_df,pd.DataFrame(new_row,index=[0])])
     plots_df.to_csv("plots_rq2_sqli.csv",index=False, float_format='%.3f')

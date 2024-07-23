@@ -1,0 +1,6 @@
+outs:
+- md5: ac2a821744c59aff9bb4b633bfba0b5f.dir
+  size: 101076
+  nfiles: 4
+  hash: md5
+  path: rq1_plots_f2

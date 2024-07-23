@@ -343,10 +343,17 @@ def summarize_synth_test_results(run_folder, test_results_file_name, synth_resul
 
     #map subfolders to a dict with the name of the folder as key and the accuracy in the json file as value
     subfolders_dict = {}
+    subfolders_dict_f2 = {}
+
     for subfolder in subfolders:
         content = json.load(open(os.path.join(subfolder, test_results_file_name)))
         if not content['failed']:
             subfolders_dict[subfolder.split('/')[-1]] = content["results"]["accuracy"]
+            if content["results"]["precision"] != 0 and content["results"]["recall"] != 0:
+                subfolders_dict_f2[subfolder.split('/')[-1]] = (((1 + 4) * content["results"]["precision"] * content["results"]["recall"]) / (4 * content["results"]["precision"] + content["results"]["recall"]))
+            else:
+                subfolders_dict_f2[subfolder.split('/')[-1]] = 0
+
     #open dataset params json file
     dataset_dict = json.load(open(dataset_params))
     if dataset_dict["examples_per_class"] == 0:
@@ -354,24 +361,30 @@ def summarize_synth_test_results(run_folder, test_results_file_name, synth_resul
     else:
         name =  f'{dataset_dict["model_name"]}_{dataset_dict["temperature"]}_{dataset_dict["generation_mode"]}_{dataset_dict["examples_per_class"]}'
     model_parameters = get_run_parameters(run_folder)
-    df = pd.DataFrame(columns = ['top_k', 'dataset', 'accuracy', 'accuracy_diff', 'dataset_index', 'task', 'template', 'prompt_parameters', 'model_name', 'generation_mode', 'examples_per_class', 'temperature', 'seed'])
+    df = pd.DataFrame(columns = ['top_k', 'dataset', 'accuracy', 'accuracy_diff', "f2", "f2_diff",'dataset_index', 'task', 'template', 'prompt_parameters', 'model_name', 'generation_mode', 'examples_per_class', 'temperature', 'seed'])
     for top_k in top_ks:
         #get the highet top_k values in the values of subfolder dicts
         best_top_k = sorted(subfolders_dict, key=subfolders_dict.get, reverse=True)[:top_k]
         #average accuracy of the top_k experiments
         avg_accuracy = sum([subfolders_dict[exp] for exp in best_top_k if exp in subfolders_dict.keys()]) / top_k
+        avg_f2 = sum([subfolders_dict_f2[exp] for exp in best_top_k if exp in subfolders_dict.keys()]) / top_k
         for dataset in range(n_datasets):
             experiments = synth_results['single_dataset_results'][f"dataset_{dataset}"][str(top_k)]["experiments"]
             to_subtract = max(1, top_k -len([exp for exp in experiments if exp not in subfolders_dict.keys()]))
             #get the avg accuracy of the top_k experiments
             avg_accuracy_syn = sum([subfolders_dict[exp] for exp in experiments if exp in subfolders_dict.keys()]) / to_subtract
+            avg_f2_syn = sum([subfolders_dict_f2[exp] for exp in experiments if exp in subfolders_dict.keys()]) / to_subtract
+
             acc_diff = abs(avg_accuracy - avg_accuracy_syn)
+            f2_diff = abs(avg_f2 - avg_f2_syn)
 
             row = {
                 "top_k": top_k,
                 "dataset": name,
                 "accuracy": avg_accuracy_syn,
                 "accuracy_diff": acc_diff,
+                "f2": avg_f2_syn,
+                "f2_diff": f2_diff,
                 "dataset_index": str(dataset),
                 "task":model_parameters["task"],
                 "template":model_parameters["template"],

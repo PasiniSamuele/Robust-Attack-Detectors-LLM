@@ -6,7 +6,7 @@ import pandas as pd
 import concurrent.futures
 
 #experiments_root = "experiments/task_detect_xss_simple_prompt/template_create_function_readable"
-experiments_root = "experiments/task_detect_sqli_extended/template_create_function_readable"
+experiments_root = "new_experiments_sap_sqli/task_detect_sqli_extended/template_create_function_readable"
 
 #find all folders named run_0 recursively inside experiments_root
 runs = []
@@ -41,7 +41,7 @@ for run in runs:
                                               "test_results.csv")
         # print(test_results_file_path)
         # asdas
-        if os.path.exists(test_results_file_path):
+        if os.path.exists(test_results_file_path) and False:
             print("Skipping", test_results_file_path)
             continue
 
