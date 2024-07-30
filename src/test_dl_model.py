@@ -14,6 +14,11 @@ def val_epoch(val_loader, model, criterion, device):
     total_loss = 0
     n_correct = 0
     n_samples = 0
+    TP = 0
+    TN = 0
+    FP = 0
+    FN = 0
+    
     with torch.no_grad():
         for i, (payloads, labels) in enumerate(val_loader):
             payloads = payloads.to(device)
@@ -21,11 +26,30 @@ def val_epoch(val_loader, model, criterion, device):
             outputs = model(payloads)
             predicted = torch.round(outputs)
             loss = criterion(outputs, labels)
+            
             total_loss += loss.item()
             n_samples += labels.size(0)
             n_correct += (predicted == labels).sum().item()
+            
+            # Update TP, TN, FP, FN directly on tensors
+            TP += ((predicted == 1) & (labels == 1)).sum().item()
+            TN += ((predicted == 0) & (labels == 0)).sum().item()
+            FP += ((predicted == 1) & (labels == 0)).sum().item()
+            FN += ((predicted == 0) & (labels == 1)).sum().item()
+ 
         accuracy = 100.0 * n_correct / n_samples
-    return total_loss / len(val_loader), accuracy
+        print(n_samples)
+        print("TP:",TP)
+        print("FP:",FP)
+        print("TN:",TN)
+        print("FN:",FN)
+ 
+        # Calculate precision, recall, and F2 score
+        precision = TP / (TP + FP) if TP + FP > 0 else 0
+        recall = TP / (TP + FN) if TP + FN > 0 else 0
+        f2_score = (5 * precision * recall) / ((4 * precision) + recall) if (precision + recall) > 0 else 0
+    
+    return total_loss / len(val_loader), accuracy, precision, recall, f2_score
 
 def test(opt):
     torch.manual_seed(opt.seed)
@@ -56,12 +80,17 @@ def test(opt):
     model = model_architecture(vocab_size, opt.embedding_dim, XSSDataset.MAX_LENGTH).to(device)
     model.load_state_dict(torch.load(checkpoint_path))
 
-    _, accuracy = val_epoch(test_loader, model, torch.nn.BCELoss(), device)
+    _, accuracy, precision, recall, f2_score = val_epoch(test_loader, model, torch.nn.BCELoss(), device)
     print(f"Accuracy: {accuracy}")
-
+    print(f"Precision: {precision}")
+    print(f"Recall: {recall}")
+    print(f"F2score: {f2_score}")
     # Save the results
     results = {
         "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f2score": f2_score,
         "model": opt.model,
         "run": opt.checkpoint_folder
     }

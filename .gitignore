@@ -204,3 +204,10 @@ data/synthetic_datasets_sap
 /rq1_plots_f2_sqli
 /rq1_f2_sqli.csv
 /rq1_large_f2_sqli.csv
+/plots_rq2_sqli_f2.csv
+/plots_rq2_f2.csv
+/rq2_f2_sqli.csv
+/rq4_f2.json
+/rq4.json
+/sofia.json
+/rq2_f2.csv

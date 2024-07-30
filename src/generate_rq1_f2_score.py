@@ -58,7 +58,7 @@ df["f2_std"] = df["accuracy_std"]
 df = df[df["model_temperature"].str.contains("gpt-4|opus|sonnet|gpt-4|gcp|llama3|mixtral-8x7b", regex=True)]
 
 #drop_columns with model_temperature == "gcp-chat-bison-001_0.0" or model_temperature == "anthropic-claude-3-sonnet_0.0" or model_temperature == "mixtral-8x7b-instruct-v01_0.0" or model_temperature == "llama3-70b-instruct_0.0"
-df = df[~df["model_temperature"].isin(["gcp-chat-bison-001_0.0","gcp-chat-bison-001_0.5","anthropic-claude-3-sonnet_0.0","mixtral-8x7b-instruct-v01_0.0","llama3-70b-instruct_0.0"])]
+df = df[~df["model_temperature"].isin(["gcp-chat-bison-001_0.0","anthropic-claude-3-sonnet_0.0","mixtral-8x7b-instruct-v01_0.0","llama3-70b-instruct_0.0"])]
 
 best_exp_global = df[df["f2"]==df["f2"].max()]["experiment"].values[0]
 worst_exp_global = df[df["f2"]==df["f2"].min()]["experiment"].values[0]
@@ -84,7 +84,7 @@ if gen_rq1:
         if "gpt-4" not in model_temperature and "claude-3" not in model_temperature and "gpt-4" not in model_temperature and "gcp" not in model_temperature and "llama3" not in model_temperature and "mixtral-8x7b" not in model_temperature:
             continue
         df_model_temperature = df[df["model_temperature"]==model_temperature]
-        if model_temperature == "gcp-chat-bison-001_0.0" or model_temperature == "gcp-chat-bison-001_0.5" or model_temperature == "anthropic-claude-3-sonnet_0.0":   #bison and sonnet working only with higher temperature
+        if model_temperature == "gcp-chat-bison-001_0.0" or model_temperature == "anthropic-claude-3-sonnet_0.0":   #bison and sonnet working only with higher temperature
             continue
         new_row = {"model_temperature":model_temperature}
         for examples_per_class in examples_values:
@@ -160,7 +160,7 @@ if gen_rq1:
     sns.set_theme(style="whitegrid")
     rag_improvement_df_gb = rag_improvement_df.groupby("model_temperature").mean().reset_index()[["model_temperature", "rag_improvement"]]
     os.makedirs(rq1_plot_folder, exist_ok=True)
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(8, 6))
     rag_improvement_df_gb = rag_improvement_df_gb.replace({"anthropic-claude-3-opus":"OPUS",
                                                             "anthropic-claude-3-sonnet": "SONNET",
                                                             "gcp-chat-bison-001":"PALM",
@@ -172,19 +172,22 @@ if gen_rq1:
                                                                                         regex = True)
     #order rag_improvement_df by rag_improvement
     rag_improvement_df_gb = rag_improvement_df_gb.sort_values(by=["rag_improvement"])
-    ax = sns.barplot(data=rag_improvement_df_gb, x = "model_temperature", y = "rag_improvement", palette = sns.color_palette(palette='Oranges', n_colors = len(rag_improvement_df_gb)))
+    ax = sns.barplot(data=rag_improvement_df_gb, x = "model_temperature", y = "rag_improvement", palette = sns.color_palette(palette='Reds', n_colors = len(rag_improvement_df_gb)))
     # ax.figure.set_size_inches(9,8)
     #ax.set_title(f"Improvement of Avg f2 using RAG", fontsize=22) 
-    ax.set_ylabel("AVG f2 Difference", fontsize=28)
-    ax.set_xlabel("Model-Temperature pairs", fontsize=28)
+    ax.set_ylabel("AVG F2 Difference", fontsize=22)
+    ax.set_xlabel("Model-Temperature pairs", fontsize=22)
     #rotate x_ticks
     plt.xticks(rotation=60)
+    ax.set_xticklabels(ax.get_xticklabels(), ha="center")
     #ax.set_yticks(np.arange(-0.4,0.5, 0.1))
     #set the font size of ytickes to 19
     #ax.tick_params(axis='y', labelsize=25)
-    # [single_ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) for single_ax in ax.axes.flat]
-    # [single_ax.set_xlim(-0.1,0.5) for single_ax in ax.axes.flat]
-    # [single_ax.set_xticks(range(-0.1,0.5, 0.05)) for single_ax in ax.axes.flat]
+    #set y ticks label size to 16
+    for bar in ax.patches:
+        bar.set_hatch('\\\\')
+    ax.tick_params(axis='y', labelsize=18)
+    ax.tick_params(axis='x', labelsize=16)
     plt.tight_layout()
     plt.savefig(os.path.join(rq1_plot_folder,f"rag_improvement_hist.pdf"), transparent=True)
     plt.close()
@@ -202,6 +205,8 @@ if gen_rq1:
     # [single_ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) for single_ax in ax.axes.flat]
     # [single_ax.set_xlim(-0.1,0.5) for single_ax in ax.axes.flat]
     # [single_ax.set_xticks(range(-0.1,0.5, 0.05)) for single_ax in ax.axes.flat]
+    for bar in ax.patches:
+        bar.set_hatch('\\\\')
     plt.tight_layout()
     plt.savefig(os.path.join(rq1_plot_folder,f"rag_improvement.pdf"), transparent=True)
     plt.close()

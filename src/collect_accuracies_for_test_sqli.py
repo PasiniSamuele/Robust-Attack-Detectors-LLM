@@ -26,7 +26,7 @@ for root, dirs, files in os.walk(test_synth_results_root_sap):
 rag_accuracies = []
 no_rag_accuracies = []
 
-accuracies = pd.DataFrame(columns=["model_temperature","use_rag", "few_shot_examples"])
+accuracies = pd.DataFrame(columns=["model_temperature","use_rag", "few_shot_examples", "accuracy", "f2"])
 for run in runs:
     #open parameters.json file
     parameters_file = os.path.join(run, "parameters.json")
@@ -43,7 +43,11 @@ for run in runs:
         with open(test_results_file) as f:
             test_results = json.load(f)
             if not test_results["failed"]:
-                row = pd.DataFrame([{"model_temperature":model_temperature, "use_rag":use_rag, "few_shot_examples":parameters["examples_per_class"], "accuracy":test_results["results"]["accuracy"]}])
+                if test_results["results"]["precision"] != 0 and  test_results["results"]["recall"] != 0:
+                    f2 = (((1 + 4) * test_results["results"]["precision"] * test_results["results"]["recall"]) / (4 * test_results["results"]["precision"] + test_results["results"]["recall"]))
+                else:
+                    f2 = 0  
+                row = pd.DataFrame([{"model_temperature":model_temperature, "use_rag":use_rag, "few_shot_examples":parameters["examples_per_class"], "accuracy":test_results["results"]["accuracy"], "f2":f2}])
                 accuracies = pd.concat([accuracies, row])
 
 #save json file with accuracies

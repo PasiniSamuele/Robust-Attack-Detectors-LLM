@@ -10,27 +10,27 @@ experiments_root = "new_experiments_sap_sqli/task_detect_sqli_extended/template_
 
 #find all folders named run_0 recursively inside experiments_root
 runs = []
+
+allowed_models = ["claude-3", "chat-bison", "llama3", "mixtral", "gpt-4"]
 for root, dirs, files in os.walk(experiments_root):
-    for dir in dirs:
-        if dir.startswith("run_0"):
-            runs.append(os.path.join(root, dir))
+    if 'run_0' in dirs and any([model in root for model in allowed_models]):
+            runs.append(os.path.join(root, 'run_0'))
+
 #datasets_root = "data/synthetic_datasets_sap/task_detect_xss_simple_prompt/template_create_synthetic_dataset/prompt_parameters_medium_dataset/"
-datasets_root = "data/synthetic_datasets_sap_sqli/task_detect_sqli_extended/template_create_synthetic_dataset/prompt_parameters_medium_dataset/"
+datasets_root = "data/synthetic_datasets/task_detect_sqli_extended/template_create_synthetic_dataset/prompt_parameters_medium_dataset/"
 
 #find all folders named run_0 recursively inside datasets_root
 pool = concurrent.futures.ThreadPoolExecutor(max_workers=3)
 
 datasets = []
 for root, dirs, files in os.walk(datasets_root):
-    for dir in dirs:
-        if dir.startswith("run_"):
-            #open results file
-            results_json = os.path.join(root, dir,"results.json")
-            #open json file and see if it is failed
-            with open(results_json, 'r') as f:
-                results = json.load(f)
-                if results["success"] == True:
-                    datasets.append(os.path.join(root, dir))
+    if 'run_0' in dirs:
+        results_json = os.path.join(root, 'run_0',"results.json")
+        #open json file and see if it is failed
+        with open(results_json, 'r') as f:
+            results = json.load(f)
+            if results["success"] == True:
+                datasets.append(os.path.join(root, 'run_0'))
 
 top_ks = [1,3,5,10,15]
 for run in runs: 
@@ -63,12 +63,12 @@ for run in runs:
 #find in runs all the files names test_results_csv
 pool.shutdown(wait=True)
 df = pd.DataFrame()
-for run in runs:
-    for root, dirs, files in os.walk(run):
-        for file in files:
-            if file == "test_results.csv":
-                df = pd.concat([df, pd.read_csv(os.path.join(root, file))])
-df.to_csv("test_results_synth_sqli_sap.csv")
+# for run in runs:
+#     for root, dirs, files in os.walk(run):
+#         for file in files:
+#             if file == "test_results.csv":
+#                 df = pd.concat([df, pd.read_csv(os.path.join(root, file))])
+# df.to_csv("test_results_synth_sqli_sap.csv")
         
 
 

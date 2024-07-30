@@ -1,1 +1,44 @@
-{"1": {"pvalue": 0.0, "a12": 0.8679837430747922, "effect_size_score": 0.7359674861495844, "effect_size": "large"}, "3": {"pvalue": 0.0, "a12": 0.8328900796398891, "effect_size_score": 0.6657801592797783, "effect_size": "large"}, "5": {"pvalue": 0.0, "a12": 0.7998725588642659, "effect_size_score": 0.5997451177285318, "effect_size": "large"}}
+{
+    "1": {
+        "accuracy": {
+            "pvalue": 0.0,
+            "a12": 0.8671905520984485,
+            "effect_size_score": 0.7343811041968971,
+            "effect_size": "large"
+        },
+        "f2": {
+            "pvalue": 0.0,
+            "a12": 0.854892775421364,
+            "effect_size_score": 0.709785550842728,
+            "effect_size": "large"
+        }
+    },
+    "3": {
+        "accuracy": {
+            "pvalue": 0.0,
+            "a12": 0.8345954487107936,
+            "effect_size_score": 0.6691908974215872,
+            "effect_size": "large"
+        },
+        "f2": {
+            "pvalue": 0.0,
+            "a12": 0.8112830847471816,
+            "effect_size_score": 0.6225661694943632,
+            "effect_size": "large"
+        }
+    },
+    "5": {
+        "accuracy": {
+            "pvalue": 0.0,
+            "a12": 0.8004716800145105,
+            "effect_size_score": 0.600943360029021,
+            "effect_size": "large"
+        },
+        "f2": {
+            "pvalue": 0.0,
+            "a12": 0.7725244865498382,
+            "effect_size_score": 0.5450489730996764,
+            "effect_size": "large"
+        }
+    }
+}

@@ -28,6 +28,16 @@ def select_best_experiment(opt):
     df = df.drop(df[(df["model_name"] == "gpt-3.5-turbo-0125")].index)
     #reset index
     df.reset_index(drop=False, inplace=True)
+    df_baseline = df[df["run"].str.contains("generation_mode_zero_shot")]
+    df_baseline_best = df_baseline.loc[df_baseline['accuracy'].idxmax()]
+
+    baseline = {"folder": str(df_baseline_best["folder"]),
+    "model_name": str(df_baseline_best["model_name"]),
+    "temperature": float(df_baseline_best["temperature"]),
+    "generation_mode": str(df_baseline_best["generation_mode"]),
+    "examples_per_class": int(df_baseline_best["examples_per_class"]),
+    "accuracy": float(df_baseline_best["accuracy"])}
+
     #get the row with maximum accuracy
     df_best = df.loc[df['accuracy'].idxmax()]
     top_k_results_val_set = {}
@@ -162,26 +172,40 @@ def select_best_experiment(opt):
     test_results_dict["top_k_metrics"] = {}
     for k in opt.top_k:
         acc = 0
+        f2 = 0
+
         experiments = validation_results["top_k_results"][f"top_{k}"]["results"]["exps"]
         for exp in experiments:
             exp_r = json.load(open(os.path.join(validation_results["folder"], exp,  opt.test_results_file_name)))
             acc += exp_r["results"]["accuracy"]
+            if exp_r["results"]["precision"] != 0 and  exp_r["results"]["recall"] != 0:
+                f2 += (((1 + 4) * exp_r["results"]["precision"] * exp_r["results"]["recall"]) / (4 * exp_r["results"]["precision"] + exp_r["results"]["recall"]))
+ 
         acc = acc/len(experiments)
+        f2 = f2/len(experiments)
 
         #avg the accuracies
         test_results_dict["top_k_metrics"][f"top_{k}_accuracy"] = acc
+        test_results_dict["top_k_metrics"][f"top_{k}_f2"] = f2
+
     
     test_results_val_dict = {}
     for k in opt.top_k:
         acc = 0
         experiments = validation_results["top_k_results_val_set"][k]["exp"]
+        f2 = 0
         for exp in experiments:
             exp_r = json.load(open(os.path.join(validation_results["folder"], exp,  opt.test_results_file_name)))
             acc += exp_r["results"]["accuracy"]
+            if exp_r["results"]["precision"] != 0 and  exp_r["results"]["recall"] != 0:
+                f2 += (((1 + 4) * exp_r["results"]["precision"] * exp_r["results"]["recall"]) / (4 * exp_r["results"]["precision"] + exp_r["results"]["recall"]))
         acc = acc/len(experiments)
+        f2 = f2/len(experiments)
         test_results_val_dict[f"top_{k}_accuracy"] = acc
+        test_results_val_dict[f"top_{k}_f2"] = f2
     
     final_results = {
+        "baseline" : baseline,
         "validation_results": validation_results,
         "test_results_synth": test_results_dict,
         "test_results_val": test_results_val_dict
