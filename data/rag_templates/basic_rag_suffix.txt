@@ -1,2 +1,0 @@
-Use the following pieces of retrieved context to write a more complete function:
-Context: {context}

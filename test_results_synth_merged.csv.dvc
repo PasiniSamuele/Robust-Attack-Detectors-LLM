@@ -1,5 +1,0 @@
-outs:
-- md5: da68c4265111498145a075fa74b94787
-  size: 202123233
-  hash: md5
-  path: test_results_synth_merged.csv

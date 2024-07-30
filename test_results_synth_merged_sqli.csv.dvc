@@ -1,5 +1,0 @@
-outs:
-- md5: 774a666213d0a5552358b9ea72f6edf3
-  size: 25718207
-  hash: md5
-  path: test_results_synth_merged_sqli.csv

@@ -1,6 +1,0 @@
-outs:
-- md5: 174027ecc47895491defec1a7ab7f899.dir
-  size: 697868
-  nfiles: 24
-  hash: md5
-  path: ranking_dataset_output

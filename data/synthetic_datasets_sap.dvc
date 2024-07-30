@@ -1,6 +1,0 @@
-outs:
-- md5: 5778bd82433d2cb62893c24ac6abc6eb.dir
-  size: 9105836
-  nfiles: 2078
-  hash: md5
-  path: synthetic_datasets_sap

@@ -1,5 +1,0 @@
-outs:
-- md5: 6cf209260e649d8aea523d0db1306c9f
-  size: 18873792
-  hash: md5
-  path: test_results_synth_sqli.csv

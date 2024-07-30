@@ -1,5 +1,0 @@
-outs:
-- md5: e6ec6aba07cf8059d042c273ce8af7f1
-  size: 1371
-  hash: md5
-  path: rq1_large_sqli_sap.csv
