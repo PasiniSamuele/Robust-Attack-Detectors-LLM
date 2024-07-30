@@ -1,0 +1,44 @@
+{
+    "1": {
+        "accuracy": {
+            "pvalue": 0.0,
+            "a12": 0.8070105229591836,
+            "effect_size_score": 0.6140210459183673,
+            "effect_size": "large"
+        },
+        "f2": {
+            "pvalue": 0.0,
+            "a12": 0.6691384991496598,
+            "effect_size_score": 0.3382769982993197,
+            "effect_size": "medium"
+        }
+    },
+    "3": {
+        "accuracy": {
+            "pvalue": 0.0,
+            "a12": 0.8010177508503401,
+            "effect_size_score": 0.6020355017006802,
+            "effect_size": "large"
+        },
+        "f2": {
+            "pvalue": 0.0,
+            "a12": 0.6258397108843538,
+            "effect_size_score": 0.2516794217687075,
+            "effect_size": "small"
+        }
+    },
+    "5": {
+        "accuracy": {
+            "pvalue": 0.0,
+            "a12": 0.7833774447278912,
+            "effect_size_score": 0.5667548894557823,
+            "effect_size": "large"
+        },
+        "f2": {
+            "pvalue": 4.499366433258921e-247,
+            "a12": 0.5912234268707482,
+            "effect_size_score": 0.1824468537414965,
+            "effect_size": "small"
+        }
+    }
+}

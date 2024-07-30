@@ -1,0 +1,2 @@
+def detect_xss(http_get_request: str)->bool: 
+""" Check if in the given http_get_request there is an XSS exploit, considering also the possible evasions that an attacker can perform."""

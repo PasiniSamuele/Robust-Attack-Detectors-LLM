@@ -1,0 +1,16 @@
+    {"exclude": [
+        "**/.git/objects/**",
+        "**/.git/subtree-cache/**",
+        "**/node_modules/*/**",
+        "**/.hg/store/**",
+        "**/.venv/**",
+        "**/experiments/**",
+        "**/plots/**",
+        "**/data/**",
+        "**/rq2_plots/**",
+        "**/new_experiments_sap/**",
+        "**/old_experiments_sap/**",
+        "**/experiments_sap/**",
+
+    ]
+}

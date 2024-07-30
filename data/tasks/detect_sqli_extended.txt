@@ -1,0 +1,2 @@
+def detect_sqli(query: str)->bool: 
+""" Check if the given SQL query contains some statement injected by an attacker to perform SQL injection. Be sure that in the patterns used for the detection, no pattern related to normal SQL code (like standard SELECT ... FROM ... WHERE ..., or standard INSERT ... INTO ...) is considered, since it is not an attack."""

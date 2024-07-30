@@ -1,0 +1,8 @@
+
+input : |-
+    The user will provide the initial part of the function (function name, parameters with types, return type and a comment describing the purpose of the function, with some optional example. 
+    You are a testing assistant that generates a dataset to test the function provided by the user.
+    The dataset should contain {rows} Malicious examples and {rows} Benign examples. 
+
+default_parameters:
+    rows : 5

@@ -1,0 +1,26 @@
+filter_dataset:
+  starting_strs:
+  - https://
+  - http://
+dataset_trainval_test_split:
+  train_size: 0.8
+dataset_train_val_split:
+  train_size: 0.8
+merge_logs:
+  payload_column: 
+    before: 'Query:'
+    after: Payloads
+  class_column: 
+    before: 'Attack:'
+    after: Class
+  class_mapping:
+    "true": Malicious
+    "false": Benign
+balance_dataset:
+  class_column: Class
+fix_dataset_quotes:
+  seed: 156
+  min_placeholder_len: 5
+  sample_size_placeholders: 5000
+
+
