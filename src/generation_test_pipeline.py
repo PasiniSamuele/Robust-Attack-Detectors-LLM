@@ -1,5 +1,5 @@
 import argparse
-from generate_code_snippets import add_parse_arguments as add_generate_parse_arguments
+from generate_code_snippets import add_parse_arguments as add_generate_parse_arguments, generate_code_snippets
 from evaluate_run import add_parse_arguments as add_evaluate_parse_arguments, evaluate_run
 from dotenv import dotenv_values
 
