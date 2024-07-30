@@ -2,8 +2,7 @@ import os
 from argparse import Namespace
 from evaluate_run import evaluate_run
 import os
-experiments_root = "new_experiments_sap_sqli/task_detect_sqli_extended/template_create_function_readable"
-#experiments_root = "experiments/task_detect_sqli_extended/template_create_function_readable"
+experiments_root = "experiments/task_detect_sqli_extended/template_create_function_readable"
 #find all folders named run_0 recursively inside experiments_root
 total = 0
 runs = []

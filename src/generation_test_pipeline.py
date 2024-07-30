@@ -4,7 +4,7 @@ from evaluate_run import add_parse_arguments as add_evaluate_parse_arguments, ev
 from dotenv import dotenv_values
 
 def run_pipeline(opt, env):
-    #generate_code_snippets(opt, env)
+    generate_code_snippets(opt, env)
     evaluate_run(opt)
 
 def init_pipeline_parser():

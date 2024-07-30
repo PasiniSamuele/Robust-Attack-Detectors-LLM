@@ -57,7 +57,7 @@ def evaluate_synth_run(opt):
                                             parameters["seed"])
     print(opt.run, exp_folder)
 
-    #evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
+    evalaute_synth_dataset(n_datasets, exp_folder, evaluation_namespace)
     file_to_check = os.path.join(opt.run, exp_folder, opt.result_file_name)
     #if the file do not exists
     if not os.path.exists(file_to_check):
