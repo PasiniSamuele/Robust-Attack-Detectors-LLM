@@ -183,8 +183,7 @@ def add_parse_arguments(parser):
 def main():
     opt = init_argument_parser(add_parse_arguments)
     env = dotenv_values()
-    #generate_synthetic_dataset(opt, env)
-    #print(opt.timeout)    
+ 
     p = multiprocessing.Process(target=generate_synthetic_dataset, args=(opt, env))
     p.start()
 

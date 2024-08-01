@@ -77,7 +77,7 @@ def get_top_k_results(exps):
 
 def summarize_results(single_results:list,
                       top_k_metric:str = "accuracy",
-                      top_k:list = [1,3,5,10,15])->dict:
+                      top_k:list = [])->dict:
     results = dict()
     #filter out the failed experiments
     successful_experiments = list(filter(lambda x: not x["failed"], single_results))
@@ -88,10 +88,11 @@ def summarize_results(single_results:list,
     #count the total number of experiments
     results["total"] = len(single_results)
     #calculate avg, std and var for each metric
-    results["accuracy"], results["accuracy_std"], results["accuracy_var"] = average_metric(successful_experiments, "accuracy")
-    results["precision"], results["precision_std"], results["precision_var"] = average_metric(successful_experiments, "precision")
-    results["recall"], results["recall_std"], results["recall_var"] = average_metric(successful_experiments, "recall")
-    results["f1"], results["f1_std"], results["f1_var"] = average_metric(successful_experiments, "f1")
+    results["accuracy"], _, _ = average_metric(successful_experiments, "accuracy")
+    results["precision"], _, _ = average_metric(successful_experiments, "precision")
+    results["recall"], _, _ = average_metric(successful_experiments, "recall")
+    results["f1"], _, _ = average_metric(successful_experiments, "f1")
+    results["f2"] = (((1 + 4) * results["precision"] * results["recall"],) / (4 * results["precision"] + results["recall"],))
     for top in top_k:
         if top > len(successful_experiments):
             continue

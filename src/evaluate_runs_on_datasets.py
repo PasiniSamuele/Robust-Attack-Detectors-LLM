@@ -17,7 +17,6 @@ for root, dirs, files in os.walk(experiments_root):
 
 datasets_root = "data/synthetic_datasets/task_detect_xss_simple_prompt/template_create_synthetic_dataset/prompt_parameters_medium_dataset/"
 
-#find all folders named run_0 recursively inside datasets_root
 pool = concurrent.futures.ThreadPoolExecutor(max_workers=3)
 
 datasets = []
@@ -61,31 +60,3 @@ for run in runs:
 #find in runs all the files names test_results_csv
 pool.shutdown(wait=True)
 df = pd.DataFrame()
-# for run in runs:
-#     for root, dirs, files in os.walk(run):
-#         for file in files:
-#             if file == "test_results.csv":
-#                 df = pd.concat([df, pd.read_csv(os.path.join(root, file))])
-# df.to_csv("test_results_synth_sqli_sap.csv")
-        
-
-
-
-# diff_metrics = get_accuracy_diff_metrics(runs, datasets)
-# hue_order = diff_metrics.groupby('synth_dataset_name')["synth_dataset_name"].first().sort_values().index
-
-# box_metrics = os.path.join(experiments_root, "box_plots")
-# experiments_synth_boxplots_by_model(diff_metrics, os.path.join(box_metrics,"accuracy_diff", "top_k"), "top_k","accuracy_diff",hue_order)
-# experiments_synth_boxplots_by_model(diff_metrics, os.path.join(box_metrics,"accuracy_diff", "temperature"), "temperature","accuracy_diff",hue_order)
-
-# experiments_synth_boxplots_by_model(diff_metrics, os.path.join(box_metrics,"avg_std", "top_k"), "top_k","avg_std",hue_order)
-# experiments_synth_boxplots_by_model(diff_metrics, os.path.join(box_metrics,"avg_std", "temperature"), "temperature","avg_std",hue_order)
-
-
-# for model in diff_metrics["model"].unique():
-#     experiments_synth_boxplots(diff_metrics, os.path.join(box_metrics,"accuracy_diff","temperature_top_k"), model, "temperature", "top_k", "accuracy_diff",hue_order)
-#     experiments_synth_boxplots(diff_metrics, os.path.join(box_metrics,"accuracy_diff","temperature_generation_mode"),model, "temperature","generation_mode", "accuracy_diff",hue_order)
-#     experiments_synth_boxplots(diff_metrics, os.path.join(box_metrics,"avg_std","temperature_top_k"), model, "temperature", "top_k", "avg_std",hue_order)
-#     experiments_synth_boxplots(diff_metrics, os.path.join(box_metrics,"avg_std","temperature_generation_mode"),model, "temperature","generation_mode", "avg_std",hue_order)
-
-

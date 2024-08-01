@@ -28,12 +28,6 @@ def evalaute_synth_dataset(n_datasets:str,
     result_file_name = opt.result_file_name
     for i in range(n_datasets):
         synth_eval_run(i, exp_folder, opt, result_file_name)
-        #find all subfolders in opt.dataset_folders
-        subset_folders = get_subfolders(opt.dataset_folder)
-        #keep only last folder name
-        subset_folders = [f.split("/")[-1] for f in subset_folders]
-        # for subfolder in subset_folders:
-        #     synth_eval_run(i, exp_folder, opt, result_file_name, subfolder)
 
 def evaluate_synth_run(opt):
     #open parameters file
@@ -43,7 +37,6 @@ def evaluate_synth_run(opt):
     with open(prompt_parameters) as f:
         yaml = YAML(typ="safe")
         params = yaml.load(f) 
-    dataset_size = params["rows"]
     evaluation_namespace = Namespace(**vars(opt))
     n_datasets = parameters["experiments"]
     exp_folder = get_experiment_folder(opt.evaluation_folder,
@@ -94,11 +87,6 @@ def add_parse_arguments(parser):
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
     parser.add_argument('--test_results_file_name', type=str, default='test_results.json', help='name of the results file')
 
-    parser.add_argument('--top_k_metric', type=str, default='accuracy', help='metric used to select the best experiments in the run')
-    parser.add_argument('--top_k', type=int, action='append', help='top_k value to be considered for the top_k_metric, you can append more than one')
-
-    #plot parameters
-    parser.add_argument('--plot', type=bool, default=True, help='if true, the plots will be generated')
     return parser
 
 def main():
