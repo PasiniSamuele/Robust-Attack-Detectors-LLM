@@ -48,7 +48,8 @@ Let's analyze first the results file in *generated_function_runs*.
 Inside that, every row represent a Model-Temperature pair.
 Every column represent the performance obtained on the *test_set* by a specific combination on RAG Usage Parameter and Few-shot examples.
 The last column, *avg_m_diff*, gives an overview of the effect of RAG on a specific Model-Temperature pair.
-Given the set $N_s$ containing all the possible value of Few-shot examples (in the provided experiments it is $\{0, 2, 6, 10\}$), *avg_m_diff* is calculated as $$\frac{1}{|N_s|} * \sum_{n \in N_s}(RAG\_n - no\_RAG\_n)$$
+Given the set $N_s$ containing all the possible value of Few-shot examples (in the provided experiments it is $\{0, 2, 6, 10\}$) dvided by 2, since, when we created the experimental framework, we were considering this number as the Few-shot examples per class (in practice you will find the set of numbers $\{0, 1, 3, 5\}$).
+*avg_m_diff* is calculated as $$\frac{1}{|N_s|} * \sum_{n \in N_s}(RAG\_n - no\_RAG\_n)$$
 
 Let's analyze the results file in *self-ranking*.
 Every row represent the pair between the Generated Function Run $U$ and the synthetic dataset $S$, represented respectively in the columns *generated_function_run* and *synthetic_dataset*, and reported in the form *model\_temperature\_generation_mode\_examples. Generation mode represents the used prompt and it is inside the set $\{zero\_shot, few\_shot, rag, rag\_few\_shot\}$
