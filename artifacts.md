@@ -51,7 +51,7 @@ The last column, *avg_m_diff*, gives an overview of the effect of RAG on a speci
 Given the set $N_s$ containing all the possible value of Few-shot examples (in the provided experiments it is $\{0, 2, 6, 10\}$), *avg_m_diff* is calculated as $$\frac{1}{|N_s|} * \sum_{n \in N_s}(RAG\_n - no\_RAG\_n)$$
 
 Let's analyze the results file in *self-ranking*.
-Every row represent a $U$-$S$ pair, represented respectively in the columns *generated_function_run* and *synthetic_dataset*, and reported in the form *model\_temperature\_generation_mode\_examples. Generation mode represents the used prompt and it is inside the set $\{zero\_shot, few\_shot, rag, rag\_few\_shot\}$
+Every row represent the pair between the Generated Function Run $U$ and the synthetic dataset $S#, represented respectively in the columns *generated_function_run* and *synthetic_dataset*, and reported in the form *model\_temperature\_generation_mode\_examples. Generation mode represents the used prompt and it is inside the set $\{zero\_shot, few\_shot, rag, rag\_few\_shot\}$
 The first column represent the average performance of a Generated Function Run (already present in the other files, but reported here to have an clear comparison).
 For every considered value of $k$, 3 columns are reported:
 *top\_k* represent the performance  *top\_k* functions of $U$ selected using $S$ to perform Self-Ranking.
