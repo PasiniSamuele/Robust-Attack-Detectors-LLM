@@ -57,7 +57,7 @@ def generate_experiments_summary(opt):
 
 def add_parse_arguments(parser):
 
-    parser.add_argument('--experiments_root_folder', type=str, default='new_experiments_sap_sqli/task_detect_sqli_extended/template_create_function_readable', help='root of the experiments')
+    parser.add_argument('--experiments_root_folder', type=str, default='generated_function_runs/task_detect_sqli_extended/template_create_function_readable', help='root of the experiments')
     parser.add_argument('--tail_folder', type=str, default='run_0', help='tail folder of the experiments')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the file containing the parameters')
     parser.add_argument('--results_file_name', type=str, default='results.json', help='name of the file containing the results')
