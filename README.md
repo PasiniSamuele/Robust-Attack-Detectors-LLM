@@ -4,8 +4,8 @@ This repository contains all the code related to the paper "Evaluating and Impro
 
 This work addresses the critical issue of evaluating the security of LLM- generated code, focusing on knowledge-intensive and security- critical code generation. The approach integrates Retrieval Augmented Generation (RAG) and Self- Ranking into the prompting process. RAG enhances the security of the output by incorporating external knowledge sources, while the novel Self-Ranking technique, inspired by the concept of Self-Consistency, generates multiple reasoning paths and creates ranks to select the most secure code.
 
-In the page [Artifacts](artifacts.md) you can find the guide to download the artifacts with their accurate description.
+In the page [Artifacts](docs/artifacts.md) you can find the guide to download the artifacts with their accurate description.
 
-[Results](results.md) reporte an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* in addition of the *f2* considered as the main metric in the paper.
+[Results](docs/results.md) reporte an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* in addition of the *f2* considered as the main metric in the paper.
 
 The following paragraphs will provide a guide to reproduct our experiments.
