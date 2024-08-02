@@ -1,0 +1,1 @@
+{"accuracy": 99.73534971644612, "precision": 0.9954163483575248, "recall": 0.9992331288343558, "f2score": 0.9984674329501917, "model": "cnn", "run": "src/detection_models/runs/cnn/run_0"}

@@ -1,0 +1,1 @@
+{"accuracy": 99.5085066162571, "precision": 0.9953952417498081, "recall": 0.9946319018404908, "f2score": 0.9947844761466482, "model": "mlp", "run": "src/detection_models/runs/mlp/run_0"}
