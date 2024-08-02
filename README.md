@@ -6,6 +6,6 @@ This work addresses the critical issue of evaluating the security of LLM- genera
 
 In the page [Artifacts](docs/artifacts.md) you can find the guide to download the artifacts with their accurate description.
 
-[Results](docs/results.md) reporte an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* in addition of the *f2* considered as the main metric in the paper.
+[Results](docs/results.md) reportes an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* in addition of the *F2* considered as the main metric in the paper.
 
 The following paragraphs will provide a guide to reproduct our experiments.
