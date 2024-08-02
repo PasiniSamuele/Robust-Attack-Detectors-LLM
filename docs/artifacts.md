@@ -56,7 +56,9 @@ Every row represent the pair between the Generated Function Run $U$ and the synt
 To give some examples and to have consistency with the results reported in the paper, the combination (GPT4T, 0.0, 10, T), is equivalent to *gpt-4-0125-preview_0.0_rag_few_shot_5* in this column notation. 
 The first column represent the average performance of a Generated Function Run (already present in the other files, but reported here to have an clear comparison).
 For every considered value of $k$, 3 columns are reported:
-*top\_k* represent the performance  *top\_k* functions of $U$ selected using $S$ to perform Self-Ranking.
-*top\_k\_m\_improvement* represent the improvement obatined with respect to the average performance by selecting the *top\_k* functions of $U$ using $S$ to perform Self-Ranking.
-*top\_k\_m\_diff* represents the difference between *top\_k\_m* and the optimal *top\_k* performance selecting the "real" *top\_k* functions using the Test set.
+<ul>
+<li>*top\_k* represent the performance  *top\_k* functions of $U$ selected using $S$ to perform Self-Ranking.</li>
+<li>*top\_k\_m\_improvement* represent the improvement obatined with respect to the average performance by selecting the *top\_k* functions of $U$ using $S$ to perform Self-Ranking.</li>
+<li>*top\_k\_m\_diff* represents the difference between *top\_k\_m* and the optimal *top\_k* performance selecting the "real" *top\_k* functions using the Test set.</li>
+</ul>
 All these metrics are discussed more in depth in the Section IV of the paper.
