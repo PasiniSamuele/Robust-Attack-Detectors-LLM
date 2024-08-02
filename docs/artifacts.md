@@ -68,7 +68,7 @@ The last column, *avg_m_diff*, gives an overview of the effect of RAG on a speci
 
 Given the set $N_s$ containing all the possible value of Few-shot examples (in the provided experiments it is $\{0, 2, 6, 10\}$) dvided by 2, since, when we created the experimental framework, we were considering this number as the Few-shot examples per class (in practice you will find the set of numbers $\{0, 1, 3, 5\}$). 
 
-*avg_m_diff* is calculated as $\frac{1}{|N_s|} * \sum_{n \in N_s}(M(rag \_ n) - M(no \_ rag \_n))$ \\
+*avg_m_diff* is calculated as $$\frac{1}{|N_s|} * \sum_{n \in N_s}(M(rag \_ n) - M(no \_ rag \_n))$$
 
 Let's analyze the results file in *self-ranking*. 
 
