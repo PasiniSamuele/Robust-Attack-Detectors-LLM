@@ -69,14 +69,27 @@ transferred and applied to achieve effective results in
 other tasks?
 
 ### Transferability Accuracy
+The table below highlights the optimal configurations for each task, specifically for function generation ($U^{best}$) and synthetic dataset generation ($S^{best}$), across various $k$ values, with $\mathcal{M} = Accuracy$. Here, Task 1 refers to XSS and Task 2 to SQLi, with $A \rightarrow B$ indicating the transfer of a configuration from one task to another. For instance, in $U^{best}_1 \rightarrow U^{transf}_2$, $U^{best}_1$ denotes the optimal configuration for Task 1, while $U^{transf}_2$ represents this configuration transferred and evaluated on Task 2.
+
 ![screen](../tables_screenshot/rq4_ubest.png)
+
+The table below presents the results of these transferability tests. The "$Accuracy(U^{best}, S^{best})$" columns display the Accuracy achieved on the original task with its best configuration. The "Avg. Acc." columns show the average Accuracy across all $U-S$ pairs for a given $k$, and the "$Acc(U^{transf}, S^{transf})$" columns demonstrate the Accuracy using transferred configurations. Comparing the performance of transferred configurations to the average column offers insight into the benefits of transferring configurations versus randomly selecting a configuration for a new, unseen task.
+
+The results validate the efficacy of configuration transfer. Although there is a slight decrease in Accuracy compared to the original best configuration (on average, 9.3 percentage points for XSS and 7.8 percentage points for SQLi), the transferred configurations generally surpass the average Accuracy, yielding an average improvement of 4.2 percentage points for XSS and 9.4 percentage points for SQLi.
 
 ![screen](../tables_screenshot/rq4.png)
 
 
 
 ### Transferability F2-Score
+Table below shows the best configuration of each task, specifically for function generation ($U^{best}$) and synthetic dataset generation ($S^{best}$), across different $k$ values with $\mathcal{M} = F_2$. In our notation, Task 1 is XSS and Task 2 is SQLi, and $A \rightarrow B$ represents the transfer of a configuration from one task to another. As an illustration, in $U^{best}_1 \rightarrow U^{transf}_2$, $U^{best}_1$ denotes the best configuration for Task 1, whereas $U^{transf}_2$ represents the transferred configuration, which originates from Task 1 ($U^{best}_1$) and is subsequently  evaluated on Task 2.
+
+
 ![screen](../tables_screenshot/rq4_ubest_f2.png)
+
+Table below presents the transferability results. The "$F2(U^{best}, S^{best})$" columns indicate F2 computed on the original task with its best configuration, "Avg. F2" columns represent the average F2 computed across all the $U-S$ pairs for a given $k$, and the "$F2(U^{transf}, S^{transf})$" columns show F2 computed using transferred configurations. Comparing the transferred configuration's performance to the average column provides a good estimate of the benefits of configuration transfer over a mere random selection of a configuration for a new, unseen task.
+
+The results support the effectiveness of transferring configurations. While there is a slight degradation in F2 compared to the original, best configuration (on average, 3\%pt for XSS and 8\%pt for SQLi ), we can observe those results of transferred configurations outperform the average F2, achieving on average, 16\%pt improvement for XSS and 10\%pt improvement for SQLi.
 
 ![screen](../tables_screenshot/rq4_f2.png)
 
