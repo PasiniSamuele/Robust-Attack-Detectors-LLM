@@ -11,16 +11,169 @@ How helpful is RAG in generating
 better security-critical functions? How does it perform
 when combined with Few-shot examples?
 
-### Accuracy XSS Detection
+### Accuracy
+
+The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant.TODO pvalue.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+        .images {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .images img {
+            width: 45%; /* Adjust width as needed */
+        }
+        .image-caption {
+            text-align: center;
+            font-size: 14px; /* Adjust font size as needed */
+            margin-top: 10px; /* Adjust margin as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="images">
+            <img src="../plots/rag_improvement_hist_xss_acc.png" alt="First Image">
+            <img src="../plots/rag_improvement_hist_sqli_acc.png" alt="Second Image">
+        </div>
+        <div class="image-caption">
+Difference between the Accuracy of Generated Function Runs with RAG (i.e., RAG Prompt and RAG-Few-shot Prompt) and the Accuracy of Generated Function Runs without RAG (i.e., Basic Prompt and Few-shot Prompt), for XSS detection (left) and SQLi detection (right).        </div>
+    </div>
+</body>
+</html>
+
+We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as Figure above. Figure below shows that the usage of Few-shot examples may not always provide advantages when RAG is already employed. 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+        .images {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .images img {
+            width: 45%; /* Adjust width as needed */
+        }
+        .image-caption {
+            text-align: center;
+            font-size: 14px; /* Adjust font size as needed */
+            margin-top: 10px; /* Adjust margin as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="images">
+            <img src="../plots/few_shot_improvement_xss_acc.png" alt="First Image">
+            <img src="../plots/few_shot_improvement_sqli_acc.png" alt="Second Image">
+        </div>
+        <div class="image-caption">
+Difference between the Accuracy of Generated Function Runs with RAG Few-shot Prompt and the Accuracy of Generated Function Runs with RAG Zero-shot Prompt, for XSS detection (left) and SQLi detection (right).         </div>
+    </div>
+</body>
+</html>
+
+### F2-Score
+Figure below illustrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario, showing the F2 differences between the configurations with and without RAG, across all possible configurations. Each bar represents the average F2 score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. Results indicate that employing RAG generally enhances the performance of function generation for both tasks. The number of Model-Temperature pairs benefiting from RAG is much larger than the number of pairs showing degradation, and the improvements are statistically significant, as evidenced by $p$-values ($\approx 10^{-66}$ for XSS and $\approx 10^{-24}$ for SQLi) below the standard threshold of 0.05. 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+        .images {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .images img {
+            width: 45%; /* Adjust width as needed */
+        }
+        .image-caption {
+            text-align: center;
+            font-size: 14px; /* Adjust font size as needed */
+            margin-top: 10px; /* Adjust margin as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="images">
+            <img src="../plots/rag_improvement_hist_xss_f2.png" alt="First Image">
+            <img src="../plots/rag_improvement_hist_sqli_f2.png" alt="Second Image">
+        </div>
+        <div class="image-caption">
+        Difference between the F2 of Generated Function Runs with RAG (i.e., RAG Prompt and RAG-Few-shot Prompt) and the F2 of Generated Function Runs without RAG (i.e., Basic Prompt and Few-shot Prompt), for XSS detection (left) and SQLi detection (right). </div>
+    </div>
+</body>
+</html>
 
 
-### F2-Score XSS Detection
+
+We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as Figure above. Figure below shows that
+while the addition of Few-shot examples shows some benefits for SQLi, the same cannot be said for XSS. These findings suggest that the usage of Few-shot examples may not always provide advantages when RAG is already employed, indicating that in the NED (No Evaluation Dataset) scenario, it could be preferable to omit them.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+        .images {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .images img {
+            width: 45%; /* Adjust width as needed */
+        }
+        .image-caption {
+            text-align: center;
+            font-size: 14px; /* Adjust font size as needed */
+            margin-top: 10px; /* Adjust margin as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="images">
+            <img src="../plots/few_shot_improvement_xss_f2.png" alt="First Image">
+            <img src="../plots/few_shot_improvement_sqli_f2.png" alt="Second Image">
+        </div>
+        <div class="image-caption">
+Difference between the F2 of Generated Function Runs with RAG Few-shot Prompt and the F2 of Generated Function Runs with RAG Zero-shot Prompt, for XSS detection (left) and SQLi detection (right).        </div>
+    </div>
+</body>
+</html>
 
 
-### Accuracy SQLi Detection
-
-
-### F2-Score SQLi Detection
 
 
 ## RQ2
@@ -28,16 +181,57 @@ Is the selection of
 top_k functions via Self-Ranking an effective strategy for
 enhancing the performance of security-critical functions?
 
-### Top-k Accuracy XSS Detection
+### Top_k accuracy
 
+### Top_k F2-score
+ The violin plots shown in Figure below depict the effect of Self-Ranking, i.e., $top\_k$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. Overall, we observe a clear improvement, particularly for XSS. The region between quartiles for XSS falls largely between a 20\%pt and 40\%pt improvement, with an average improvement of 25\%pt and an improvement that affects 98\% of the cases. While the improvement for SQLi is less pronounced, we still observe improvements in 73\% cases, with an average improvement of 4\%pt. Additionally, we can see that, as $k$ increases, the average improvement decreases for both tasks, but the gains become more stable.
+The improvements given by the usage of $top\_k$ selection are statistically significant: the $p$-values obtained with the Wilcoxon signed-rank test are below the threshold of 0.05 for both the tasks and all the values of $k$.
 
-### Top-k F2-Score XSS Detection
+In the EDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.21\%pt and 4.94\%pt increases in F2, for XSS and SQLi respectively.
 
-
-### Top-k Accuracy SQLi Detection
-
-
-### Top-k F2-Score SQLi Detection
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center the caption */
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%; /* Ensure the row takes full width for proper spacing */
+        }
+        .row img {
+            width: 30%; /* Adjust width as needed to fit three images per row */
+            margin: 5px; /* Add space between images */
+        }
+        .caption {
+            text-align: center;
+            font-size: 14px; /* Adjust font size as needed */
+            margin-top: 10px; /* Add space above the caption */
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <div class="row">
+            <img src="../plots/rq2_top_1_f2_xss.png" alt="Image 4">
+            <img src="../plots/rq2_top_3_f2_xss.png" alt="Image 5">
+            <img src="../plots/rq2_top_5_f2_xss.png" alt="Image 6">
+        </div>
+        <div class="row">
+            <img src="../plots/rq2_top_1_f2_sqli.png" alt="Image 1">
+            <img src="../plots/rq2_top_3_f2_sqli.png" alt="Image 2">
+            <img src="../plots/rq2_top_5_f2_sqli.png" alt="Image 3">
+        </div>
+        <div class="caption">
+            F2 given by top_k selection (i.e., Self-Ranking) for XSS detection (first row) and SQLi detection (second row), with k=1, k=3 and k=5.
+        </div>
+    </div>
+</body>
+</html>
 
 
 ## RQ3
