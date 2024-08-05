@@ -53,7 +53,7 @@ while the addition of Few-shot examples shows some benefits for SQLi, the same c
 
 ### Accuracy
 
-The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant.TODO pvalue.
+The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant, as it is evidenced  by the p-values ($\approx 10^{-26}$ for XSS and $\approx 10^{-8}$ for SQLi) below the standard threshold of 0.05.
 
 <!DOCTYPE html>
 <html lang="en">
