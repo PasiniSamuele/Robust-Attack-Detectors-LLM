@@ -3,7 +3,7 @@ from utils.openai_utils import is_openai_model, build_chat_model
 from utils.hf_utils import create_hf_pipeline
 from utils.utils import load_yaml, init_argument_parser, fill_default_parameters, save_parameters_file, save_input_prompt_file, is_valid_url
 from utils.path_utils import create_folder_for_experiment, folder_exists_and_not_empty, get_last_run
-from utils.synthetic_dataset_utils import XSS_dataset, save_subset_of_df
+from utils.synthetic_dataset_utils import XSS_dataset, SQLi_dataset, save_subset_of_df
 from dotenv import dotenv_values
 from langchain.prompts import (
     SystemMessagePromptTemplate,
@@ -65,7 +65,10 @@ def generate_synthetic_dataset(opt, env):
 
     #get experiment folder
     experiment_folder = create_folder_for_experiment(opt)
-    output_parser = PydanticOutputParser(pydantic_object=XSS_dataset)
+    if "xss" in opt.task:
+        output_parser = PydanticOutputParser(pydantic_object=XSS_dataset)
+    else:
+        output_parser = PydanticOutputParser(pydantic_object=SQLi_dataset)
 
     #build prompt and chain
     prompt = ChatPromptTemplate(

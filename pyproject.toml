@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "rag-secure-code-generation"
+name = "security_functions_llms"
 version = "0.1.0"
 description = ""
-authors = ["PasiniSamuele <samu.pasini98@gmail.com>"]
+authors = ["anonymous"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
