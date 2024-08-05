@@ -30,6 +30,7 @@ The figure below demonstrates the impact of RAG on function generation for XSS a
 </body>
 </html>
 
+---
 
 We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as Figure above. Figure below shows that the usage of Few-shot examples may not always provide advantages when RAG is already employed. 
 
@@ -42,7 +43,7 @@ We further investigate the benefit of combining Few-shot examples with RAG using
             <img src="../plots/few_shot_improvement_sqli_acc.png" alt="Image 2" style="width: 45%; margin: 5px;">
         </div>
         <div style="text-align: center; font-size: 14px; font-style: italic; margin-top: 10px;">
-            Difference between the Accuracy of Generated Function Runs with RAG Few-shot Prompt and the Accuracy of Generated Function Runs with RAG Zero-shot Prompt, for XSS detection (left) and SQLi detection (right). 
+            Figure: Difference between the Accuracy of Generated Function Runs with RAG Few-shot Prompt and the Accuracy of Generated Function Runs with RAG Zero-shot Prompt, for XSS detection (left) and SQLi detection (right). 
         </div>
     </div>
 </body>
@@ -61,12 +62,13 @@ Figure below illustrates the impact of RAG on function generation for XSS and SQ
             <img src="../plots/rag_improvement_hist_sqli_f2.png" alt="Image 2" style="width: 45%; margin: 5px;">
         </div>
         <div style="text-align: center; font-size: 14px; font-style: italic; margin-top: 10px;">
-            Difference between the F2 of Generated Function Runs with RAG (i.e., RAG Prompt and RAG-Few-shot Prompt) and the F2 of Generated Function Runs without RAG (i.e., Basic Prompt and Few-shot Prompt), for XSS detection (left) and SQLi detection (right).
+            Figure: Difference between the F2 of Generated Function Runs with RAG (i.e., RAG Prompt and RAG-Few-shot Prompt) and the F2 of Generated Function Runs without RAG (i.e., Basic Prompt and Few-shot Prompt), for XSS detection (left) and SQLi detection (right).
         </div>
     </div>
 </body>
 </html>
 
+---
 
 We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as Figure above. Figure below shows that
 while the addition of Few-shot examples shows some benefits for SQLi, the same cannot be said for XSS. These findings suggest that the usage of Few-shot examples may not always provide advantages when RAG is already employed, indicating that in the NED (No Evaluation Dataset) scenario, it could be preferable to omit them.
@@ -80,7 +82,7 @@ while the addition of Few-shot examples shows some benefits for SQLi, the same c
             <img src="../plots/few_shot_improvement_sqli_f2.png" alt="Image 2" style="width: 45%; margin: 5px;">
         </div>
         <div style="text-align: center; font-size: 14px; font-style: italic; margin-top: 10px;">
-            Difference between the F2 of Generated Function Runs with RAG Few-shot Prompt and the F2 of Generated Function Runs with RAG Zero-shot Prompt, for XSS detection (left) and SQLi detection (right).
+            Figure: Difference between the F2 of Generated Function Runs with RAG Few-shot Prompt and the F2 of Generated Function Runs with RAG Zero-shot Prompt, for XSS detection (left) and SQLi detection (right).
         </div>
     </div>
 </body>
@@ -117,7 +119,7 @@ In the EDA scenario, we observe that utilizing the Self-Ranking mechanism to sel
             <img src="../plots/rq2_top_5_f2_sqli.png" alt="Image 6" style="width: 30%; margin: 5px;">
         </div>
         <div style="text-align: center; font-size: 14px; font-style: italic; margin-top: 10px;">
-F2 given by top_k selection (i.e., Self-Ranking) for XSS detection (first row) and SQLi detection (second row), with k=1, k=3 and k=5.        </div>
+Figure: F2 given by top_k selection (i.e., Self-Ranking) for XSS detection (first row) and SQLi detection (second row), with k=1, k=3 and k=5.        </div>
     </div>
 </body>
 </html>
@@ -133,7 +135,15 @@ the-art ML models trained specifically for the task?
 In this section we select the $U^{best}$ and $top\_k$ functions based on the validation set ($val\_set$) using the Accuracy ($\mathcal{M} = Accuracy$). For XSS, the optimal configuration $U^{best}$ is $(Opus, 0.0, 6, F)$, while for SQLi, it is $(GPT-4, 0.0, 2, T)$. To establish a reference point, we use a baseline derived from the Basic Prompt, which lacks Few-shot examples and Retrieval-Augmented Generation (RAG).
 
 The table below shows the results of our comparison. Our method achieves a substantial improvement of 21%pt for XSS and 18%pt for SQLi when compared to the baseline. However, there is a minor decrease in the Accuracy relative to SOTA models, with a reduction of 0.3 percentage points for XSS and 1.33 percentage points for SQLi. We believe that this small performance gap is justified, considering our method's training-free nature and its direct applicability to various tasks.
-![screen](../tables_screenshot/rq3.png)
+
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <img src="../tables_screenshot/rq3.png" alt="Descriptive Alt Text" style="width: 65%; margin: 5px;">
+    </div>
+</body>
+</html>
 
 
 ### Comparison with SOTA (F2-Score)
@@ -144,7 +154,15 @@ Table below presents the results of the comparison. We observe a significant imp
 There is a slight decrease in F2 compared to SOTA models, with a 3.15\%pt and 0.83\%pt drop for XSS and SQLi, respectively. 
 We argue that the slight performance gap between our approach and SOTA models is understandable, given our approach's training-free nature and direct applicability to multiple tasks. <!--These results provide empirical support for our claim that incorporating external knowledge and Self-Ranking is essential for LLMs to achieving competitive performance with SOTA models. -->
 
-![screen](../tables_screenshot/rq3_f2.png)
+
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <img src="../tables_screenshot/rq3_f2.png" alt="Descriptive Alt Text" style="width: 65%; margin: 5px;">
+    </div>
+</body>
+</html>
 
 ## RQ4
 Can the optimal parameters for
@@ -155,26 +173,54 @@ other tasks?
 ### Transferability Accuracy
 The table below highlights the optimal configurations for each task, specifically for function generation ($U^{best}$) and synthetic dataset generation ($S^{best}$), across various $k$ values, with $\mathcal{M} = Accuracy$. Here, Task 1 refers to XSS and Task 2 to SQLi, with $A \rightarrow B$ indicating the transfer of a configuration from one task to another. For instance, in $U^{best}_1 \rightarrow U^{transf}_2$, $U^{best}_1$ denotes the optimal configuration for Task 1, while $U^{transf}_2$ represents this configuration transferred and evaluated on Task 2.
 
-![screen](../tables_screenshot/rq4_ubest.png)
+
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <img src="../tables_screenshot/rq4_ubest.png" alt="Descriptive Alt Text" style="width: 65%; margin: 5px;">
+    </div>
+</body>
+</html>
 
 The table below presents the results of these transferability tests. The "$Accuracy(U^{best}, S^{best})$" columns display the Accuracy achieved on the original task with its best configuration. The "Avg. Acc." columns show the average Accuracy across all $U-S$ pairs for a given $k$, and the "$Acc(U^{transf}, S^{transf})$" columns demonstrate the Accuracy using transferred configurations. Comparing the performance of transferred configurations to the average column offers insight into the benefits of transferring configurations versus randomly selecting a configuration for a new, unseen task.
 
 The results validate the efficacy of configuration transfer. Although there is a slight decrease in Accuracy compared to the original best configuration (on average, 9.3 percentage points for XSS and 7.8 percentage points for SQLi), the transferred configurations generally surpass the average Accuracy, yielding an average improvement of 4.2 percentage points for XSS and 9.4 percentage points for SQLi.
 
-![screen](../tables_screenshot/rq4.png)
 
-
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <img src="../tables_screenshot/rq4.png" alt="Descriptive Alt Text" style="width: 65%; margin: 5px;">
+    </div>
+</body>
+</html>
 
 ### Transferability F2-Score
 Table below shows the best configuration of each task, specifically for function generation ($U^{best}$) and synthetic dataset generation ($S^{best}$), across different $k$ values with $\mathcal{M} = F_2$. In our notation, Task 1 is XSS and Task 2 is SQLi, and $A \rightarrow B$ represents the transfer of a configuration from one task to another. As an illustration, in $U^{best}_1 \rightarrow U^{transf}_2$, $U^{best}_1$ denotes the best configuration for Task 1, whereas $U^{transf}_2$ represents the transferred configuration, which originates from Task 1 ($U^{best}_1$) and is subsequently  evaluated on Task 2.
 
 
-![screen](../tables_screenshot/rq4_ubest_f2.png)
+
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <img src="../tables_screenshot/rq4_ubest_f2.png" alt="Descriptive Alt Text" style="width: 65%; margin: 5px;">
+    </div>
+</body>
+</html>
 
 Table below presents the transferability results. The "$F2(U^{best}, S^{best})$" columns indicate F2 computed on the original task with its best configuration, "Avg. F2" columns represent the average F2 computed across all the $U-S$ pairs for a given $k$, and the "$F2(U^{transf}, S^{transf})$" columns show F2 computed using transferred configurations. Comparing the transferred configuration's performance to the average column provides a good estimate of the benefits of configuration transfer over a mere random selection of a configuration for a new, unseen task.
 
 The results support the effectiveness of transferring configurations. While there is a slight degradation in F2 compared to the original, best configuration (on average, 3\%pt for XSS and 8\%pt for SQLi ), we can observe those results of transferred configurations outperform the average F2, achieving on average, 16\%pt improvement for XSS and 10\%pt improvement for SQLi.
 
-![screen](../tables_screenshot/rq4_f2.png)
 
-
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <img src="../tables_screenshot/rq4_f2.png" alt="Descriptive Alt Text" style="width: 65%; margin: 5px;">
+    </div>
+</body>
+</html>
