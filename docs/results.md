@@ -1,9 +1,10 @@
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default'></script>
 # Results
 
 ## Introduction
 
 In our application scenarios (XSS/SQLi detection), we give more weight to false negatives (resulting in low recall) with respect to false positives (resulting in low precision), since a non-detected attack can cause much more damage than a benign request detected as an attack.
-For this reason, the main performance metric used in our empirical study is the F2-Score, referred to as F2 for simplicity, which gives double importance to recall than to precision: F2 = (5 * precision * recall) / (4 * precision + recall).
+For this reason, the main performance metric used in our empirical study is the F2-Score, referred to as F2 for simplicity, which gives double importance to recall than to precision: $F2 = \frac{5 * precision * recall}{4 * precision + recall}$.
 To mitigate a possible threat to the construct validity associated with the choice of F2-Score as the performance metric, we replicated all experiments using accuracy as an alternative performance metric. For space reasons, we could not report the results obtained with both metrics in the paper, so here, where we do not have space limitations you can find the results obtained with both metrics.
 
 ## RQ1
