@@ -166,3 +166,7 @@ poetry.lock
 /*.dvc
 /*.txt
 
+datasets/*
+
+generated_function_runs/*
+synthetic_datasets/*

@@ -9,7 +9,9 @@ import importlib.util
 
 
 def evaluate_run(opt):
+    print(opt.run, opt.run is not None)
     run_path = opt.run if opt.run is not None else get_last_run(opt)
+    print(run_path)
     run_name = run_path.split('/')[-1]
     print(f"Evaluating {run_name}")
     val_set = pd.read_csv(opt.data)
@@ -58,8 +60,7 @@ def evaluate_run(opt):
             with open(filename, 'w') as f:
                 json.dump(experiment_results, f,ensure_ascii=False,indent=4)
             continue
-    #delete temp folder
-    #shutil.rmtree(exec_dir)
+
 
     if opt.summarize_results:
         single_results = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))

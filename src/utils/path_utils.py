@@ -51,6 +51,7 @@ def get_last_run_number(experiment_folder:str, default:int = -1)->int:
     return max(runs_numbers, default=default) 
 
 def get_last_run(opt)->str:
+    print("Searching")
     base_folder = opt.experiments_folder
     task = from_file_to_name(opt.task)
     template = from_file_to_name(opt.template)

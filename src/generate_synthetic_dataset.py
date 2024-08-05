@@ -97,8 +97,6 @@ def generate_synthetic_dataset(opt, env):
             df= fill_df(chain, prompt_parameters)
             save_file = os.path.join(experiment_folder, f"exp_{i}.csv")
             df.to_csv(save_file, index=False)
-            for s in opt.subset:
-                save_subset_of_df(save_file, s)
             i = i + 1
             failures = 0
         except TimeoutException:

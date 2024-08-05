@@ -92,7 +92,7 @@ def summarize_results(single_results:list,
     results["precision"], _, _ = average_metric(successful_experiments, "precision")
     results["recall"], _, _ = average_metric(successful_experiments, "recall")
     results["f1"], _, _ = average_metric(successful_experiments, "f1")
-    results["f2"] = (((1 + 4) * results["precision"] * results["recall"],) / (4 * results["precision"] + results["recall"],))
+    results["f2"] = (((1 + 4) * results["precision"] * results["recall"]) / (4 * results["precision"] + results["recall"]))
     for top in top_k:
         if top > len(successful_experiments):
             continue
@@ -262,14 +262,14 @@ def summarize_synth_results(subfolders:list,
     subsets = get_not_exp_subfolders(os.path.join(subfolders[0], exp_folder)) if len(subfolders)> 0 else []
     #filter subset keeping only last folder
     subsets = list(map(lambda x: x.split("/")[-1], subsets))
-    single_dataset_results = get_single_dataset_exp_results(subfolders, exp_folder, n_datasets, opt.result_file_name, opt.top_k)
+    single_dataset_results = get_single_dataset_exp_results(subfolders, exp_folder, n_datasets, opt.result_file_name, [])
 
-    for subfolder in subfolders:
-        exp_folder_in_subfolder = os.path.join(subfolder, exp_folder)
+    # for subfolder in subfolders:
+    #     exp_folder_in_subfolder = os.path.join(subfolder, exp_folder)
 
-        summarized_results = summarize_synth_subfolder_results(subfolder, exp_folder, opt.result_file_name, n_datasets, opt.top_k_metric)
-        with open(os.path.join(exp_folder_in_subfolder, opt.result_file_name), 'w') as f:
-            json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
+    #     summarized_results = summarize_synth_subfolder_results(subfolder, exp_folder, opt.result_file_name, n_datasets, opt.top_k_metric)
+    #     with open(os.path.join(exp_folder_in_subfolder, opt.result_file_name), 'w') as f:
+    #         json.dump(summarized_results, f,ensure_ascii=False,indent=4, cls=NpEncoder)
 
     summarized_results = dict()
     #print('\n', subfolders[0], '\n',exp_folder, '\n',opt.result_file_name)
@@ -280,11 +280,7 @@ def summarize_synth_results(subfolders:list,
     summarized_results["synthetic_dataset"] = summarize_synth_results_on_synth(single_results_syn, opt.top_k_metric, opt.top_k, None)
 
     single_results_val = list(map(lambda x: json.load(open(os.path.join(x, opt.result_file_name))), subfolders))
-    summarized_results["validation_dataset"] = summarize_results(single_results_val, opt.top_k_metric, opt.top_k)  
-    summarized_results["single_dataset_results"] = single_dataset_results
 
-    summarized_results["top_k_metrics"] = summarize_synth_results_on_top_k(single_results_syn, single_results_val, opt.top_k_metric, opt.top_k, None)
-    summarized_results['top_k_metrics_per_dataset'] = summarize_synth_results_on_top_k_per_single_dataset(single_dataset_results, single_results_val, opt.top_k_metric, opt.top_k, n_datasets)
     summary_dir = os.path.join(opt.run, exp_folder)
     filename = os.path.join(summary_dir, opt.result_file_name)
     os.makedirs(os.path.dirname(filename), exist_ok=True)

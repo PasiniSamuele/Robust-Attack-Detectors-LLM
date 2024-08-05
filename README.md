@@ -9,3 +9,66 @@ In the page [Artifacts](docs/artifacts.md) you can find the guide to download th
 [Results](docs/results.md) reportes an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* in addition of the *F2* considered as the main metric in the paper.
 
 The following paragraphs will provide a guide to reproduct our experiments.
+
+## How to reproduct the experiments
+
+### Configuration
+
+In the repository you will find a template for you environmental variable in the file `env_template`.
+Following this template, you should create the `.env` inserting your API keys, in particular the API key for OpenAI and for HuggingFace.
+
+### Creating the environment
+
+The libraries are managed using Poetry. The suggested environment, however, uses a Docker Environment to isolate the execution of the LLM generated code.
+
+To build the image, let's run 
+```
+docker build -t security_functions_llm .
+```
+
+If you want to include the datasets used in our experiments, do not forget to download them from the [Artifacts](docs/artifacts.md) page and to include them into the image.
+
+Once the image is built, you can Run the container in interactive mode.
+```
+docker  run --gpus all -it --name security_functions_llm security_functions_llm:latest
+```
+Do not forget to mount the `generated_function_runs` directory and the `synthetic_datasets` directory if you want to persist the results of the generation process.
+Inside the container, you can install the Poetry shell solving all the dependencies and spawning the shell of the virtual environment.
+```
+poetry install
+poetry shell
+```
+
+### Scripts
+
+#### generate_code_snippets.py
+
+This is the main script used to generate the Generated Functions Runs. It contains parameters related to the combination, the structure of the prompt, and also the dependencies to use `rag` and `few_shot`
+
+#### evaluate_run.py
+This script is used to evaluate a Generated Functions Run using a ground-truth dataset.
+
+#### generation_test_pipeline.py
+Most of the times, once a Generated Functions Run is generated, you want to test it using `evaluate_run.py`.
+This script creates a pipeline between the generation and the evaluation.
+Because of the large number of parameters, it could be hard to manage this script.
+Inside the `notebooks` folder, there are the notebooks `create_xss_command.ipynb` and `create_sqli_command.ipynb` that you can use to build the correct pipeline command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters.
+
+#### generate_experiments_summary.py
+This script is used to generate a summary of the results of a Function Generation Experiment.
+
+#### test_all_runs.py
+This script is used to test all the Generated Functions Runs of a Function Generation Experiment on a ground-truth dataset.
+
+#### generate_synthetic_dataset
+This script is similar to `generate_code_snippets.py`, it is used to generate a Synthetic Dataset Run.
+Inside the `notebooks` folder, there are the notebooks `create_xss_synth_dataset_command.ipynb` and `create_sqli_synth_dataset_command.ipynb` that you can use to build the correct command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters.
+
+#### evaluate_run_on_synthetic.py
+This script is used to test a Generated Function Run with a Synthetic Dataset Run.
+
+#### evaluate_runs_on_datasets.py
+This script is used to test all the Generated Function Runs of a Function Generation Experiment with all the Synthetic Dataset Runs of a Synthetic Dataset Experiment.
+
+#### train_dl_model.pt and test_dl_model.py
+These scripts are used to manage the training and testing procedure of the Deep Learning model used for comparison for RQ3

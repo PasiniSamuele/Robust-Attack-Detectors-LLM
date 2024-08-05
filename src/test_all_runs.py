@@ -31,12 +31,11 @@ def test_all_runs(opt):
 def add_parse_arguments(parser):
     #run parameters
     parser.add_argument('--experiments_root', type=str, default="generated_function_runs/task_detect_xss_simple_prompt/template_create_function_readable", help='Folder containing the generated function runs to be tested')
-    parser.add_argument('--dataset', type=str, default='data/sqli/val.csv', help='CSV file containing the dataset')
+    parser.add_argument('--dataset', type=str, default='datasets/xss/test.csv', help='CSV file containing the dataset')
     parser.add_argument('--parameters_file_name', type=str, default='parameters.json', help='name of the parameters file')
     parser.add_argument('--function_name', type=str, default='detect_xss', help='name of the generated function to be executed for evaluation')
-    parser.add_argument('--evaluation folder', type=str, default='synthetic_results', help='name of the evaluation folder to store the results')
-    parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file to save results set')
-    parser.add_argument('--leaf_folder_name', type=str, default='runs_0', help='name of the leaf folder containing the generated data')
+    parser.add_argument('--result_file_name', type=str, default='test_results.json', help='name of the results file to save results set')
+    parser.add_argument('--leaf_folder_name', type=str, default='run_0', help='name of the leaf folder containing the generated data')
 
     return parser
     
