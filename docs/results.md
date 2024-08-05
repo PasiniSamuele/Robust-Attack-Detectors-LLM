@@ -97,6 +97,29 @@ top_k functions via Self-Ranking an effective strategy for
 enhancing the performance of security-critical functions?
 
 ### Top_k accuracy
+The violin plots shown in Figure below depict the effect of Self-Ranking, i.e., $top\_k$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. 
+
+TODO HERE ADD DESCRIPTION
+
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+            <img src="../plots/rq2_top_1_acc_xss.png" alt="Image 1" style="width: 30%; margin: 5px;">
+            <img src="../plots/rq2_top_3_acc_xss.png" alt="Image 2" style="width: 30%; margin: 5px;">
+            <img src="../plots/rq2_top_5_acc_xss.png" alt="Image 3" style="width: 30%; margin: 5px;">
+        </div>
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+            <img src="../plots/rq2_top_1_acc_sqli.png" alt="Image 4" style="width: 30%; margin: 5px;">
+            <img src="../plots/rq2_top_3_acc_sqli.png" alt="Image 5" style="width: 30%; margin: 5px;">
+            <img src="../plots/rq2_top_5_acc_sqli.png" alt="Image 6" style="width: 30%; margin: 5px;">
+        </div>
+        <div style="text-align: center; font-size: 14px; font-style: italic; margin-top: 10px;">
+Figure: Accuracy given by top_k selection (i.e., Self-Ranking) for XSS detection (first row) and SQLi detection (second row), with k=1, k=3 and k=5.        </div>
+    </div>
+</body>
+</html>
 
 ### Top_k F2-score
  The violin plots shown in Figure below depict the effect of Self-Ranking, i.e., $top\_k$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. Overall, we observe a clear improvement, particularly for XSS. The region between quartiles for XSS falls largely between a 20\%pt and 40\%pt improvement, with an average improvement of 25\%pt and an improvement that affects 98\% of the cases. While the improvement for SQLi is less pronounced, we still observe improvements in 73\% cases, with an average improvement of 4\%pt. Additionally, we can see that, as $k$ increases, the average improvement decreases for both tasks, but the gains become more stable.
@@ -183,7 +206,7 @@ The table below highlights the optimal configurations for each task, specificall
 </body>
 </html>
 
-The table below presents the results of these transferability tests. The "$Accuracy(U^{best}, S^{best})$" columns display the Accuracy achieved on the original task with its best configuration. The "Avg. Acc." columns show the average Accuracy across all $U-S$ pairs for a given $k$, and the "$Acc(U^{transf}, S^{transf})$" columns demonstrate the Accuracy using transferred configurations. Comparing the performance of transferred configurations to the average column offers insight into the benefits of transferring configurations versus randomly selecting a configuration for a new, unseen task.
+The table below presents the results of these transferability tests. The $Accuracy(U^{best}, S^{best})$ columns display the Accuracy achieved on the original task with its best configuration. The "Avg. Acc." columns show the average Accuracy across all $U-S$ pairs for a given $k$, and the $Acc(U^{transf}, S^{transf})$ columns demonstrate the Accuracy using transferred configurations. Comparing the performance of transferred configurations to the average column offers insight into the benefits of transferring configurations versus randomly selecting a configuration for a new, unseen task.
 
 The results validate the efficacy of configuration transfer. Although there is a slight decrease in Accuracy compared to the original best configuration (on average, 9.3 percentage points for XSS and 7.8 percentage points for SQLi), the transferred configurations generally surpass the average Accuracy, yielding an average improvement of 4.2 percentage points for XSS and 9.4 percentage points for SQLi.
 
@@ -211,7 +234,7 @@ Table below shows the best configuration of each task, specifically for function
 </body>
 </html>
 
-Table below presents the transferability results. The "$F2(U^{best}, S^{best})$" columns indicate F2 computed on the original task with its best configuration, "Avg. F2" columns represent the average F2 computed across all the $U-S$ pairs for a given $k$, and the "$F2(U^{transf}, S^{transf})$" columns show F2 computed using transferred configurations. Comparing the transferred configuration's performance to the average column provides a good estimate of the benefits of configuration transfer over a mere random selection of a configuration for a new, unseen task.
+Table below presents the transferability results. The $F2(U^{best}, S^{best})$ columns indicate F2 computed on the original task with its best configuration, "Avg. F2" columns represent the average F2 computed across all the $U-S$ pairs for a given $k$, and the $F2(U^{transf}, S^{transf})$ columns show F2 computed using transferred configurations. Comparing the transferred configuration's performance to the average column provides a good estimate of the benefits of configuration transfer over a mere random selection of a configuration for a new, unseen task.
 
 The results support the effectiveness of transferring configurations. While there is a slight degradation in F2 compared to the original, best configuration (on average, 3\%pt for XSS and 8\%pt for SQLi ), we can observe those results of transferred configurations outperform the average F2, achieving on average, 16\%pt improvement for XSS and 10\%pt improvement for SQLi.
 
