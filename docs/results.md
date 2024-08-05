@@ -53,7 +53,7 @@ while the addition of Few-shot examples shows some benefits for SQLi, the same c
 
 ### Accuracy
 
-The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant, as it is evidenced  by the p-values ($\approx 10^{-26}$ for XSS and $\approx 10^{-8}$ for SQLi) below the standard threshold of 0.05.
+The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant, as it is evidenced  by the p-values ( $\approx 10^{-26}$ for XSS and $\approx 10^{-8}$ for SQLi) below the standard threshold of 0.05.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -128,6 +128,8 @@ The violin plots shown in Figure below depict the effect of Self-Ranking, i.e., 
 
 TODO HERE ADD DESCRIPTION
 
+The improvements given by the usage of $top\_k$ selection are statistically significant: the p-values obtained with the Wilcoxon signed-rank test are below the threshold of 0.05 for both the tasks and all the values of k.
+
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -173,7 +175,7 @@ We argue that the slight performance gap between our approach and SOTA models is
 
 
 ### Comparison with SOTA (Accuracy)
-In this section we select the $U^{best}$ and $top\_k$ functions based on the validation set using the Accuracy ( $M = Accuracy$). For XSS, the optimal configuration $U^{best}$ is $(Opus, 0.0, 6, F)$, while for SQLi, it is $(GPT-4, 0.0, 2, T)$. To establish a reference point, we use a baseline derived from the Basic Prompt, which lacks Few-shot examples and Retrieval-Augmented Generation (RAG).
+In this section we select the $U^{best}$ and $top\_k$ functions based on the validation set using the Accuracy ( $M = Accuracy$ ). For XSS, the optimal configuration $U^{best}$ is $(Opus, 0.0, 6, F)$, while for SQLi, it is $(GPT-4, 0.0, 2, T)$. To establish a reference point, we use a baseline derived from the Basic Prompt, which lacks Few-shot examples and Retrieval-Augmented Generation (RAG).
 
 The table below shows the results of our comparison. Our method achieves a substantial improvement of 21%pt for XSS and 18%pt for SQLi when compared to the baseline. However, there is a minor decrease in the Accuracy relative to SOTA models, with a reduction of 0.3 percentage points for XSS and 1.33 percentage points for SQLi. We believe that this small performance gap is justified, considering our method's training-free nature and its direct applicability to various tasks.
 
@@ -191,7 +193,7 @@ Can the optimal parameters for function and synthetic data generation in one tas
 
 
 ### Transferability F2-Score
-Table below shows the best configuration of each task, specifically for function generation ($U^{best}$) and synthetic dataset generation ($S^{best}$), across different $k$ values with $\mathcal{M} = F_2$. In our notation, Task 1 is XSS and Task 2 is SQLi, and $A \rightarrow B$ represents the transfer of a configuration from one task to another. As an illustration, in $U^{best}_1 \rightarrow U^{transf}_2$, $U^{best}_1$ denotes the best configuration for Task 1, whereas $U^{transf}_2$ represents the transferred configuration, which originates from Task 1 ($U^{best}_1$) and is subsequently  evaluated on Task 2.
+Table below shows the best configuration of each task, specifically for function generation ( $U^{best}$ ) and synthetic dataset generation ( $S^{best}$ ), across different $k$ values with $\mathcal{M} = F_2$. In our notation, Task 1 is XSS and Task 2 is SQLi, and $A \rightarrow B$ represents the transfer of a configuration from one task to another. As an illustration, in $U^{best}_1 \rightarrow U^{transf}_2$, $U^{best}_1$ denotes the best configuration for Task 1, whereas $U^{transf}_2$ represents the transferred configuration, which originates from Task 1 ( $U^{best}_1$ ) and is subsequently  evaluated on Task 2.
 
 
 
