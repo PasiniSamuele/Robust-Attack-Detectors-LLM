@@ -1,5 +1,5 @@
 FROM nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
-
+WORKDIR /home
 ENV PYTHONUNBUFFERED=1 \
     # prevents python creating .pyc files
     PYTHONDONTWRITEBYTECODE=1 \
@@ -50,13 +50,11 @@ RUN curl -sSL https://install.python-poetry.org | python3 - --git https://github
 #RUN source /root/.bashrc
 #ENV PATH="${PATH}:/root/.poetry/bin"
 #RUN poetry config virtualenvs.in-project true
-WORKDIR $PYSETUP_PATH
+#WORKDIR $PYSETUP_PATH
 #COPY ./poetry.lock ./
 #COPY ./pyproject.toml ./
-COPY ./src ./src
-COPY ./data ./data
-COPY ./.env ./.env
-COPY ./pyproject.toml ./pyproject.toml
+
+COPY ./pyproject.toml .
 
 
 
@@ -67,6 +65,10 @@ COPY ./pyproject.toml ./pyproject.toml
 RUN poetry install 
 
 RUN poetry run pip install --upgrade pip
+
+COPY ./src ./src
+COPY ./data ./data
+COPY ./.env ./.env
 
 #RUN poetry init
 #RUN poetry shell

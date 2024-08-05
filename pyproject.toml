@@ -40,6 +40,7 @@ torch-tb-profiler = "^0.4.3"
 sentence-transformers = "2.2.2"
 instructorembedding = "^1.0.1"
 statannot = "^0.2.3"
+protobuf = "3.20.0"
 
 
 [tool.poetry.group.dev.dependencies]
