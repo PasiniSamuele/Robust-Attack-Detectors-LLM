@@ -49,7 +49,7 @@ We further investigate the benefit of combining Few-shot examples with RAG using
 </html>
 
 ### F2-Score
-Figure below illustrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario, showing the F2 differences between the configurations with and without RAG, across all possible configurations. Each bar represents the average F2 score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. Results indicate that employing RAG generally enhances the performance of function generation for both tasks. The number of Model-Temperature pairs benefiting from RAG is much larger than the number of pairs showing degradation, and the improvements are statistically significant, as evidenced by p-values ($\approx 10^{-66}$ for XSS and $\approx 10^{-24}$ for SQLi) below the standard threshold of 0.05. 
+Figure below illustrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario, showing the F2 differences between the configurations with and without RAG, across all possible configurations. Each bar represents the average F2 score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. Results indicate that employing RAG generally enhances the performance of function generation for both tasks. The number of Model-Temperature pairs benefiting from RAG is much larger than the number of pairs showing degradation, and the improvements are statistically significant, as evidenced by p-values ( $\approx 10^{-66}$ for XSS and $\approx 10^{-24}$ for SQLi) below the standard threshold of 0.05. 
 
 
 <!DOCTYPE html>
