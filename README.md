@@ -12,6 +12,9 @@ The following paragraphs will provide a guide to reproduct our experiments.
 
 ## How to reproduct the experiments
 
+The experiments are executed on a machine with Linux Ubuntu and CUDA installed.
+At the moment other machines are not supported, in the future a multi-platform version will become available.
+
 ### Configuration
 
 In the repository you will find a template for you environmental variable in the file `env_template`.
