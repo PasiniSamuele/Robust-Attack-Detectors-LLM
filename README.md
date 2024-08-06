@@ -66,7 +66,18 @@ This is the main script used to sequentially generating and evaluating the Gener
 Inside the `notebooks` folder, there are the notebooks `create_xss_command.ipynb` and `create_sqli_command.ipynb` that you can use to build the correct pipeline command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters. 
 Here it is reported of a command generated to call this script.
 ```
-python src/generation_test_pipeline.py --model_name gpt-4-1106-preview --temperature 1.0 --task data/tasks/detect_xss_simple_prompt.txt --template data/templates/create_function_readable.yaml --prompt_parameters data/prompt_parameters/empty.yaml --generation_mode rag_few_shot --experiments_folder generated_function_runs --experiments 5 --parameters_file_name parameters.json --input_prompt_file_name prompt.txt --hf_max_new_tokens 400 --hf_load_in_4bit True --seed 156 --example_template data/example_templates/detect_xss_simple_prompt.txt --examples_per_class 0 --examples_file datasets/xss/train.csv --examples_payload_column Payloads --examples_label_column Class --example_positive_label Malicious --example_negative_label Benign --rag_template_file data/rag_templates/basic_rag_suffix.txt --rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html --db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500 --data datasets/xss/val.csv --function_name detect_xss --summarize_results True --result_file_name val_results.json --create_confusion_matrix True 
+python src/generation_test_pipeline.py --model_name gpt-4-1106-preview --temperature 1.0 --task data/tasks/detect_xss_simple_prompt.txt 
+--template data/templates/create_function_readable.yaml --prompt_parameters data/prompt_parameters/empty.yaml 
+--generation_mode rag_few_shot --experiments_folder generated_function_runs --experiments 5 
+--parameters_file_name parameters.json --input_prompt_file_name prompt.txt --hf_max_new_tokens 400 
+--hf_load_in_4bit True --seed 156 --example_template data/example_templates/detect_xss_simple_prompt.txt 
+--examples_per_class 0 --examples_file datasets/xss/train.csv --examples_payload_column Payloads 
+--examples_label_column Class --example_positive_label Malicious --example_negative_label Benign 
+--rag_template_file data/rag_templates/basic_rag_suffix.txt 
+--rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html 
+--db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500 --data datasets/xss/val.csv 
+--function_name detect_xss --summarize_results True --result_file_name val_results.json 
+--create_confusion_matrix True 
 ```
 
 `generation_test_pipeline.py` takes advantage of two different script: `generate_code_snippets.py` and `evaluate_run.py`
