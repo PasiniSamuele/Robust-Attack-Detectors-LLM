@@ -47,7 +47,7 @@ security_functions_llm:latest
 If you downloaded the datasets from [Artifacts](docs/artifacts.md) and you stored them in the folder `datasets`, you can also mount it.
 ```
 docker run --rm --gpus all -it --name security_functions_llm 
--mount type=bind,source=/home/user/Security-Critical-Code-LLM/generated_function_runs,target=/home/generated_function_runs 
+--mount type=bind,source=/home/user/Security-Critical-Code-LLM/generated_function_runs,target=/home/generated_function_runs 
 --mount type=bind,source=/home/user/Security-Critical-Code-LLM/synthetic_datasets,target=/home/synthetic_datasets 
 --mount type=bind,source=/home/user/Security-Critical-Code-LLM/datasets,target=/home/datasets 
 security_functions_llm:latest 
