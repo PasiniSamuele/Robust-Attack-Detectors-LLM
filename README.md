@@ -8,7 +8,7 @@ In the page [Artifacts](docs/artifacts.md) you can find the guide to download th
 
 [Results](docs/results.md) reportes an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* in addition of the *F2* considered as the main metric in the paper.
 
-The following paragraphs will provide a guide to reproduct our experiments.
+The following paragraphs will provide a guide to reproduce our experiments.
 
 ## How to reproduce the experiments
 
@@ -17,8 +17,8 @@ At the moment other machines are not supported, in the future a multi-platform v
 
 ### Configuration
 
-In the repository you will find a template for you environmental variable in the file `env_template`.
-Following this template, you should create the `.env` inserting your API keys, in particular the API key for OpenAI and for HuggingFace.
+In the repository you will find a template for your environmental variable in the file `env_template`.
+Following this template, you should create the `.env` inserting your API keys, in particular the API keys for OpenAI and for HuggingFace.
 
 ### Creating the environment
 
@@ -29,9 +29,7 @@ To build the image, let's run
 docker build -t security_functions_llm .
 ```
 
-If you want to include the datasets used in our experiments, do not forget to download them from the [Artifacts](docs/artifacts.md) page and to include them into the image.
-
-Once the image is built, you can Run the container in interactive mode.
+Once the image is built, you can run the container in interactive mode.
 ```
 docker run --rm --gpus all -it --name security_functions_llm security_functions_llm:latest
 ```
@@ -44,7 +42,7 @@ docker run --rm --gpus all -it --name security_functions_llm
 security_functions_llm:latest 
 ```
 
-If you downloaded the datasets from [Artifacts](docs/artifacts.md) and you stored them in the folder `datasets`, you can also mount it.
+If you want to include the datasets used in our experiments, do not forget to download them from the [Artifacts](docs/artifacts.md) page and to mount their folder them into the container.
 ```
 docker run --rm --gpus all -it --name security_functions_llm 
 --mount type=bind,source=/home/user/Security-Critical-Code-LLM/generated_function_runs,target=/home/generated_function_runs 
@@ -52,7 +50,7 @@ docker run --rm --gpus all -it --name security_functions_llm
 --mount type=bind,source=/home/user/Security-Critical-Code-LLM/datasets,target=/home/datasets 
 security_functions_llm:latest 
 ```
-Inside the container, you can install the Poetry shell solving all the dependencies and spawning the shell of the virtual environment.
+Inside the container, you can spawn the Poetry shell.
 The poetry install could be useless, but, in case some libraries are changed after the build, it is necessary to regenerate the lock file. It could potentially generate some warning.
 ```
 poetry install
@@ -62,8 +60,8 @@ poetry shell
 ### Scripts
 
 #### Generation and Evaluation of Functions
-This is the main script used to sequentially generating and evaluating the Generated Functions Runs is `generation_test_pipeline.py`. Because of the large number of parameters, it could be hard to manage this script.
-Inside the `notebooks` folder, there are the notebooks `create_xss_command.ipynb` and `create_sqli_command.ipynb` that you can use to build the correct pipeline command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters. 
+The main script used to sequentially generating and evaluating the Generated Functions Runs is `generation_test_pipeline.py`. Because of the large number of parameters, it could be hard to manage this script.
+Inside the `notebooks` folder, there are the notebooks `create_xss_command.ipynb` and `create_sqli_command.ipynb` that you can use to build the correct pipeline commands to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters. 
 Here it is reported of a command generated to call this script.
 ```
 python src/generation_test_pipeline.py --model_name gpt-4-1106-preview --temperature 1.0 --task data/tasks/detect_xss_simple_prompt.txt 
@@ -82,7 +80,7 @@ python src/generation_test_pipeline.py --model_name gpt-4-1106-preview --tempera
 
 `generation_test_pipeline.py` takes advantage of two different script: `generate_code_snippets.py` and `evaluate_run.py`
 The first is used to generate the Generated Function Runs.
-It contains parameters related to the combination, the structure of the prompt, and also the dependencies to use `rag` and `few_shot`
+It contains parameters related to the combination, the structure of the prompt, and also the dependencies to use `rag` and `few_shot`.
 It could be used also independentelly from the pipeline to generate Generated Function Runs without sequentially evaluating them, here an example is reported.
 ```
 python src/generate_code_snippets.py --model_name gpt-4-1106-preview --temperature 1.0 
@@ -94,9 +92,9 @@ python src/generate_code_snippets.py --model_name gpt-4-1106-preview --temperatu
 --example_template data/example_templates/detect_xss_simple_prompt.txt --examples_per_class 0 
 --examples_file datasets/xss/train.csv --examples_payload_column Payloads 
 --examples_label_column Class --example_positive_label Malicious --example_negative_label Benign 
- --rag_template_file data/rag_templates/basic_rag_suffix.txt 
- --rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html 
- --db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500
+--rag_template_file data/rag_templates/basic_rag_suffix.txt 
+--rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html 
+--db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500
 ```
 
 The latter is used to evaluate a Generated Functions Run using a ground-truth dataset. In the same way of the previous script, it could be used independently from the the pipeline script:
@@ -126,8 +124,8 @@ python src/generate_experiments_summary.py --experiments_root_folder generated_f
 
 #### Generation of Synthetic Datasets
 To perform Self-Ranking, it is needed to generate a Synthetic Dataset Run using the script `generate_synthetic_dataset.py`
-This script is similar to `generate_code_snippets.py`, it is used to generate a Synthetic Dataset Run.
-Inside the `notebooks` folder, there are the notebooks `create_xss_synth_dataset_command.ipynb` and `create_sqli_synth_dataset_command.ipynb` that you can use to build the correct command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters. Here there is an example of usage of this script.
+This script is similar to `generate_code_snippets.py`.
+Inside the `notebooks` folder, there are the notebooks `create_xss_synth_dataset_command.ipynb` and `create_sqli_synth_dataset_command.ipynb` that you can use to build the correct commands to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters. Here there is an example of usage of this script.
 ```
 python src/generate_synthetic_dataset.py --model_name gpt-3.5-turbo-0125 --temperature 1.0 
 --task data/tasks/detect_xss_simple_prompt.txt 
@@ -143,7 +141,6 @@ python src/generate_synthetic_dataset.py --model_name gpt-3.5-turbo-0125 --tempe
 --rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html 
 --db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500 --timeout 9000 
 ```
-
 
 #### Self-Ranking
 To perform Self-Ranking on a Generated Function Run it is needed to evaluate it with a Synthetic Dataset Run.
