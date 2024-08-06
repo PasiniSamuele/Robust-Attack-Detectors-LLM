@@ -62,7 +62,6 @@ def add_parse_arguments(parser):
    
 
     #evaluation parameters
-    parser.add_argument('--isolated_execution', type=bool, default=False, help='if true, the evaluation will be executed in a separate docker environment')
     parser.add_argument('--result_file_name', type=str, default='results.json', help='name of the results file')
     parser.add_argument('--test_results_file_name', type=str, default='test_results.json', help='name of the results file')
 

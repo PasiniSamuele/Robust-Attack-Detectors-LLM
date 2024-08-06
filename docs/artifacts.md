@@ -18,9 +18,7 @@ The csv files are structured with 2 columns. *Payloads* column contains the inpu
 ## Generated Function Runs
 Inside the zip file there is a folder named *generated_function_runs*.
 
-The tree structure of the folder is quite complicated because of pratical needs, but it is not interesting from an artifact point-of-view.
-
-The only relevant point is that, during the navigation of the structure, it is possible to explore all the possible values of the Configuration, leading to the different combinations used to generated the Generated Function Runs.
+The folder contains a tree structure that allows to explore all the possible values of the Configuration, leading to the different combinations used to generated the Generated Function Runs.
 
 It is possible to find every single Generated Function Run inside the folders named *run_0*, that represent the leaf of the tree structure of the Configuration values.
 
@@ -28,7 +26,7 @@ Inside that, there are 40 subfolders representing every single Generated Functio
 
 Inside every subfolder there is the *.py* file containing the function itself.
 
-Additionally, two JSON files reports the success or failure outcome of the testing, and the performance of the Generated Function on *val.csv* and *test.csv*.
+Additionally, two JSON files report the success or failure outcome of the testing, and the performance of the Generated Function on *val.csv* and *test.csv*.
 
 With the 40 subfolders, there are also two JSON files summarizing the results for the entire Generated Function Run, *prompt.txt* that reports the input prompt to the LLM, and *parameters.json* that summarizes the Combination and other metadata regarding the Generated Function Run.
 
@@ -63,12 +61,12 @@ For example, we will explain the meaning of *avg_m_diff*, but this column will b
 
 Let's analyze first the results file in *generated_function_runs*.
 
-Inside the csv files, every row represent a Model-Temperature pair. 
+Inside the csv files, every row represents a Model-Temperature pair. 
 
-Every column represent the performance obtained on the *test_set* by a specific combination on RAG Usage Parameter and Few-shot examples.
+Every column represents the performance obtained on the *test_set* by a specific combination on RAG Usage Parameter and Few-shot examples.
 The last column, *avg_m_diff*, gives an overview of the effect of RAG on a specific Model-Temperature pair. 
 
-Given the set $N_s$ containing all the possible value of Few-shot examples (in the provided experiments it is \{0, 2, 6, 10\}) dvided by 2, since, when we created the experimental framework, we were considering this number as the Few-shot examples per class (in practice you will find the set of numbers \{0, 1, 3, 5\}). 
+Given the set $N_s$ containing all the possible values of Few-shot examples (in the provided experiments it is \{0, 2, 6, 10\}) dvided by 2, since, when we created the experimental framework, we were considering this number as the Few-shot examples per class (in practice you will find the set of numbers \{0, 1, 3, 5\}). 
 
 *avg_m_diff* is calculated as:
 
@@ -76,7 +74,7 @@ $$\frac{1}{|N_s|} * \sum_{n \in N_s}(M(rag \_ n) - M(no \_ rag \_n))$$
 
 Let's analyze the results file in *self-ranking*. 
 
-Every row represent the pair between the Generated Function Run $U$ and the synthetic dataset $S$, represented respectively in the columns *generated_function_run* and *synthetic_dataset*, and reported in the form *(model)\_(temperature)\_(generation_mode)\_(examples)*. Generation mode represents the used prompt and it is inside the set $\{zero\_shot, few\_shot, rag, rag\_few\_shot\}$ 
+Every row represents the pair between the Generated Function Run $U$ and the synthetic dataset $S$, represented respectively in the columns *generated_function_run* and *synthetic_dataset*, and reported in the form *(model)\_(temperature)\_(generation_mode)\_(examples)*. Generation mode represents the used prompt and it is inside the set $\{zero\_shot, few\_shot, rag, rag\_few\_shot\}$ 
 
 To give some examples and to have consistency with the results reported in the paper, the combination (GPT4T, 0.0, 10, T), is equivalent to *gpt-4-0125-preview_0.0_rag_few_shot_5* in this column notation. 
 

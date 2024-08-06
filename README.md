@@ -10,7 +10,7 @@ In the page [Artifacts](docs/artifacts.md) you can find the guide to download th
 
 The following paragraphs will provide a guide to reproduct our experiments.
 
-## How to reproduct the experiments
+## How to reproduce the experiments
 
 The experiments are executed on a machine with Linux Ubuntu and CUDA installed.
 At the moment other machines are not supported, in the future a multi-platform version will become available.
@@ -33,10 +33,20 @@ If you want to include the datasets used in our experiments, do not forget to do
 
 Once the image is built, you can Run the container in interactive mode.
 ```
-docker  run --gpus all -it --name security_functions_llm security_functions_llm:latest
+docker run --rm --gpus all -it --name security_functions_llm security_functions_llm:latest
 ```
+
 Do not forget to mount the `generated_function_runs` directory and the `synthetic_datasets` directory if you want to persist the results of the generation process.
+```
+docker run --rm --gpus all -it --name security_functions_llm --mount type=bind,source=/home/user/Security-Critical-Code-LLM/generated_function_runs,target=/home/generated_function_runs --mount type=bind,source=/home/user/Security-Critical-Code-LLM/synthetic_datasets,target=/home/synthetic_datasets security_functions_llm:latest 
+```
+
+If you downloaded the datasets from [Artifacts](docs/artifacts.md) and you stored them in the folder `datasets`, you can also mount it.
+```
+docker run --rm --gpus all -it --name security_functions_llm --mount type=bind,source=/home/user/Security-Critical-Code-LLM/generated_function_runs,target=/home/generated_function_runs --mount type=bind,source=/home/user/Security-Critical-Code-LLM/synthetic_datasets,target=/home/synthetic_datasets --mount type=bind,source=/home/user/Security-Critical-Code-LLM/datasets,target=/home/datasets security_functions_llm:latest 
+```
 Inside the container, you can install the Poetry shell solving all the dependencies and spawning the shell of the virtual environment.
+The poetry install could be useless, but, in case some libraries are changed after the build, it is necessary to regenerate the lock file. It could potentially generate some warning.
 ```
 poetry install
 poetry shell
@@ -44,34 +54,60 @@ poetry shell
 
 ### Scripts
 
-#### generate_code_snippets.py
+#### Generation and Evaluation of Functions
+This is the main script used to sequentially generating and evaluating the Generated Functions Runs is `generation_test_pipeline.py`. Because of the large number of parameters, it could be hard to manage this script.
+Inside the `notebooks` folder, there are the notebooks `create_xss_command.ipynb` and `create_sqli_command.ipynb` that you can use to build the correct pipeline command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters. 
+Here it is reported of a command generated to call this script.
+```
+python src/generation_test_pipeline.py --model_name gpt-4-1106-preview --temperature 1.0 --task data/tasks/detect_xss_simple_prompt.txt --template data/templates/create_function_readable.yaml --prompt_parameters data/prompt_parameters/empty.yaml --generation_mode rag_few_shot --experiments_folder generated_function_runs --experiments 5 --parameters_file_name parameters.json --input_prompt_file_name prompt.txt --hf_max_new_tokens 400 --hf_load_in_4bit True --seed 156 --example_template data/example_templates/detect_xss_simple_prompt.txt --examples_per_class 0 --examples_file datasets/xss/train.csv --examples_payload_column Payloads --examples_label_column Class --example_positive_label Malicious --example_negative_label Benign --rag_template_file data/rag_templates/basic_rag_suffix.txt --rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html --db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500 --data datasets/xss/val.csv --function_name detect_xss --summarize_results True --result_file_name val_results.json --create_confusion_matrix True 
+```
 
-This is the main script used to generate the Generated Functions Runs. It contains parameters related to the combination, the structure of the prompt, and also the dependencies to use `rag` and `few_shot`
+`generation_test_pipeline.py` takes advantage of two different script: `generate_code_snippets.py` and `evaluate_run.py`
+The first is used to generate the Generated Function Runs.
+It contains parameters related to the combination, the structure of the prompt, and also the dependencies to use `rag` and `few_shot`
+It could be used also independentelly from the pipeline to generate Generated Function Runs without sequentially evaluating them, here an example is reported.
+```
+python src/generate_code_snippets.py --model_name gpt-4-1106-preview --temperature 1.0 --task data/tasks/detect_xss_simple_prompt.txt --template data/templates/create_function_readable.yaml --prompt_parameters data/prompt_parameters/empty.yaml --generation_mode rag_few_shot --experiments_folder generated_function_runs --experiments 5 --parameters_file_name parameters.json --input_prompt_file_name prompt.txt --hf_max_new_tokens 400 --hf_load_in_4bit True --seed 156 --example_template data/example_templates/detect_xss_simple_prompt.txt --examples_per_class 0 --examples_file datasets/xss/train.csv --examples_payload_column Payloads --examples_label_column Class --example_positive_label Malicious --example_negative_label Benign --rag_template_file data/rag_templates/basic_rag_suffix.txt --rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html --db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500
+```
 
-#### evaluate_run.py
-This script is used to evaluate a Generated Functions Run using a ground-truth dataset.
+The latter is used to evaluate a Generated Functions Run using a ground-truth dataset. In the same way of the previous script, it could be used independently from the the pipeline script:
+```
+python src/evaluate_run.py --run generated_function_runs/tree/structure/run_0  --data datasets/xss/val.csv --function_name detect_xss --summarize_results True --result_file_name val_results.json --create_confusion_matrix True
+```
 
-#### generation_test_pipeline.py
-Most of the times, once a Generated Functions Run is generated, you want to test it using `evaluate_run.py`.
-This script creates a pipeline between the generation and the evaluation.
-Because of the large number of parameters, it could be hard to manage this script.
-Inside the `notebooks` folder, there are the notebooks `create_xss_command.ipynb` and `create_sqli_command.ipynb` that you can use to build the correct pipeline command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters.
+#### Testing the Generated Function Runs
+Once all the Generated Functions Runs of a Function Generation Experiment are generated, it is possible to test them on a test set. The process is similar to the one presented for the evaluation. However, it could be easier to have a script to test all these Generated Functions Runs without calling `evaluate_run.py` for every single one.
+The script `test_all_runs.py` can be used to test all the Generated Functions Runs of a Function Generation Experiment on a ground-truth dataset. Here there is an example of usage of this script.
+```
+python src/test_all_runs.py --experiments_root generated_function_runs/task_detect_xss_simple_prompt/template_create_function_readable --dataset datasets/xss/test.csv--parameters_file_name parameters.json --function_name detect_xss --result_file_name test_results.json' --leaf_folder_name run_0
+```
 
-#### generate_experiments_summary.py
-This script is used to generate a summary of the results of a Function Generation Experiment.
+#### Generate summary
+Once the testing is completed, it is possible to use the script `generate_experiments_summary.py` to generate a summary of the results of a Function Generation Experiment. Here there is an example of usage.
+```
+python src/generate_experiments_summary.py --experiments_root_folder generated_function_runs/task_detect_sqli_extended/template_create_function_readable --tail_folder run_0 --parameters_file_name parameters.json --results_file_name val_results.json --template data/templates/create_function_readable.yaml --output_file data/templates/create_function_readable.yaml
+```
 
-#### test_all_runs.py
-This script is used to test all the Generated Functions Runs of a Function Generation Experiment on a ground-truth dataset.
-
-#### generate_synthetic_dataset
+#### Generation of Synthetic Datasets
+To perform Self-Ranking, it is needed to generate a Synthetic Dataset Run using the script `generate_synthetic_dataset.py`
 This script is similar to `generate_code_snippets.py`, it is used to generate a Synthetic Dataset Run.
-Inside the `notebooks` folder, there are the notebooks `create_xss_synth_dataset_command.ipynb` and `create_sqli_synth_dataset_command.ipynb` that you can use to build the correct command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters.
+Inside the `notebooks` folder, there are the notebooks `create_xss_synth_dataset_command.ipynb` and `create_sqli_synth_dataset_command.ipynb` that you can use to build the correct command to be used respectively for XSS Detection and SQLi Detection, playing easily with all the possible parameters. Here there is an example of usage of this script.
+```
+python src/generate_synthetic_dataset.py --model_name gpt-3.5-turbo-0125 --temperature 1.0 --task data/tasks/detect_xss_simple_prompt.txt --template data/templates/create_synthetic_dataset.yaml --prompt_parameters data/prompt_parameters/medium_dataset.yaml --generation_mode rag_few_shot --experiments_folder synthetic_datasets --experiments 2 --parameters_file_name parameters.json --input_prompt_file_name prompt.txt --hf_max_new_tokens 400 --hf_load_in_4bit True --seed 156 --example_template data/example_templates/detect_xss_simple_prompt.txt --examples_per_class 3 --examples_file datasets/xss/train.csv --examples_payload_column Payloads --examples_label_column Class --example_positive_label Malicious --example_negative_label Benign --rag_template_file data/rag_templates/dataset_rag_suffix.txt --rag_source https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html --db_persist_path data/db/chroma_web --chunk_size 1500 --chunk_overlap 500 --timeout 9000 
+```
 
-#### evaluate_run_on_synthetic.py
-This script is used to test a Generated Function Run with a Synthetic Dataset Run.
 
-#### evaluate_runs_on_datasets.py
-This script is used to test all the Generated Function Runs of a Function Generation Experiment with all the Synthetic Dataset Runs of a Synthetic Dataset Experiment.
+#### Self-Ranking
+To perform Self-Ranking on a Generated Function Run it is needed to evaluate it with a Synthetic Dataset Run.
+To do it, it is possible to use the script `evaluate_run_on_synthetic.py`. Here there is an example of usage.
+```
+python src/evaluate_run_on_synthetic.py --run generated_function_runs/tree/structure/run_0 --dataset_folder synthetic_datasets/tree/structure/run_0 --parameters_file_name parameters.json --function_name detect_xss --evaluation_folder synthetic_results --result_file_name results.json --test_results_file_name test_results.json
+```
 
-#### train_dl_model.pt and test_dl_model.py
-These scripts are used to manage the training and testing procedure of the Deep Learning model used for comparison for RQ3
+To help the evaluation of all the $U$ - $S$ pairs, the script `evaluate_runs_on_datasets.py` allows to test all the Generated Function Runs of a Function Generation Experiment with all the Synthetic Dataset Runs of a Synthetic Dataset Experiment. Here there is an example of usage.
+```
+python src/evaluate_runs_on_datasets.py --experiments_root generated_function_runs/task_detect_xss_simple_prompt/template_create_function_readable --datasets_root synthetic_datasets/task_detect_xss_simple_prompt/template_create_synthetic_dataset/prompt_parameters_medium_dataset/ --parameters_file_name parameters.json --function_name detect_xss --evaluation_folder synthetic_results --result_file_name val_results.json' --dataset_generation_results_file_name results.json --test_results_file_name test_results.json --leaf_folder_name run_0
+```
+
+#### Deep Learning Models for Comparison
+The scripts `train_dl_model.pt` and `test_dl_model.py` are used to manage the training and testing procedure of the Deep Learning model used for comparison for RQ3.
