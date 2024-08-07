@@ -126,7 +126,7 @@ Figure: F2 given by top_k selection (i.e., Self-Ranking) for XSS detection (firs
 
 The violin plots in the figure below illustrate the impact of Self-Ranking, specifically $top\_k$ selection, across three different values of $k$ for two tasks. This analysis includes all possible pairs of function configurations and synthetic dataset generations.
 
-Overall, we observe a significant improvement, especially for XSS. The interquartile range for XSS predominantly shows an improvement between 10 and 20 percentage points, affecting 87% of the cases. While the improvement for SQLi is less substantial, 61% of the cases still exhibit enhancements.
+Overall, we observe a significant improvement, especially for XSS. The interquartile range for XSS predominantly shows an improvement between 10 and 20 percentage points, affecting 87% of the cases with an average improvement of 12%. While the improvement for SQLi is less substantial, 61% of the cases still exhibit enhancements with an average improvement of 7%.
 
 The improvements due to $top\_k$ selection are statistically significant. The p-values from the Wilcoxon signed-rank test are below 0.05 for both tasks across all values of $k$, confirming the reliability of these enhancements.
 
