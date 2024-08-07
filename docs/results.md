@@ -13,7 +13,7 @@ How helpful is RAG in generating better security-critical functions? How does it
 
 
 ### F2-Score
-The Figure below illustrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario, showing the F2 differences between the configurations with and without RAG, across all possible configurations. Each bar represents the average F2 score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. Results indicate that employing RAG generally enhances the performance of function generation for both tasks. The number of Model-Temperature pairs benefiting from RAG is much larger than the number of pairs showing degradation, and the improvements are statistically significant, as evidenced by p-values ( $\approx 10^{-66}$ for XSS and $\approx 10^{-24}$ for SQLi) below the standard threshold of 0.05. 
+The figure below illustrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario, showing the F2 differences between the configurations with and without RAG, across all possible configurations. Each bar represents the average F2 score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. Results indicate that employing RAG generally enhances the performance of function generation for both tasks. The number of Model-Temperature pairs benefiting from RAG is much larger than the number of pairs showing degradation, and the improvements are statistically significant, as evidenced by p-values ( $\approx 10^{-66}$ for XSS and $\approx 10^{-24}$ for SQLi) below the standard threshold of 0.05. 
 
 
 <!DOCTYPE html>
@@ -33,7 +33,7 @@ The Figure below illustrates the impact of RAG on function generation for XSS an
 
 ---
 
-We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as Figure above. The Figure below shows that while the addition of Few-shot examples shows some benefits for SQLi, the same cannot be said for XSS. These findings suggest that the usage of Few-shot examples may not always provide advantages when RAG is already employed, indicating that in the NED (No Evaluation Dataset) scenario, it could be preferable to omit them.
+We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as the figure above. The Figure below shows that while the addition of Few-shot examples shows some benefits for SQLi, the same cannot be said for XSS. These findings suggest that the usage of Few-shot examples may not always provide advantages when RAG is already employed, indicating that in the NED (No Evaluation Dataset) scenario, it could be preferable to omit them.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -52,7 +52,7 @@ We further investigate the benefit of combining Few-shot examples with RAG using
 
 ### Accuracy
 
-The Figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant, as it is evidenced  by the p-values ( $\approx 10^{-26}$ for XSS and $\approx 10^{-8}$ for SQLi) below the standard threshold of 0.05.
+The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant, as it is evidenced  by the p-values ( $\approx 10^{-26}$ for XSS and $\approx 10^{-8}$ for SQLi) below the standard threshold of 0.05.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -71,7 +71,7 @@ The Figure below demonstrates the impact of RAG on function generation for XSS a
 
 ---
 
-We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as the Figure above. The Figure below shows that the usage of Few-shot examples may not always provide advantages when RAG is already employed. 
+We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as the figure above. The Figure below shows that the usage of Few-shot examples may not always provide advantages when RAG is already employed. 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -97,7 +97,7 @@ enhancing the performance of security-critical functions?
 
 
 ### Top_k F2-Score
- The violin plots shown in the Figure below depict the effect of Self-Ranking, i.e., $top\_k$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. Overall, we observe a clear improvement, particularly for XSS. The region between quartiles for XSS falls largely between a 20\%pt and 40\%pt improvement, with an average improvement of 25\%pt and an improvement that affects 98\% of the cases. While the improvement for SQLi is less pronounced, we still observe improvements in 73\% cases, with an average improvement of 4\%pt. Additionally, we can see that, as $k$ increases, the average improvement decreases for both tasks, but the gains become more stable.
+ The violin plots shown in the figure below depict the effect of Self-Ranking, i.e., $top\_k$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. Overall, we observe a clear improvement, particularly for XSS. The region between quartiles for XSS falls largely between a 20\%pt and 40\%pt improvement, with an average improvement of 25\%pt and an improvement that affects 98\% of the cases. While the improvement for SQLi is less pronounced, we still observe improvements in 73\% cases, with an average improvement of 4\%pt. Additionally, we can see that, as $k$ increases, the average improvement decreases for both tasks, but the gains become more stable.
 The improvements given by the usage of $top\_k$ selection are statistically significant: the p-values obtained with the Wilcoxon signed-rank test are below the threshold of 0.05 for both the tasks and all the values of k.
 
 In the EDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.21\%pt and 4.94\%pt increases in F2, for XSS and SQLi respectively.
