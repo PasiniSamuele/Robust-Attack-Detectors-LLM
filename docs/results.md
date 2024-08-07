@@ -130,6 +130,8 @@ Overall, we observe a significant improvement, especially for XSS. The interquar
 
 The improvements due to $top\_k$ selection are statistically significant. The p-values from the Wilcoxon signed-rank test are below 0.05 for both tasks across all values of $k$, confirming the reliability of these enhancements.
 
+In the EDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.37\%pt and 7.29\%pt increases in Accuracy, for XSS and SQLi respectively.
+
 <!DOCTYPE html>
 <html lang="en">
 <body>
