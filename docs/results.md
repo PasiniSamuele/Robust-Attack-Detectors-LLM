@@ -8,12 +8,12 @@ For this reason, the main performance metric used in our empirical study is the 
 To mitigate a possible threat to the construct validity associated with the choice of F2-Score as the performance metric, we replicated all experiments using accuracy as an alternative performance metric. For space reasons, we could not report the results obtained with both metrics in the paper, so here, where we do not have space limitations you can find the results obtained with both metrics.
 
 ## RQ1
-How helpful is RAG in generating better security-critical functions? How does it perform when combined with Few-shot examples?
+How helpful is RAG in generating better security attack detectors? How does it perform when combined with Few-shot examples?
 
 
 
 ### F2-Score [Included in the paper]
-The figure below illustrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario, showing the F2 differences between the configurations with and without RAG, across all possible configurations. Each bar represents the average F2 score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. Results indicate that employing RAG generally enhances the performance of function generation for both tasks. The number of Model-Temperature pairs benefiting from RAG is much larger than the number of pairs showing degradation, and the improvements are statistically significant, as evidenced by p-values ( $\approx 10^{-66}$ for XSS and $\approx 10^{-24}$ for SQLi) below the standard threshold of 0.05. 
+The figure below illustrates the impact of RAG on function generation for XSS and SQLi in the NTD (No Training Dataset) scenario, showing the F2 differences between the configurations with and without RAG, across all possible configurations. Each bar represents the average F2 score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. Results indicate that employing RAG generally enhances the performance of function generation for both tasks. The number of Model-Temperature pairs benefiting from RAG is much larger than the number of pairs showing degradation, and the improvements are statistically significant, as evidenced by p-values ( $\approx 10^{-66}$ for XSS and $\approx 10^{-24}$ for SQLi) below the standard threshold of 0.05. 
 
 
 <!DOCTYPE html>
@@ -33,7 +33,7 @@ The figure below illustrates the impact of RAG on function generation for XSS an
 
 ---
 
-We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as the figure above. The Figure below shows that while the addition of Few-shot examples shows some benefits for SQLi, the same cannot be said for XSS. These findings suggest that the usage of Few-shot examples may not always provide advantages when RAG is already employed, indicating that in the NED (No Evaluation Dataset) scenario, it could be preferable to omit them.
+We further investigate the benefit of combining Few-shot examples with RAG using a similar setting as the figure above. The Figure below shows that while the addition of Few-shot examples shows some benefits for SQLi, the same cannot be said for XSS. These findings suggest that the usage of Few-shot examples may not always provide advantages when RAG is already employed, indicating that in the NTD (No Training Dataset) scenario, it could be preferable to omit them.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -52,7 +52,7 @@ We further investigate the benefit of combining Few-shot examples with RAG using
 
 ### Accuracy [Not included in the paper]
 
-The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NED (No Evaluation Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant, as it is evidenced  by the p-values ( $\approx 10^{-26}$ for XSS and $\approx 10^{-8}$ for SQLi) below the standard threshold of 0.05.
+The figure below demonstrates the impact of RAG on function generation for XSS and SQLi in the NTD (No Training Dataset) scenario. It illustrates the differences in accuracy between configurations with and without RAG across all possible configurations. Each bar represents the average accuracy score difference for a specific Model-Temperature pair when using RAG, compared to the same pair without RAG. The results show that using RAG generally improves function generation performance for both tasks. The number of Model-Temperature pairs that benefit from RAG is significantly higher than those that do not, and these improvements are statistically significant, as it is evidenced  by the p-values ( $\approx 10^{-26}$ for XSS and $\approx 10^{-8}$ for SQLi) below the standard threshold of 0.05.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -91,8 +91,7 @@ We further investigate the benefit of combining Few-shot examples with RAG using
 
 ## RQ2
 Is the selection of
-top_k functions via Self-Ranking an effective strategy for
-enhancing the performance of security-critical functions?
+top_k functions via Self-Ranking an effective strategy to enhance the robustness of LLM-generated detectors?
 
 
 
@@ -100,7 +99,7 @@ enhancing the performance of security-critical functions?
  The violin plots shown in the figure below depict the effect of Self-Ranking, i.e., $top\_k$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. Overall, we observe a clear improvement, particularly for XSS. The region between quartiles for XSS falls largely between a 20\%pt and 40\%pt improvement, with an average improvement of 25\%pt and an improvement that affects 98\% of the cases. While the improvement for SQLi is less pronounced, we still observe improvements in 73\% cases, with an average improvement of 4\%pt. Additionally, we can see that, as $k$ increases, the average improvement decreases for both tasks, but the gains become more stable.
 The improvements given by the usage of $top\_k$ selection are statistically significant: the p-values obtained with the Wilcoxon signed-rank test are below the threshold of 0.05 for both the tasks and all the values of k.
 
-In the EDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.21\%pt and 4.94\%pt increases in F2, for XSS and SQLi respectively.
+In the TDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.21\%pt and 4.94\%pt increases in F2, for XSS and SQLi respectively.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -130,7 +129,7 @@ Overall, we observe a significant improvement, especially for XSS. The interquar
 
 The improvements due to $top\_k$ selection are statistically significant. The p-values from the Wilcoxon signed-rank test are below 0.05 for both tasks across all values of $k$, confirming the reliability of these enhancements.
 
-In the EDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.37\%pt and 7.29\%pt increases in Accuracy, for XSS and SQLi respectively.
+In the TDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.37\%pt and 7.29\%pt increases in Accuracy, for XSS and SQLi respectively.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -153,7 +152,7 @@ Figure: Accuracy given by top_k selection (i.e., Self-Ranking) for XSS detection
 </html>
 
 ## RQ3
-Do the functions generated by LLMs, when assessed on an existing evaluation dataset, demonstrate comparable performance to state-of-the-art ML models trained specifically for the task?
+Do the detectors generated by LLMs, when assessed on an existing evaluation dataset, demonstrate comparable performance to state-of-the-art ML models trained specifically for the task?
 
 
 
