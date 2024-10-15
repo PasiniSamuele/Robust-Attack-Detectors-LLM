@@ -96,10 +96,10 @@ top_k functions via Self-Ranking an effective strategy to enhance the robustness
 
 
 ### Top_k F2-Score [Included in the paper]
- The violin plots shown in the figure below depict the effect of Self-Ranking, i.e., $top\_k$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. Overall, we observe a clear improvement, particularly for XSS. The region between quartiles for XSS falls largely between a 20\%pt and 40\%pt improvement, with an average improvement of 25\%pt and an improvement that affects 98\% of the cases. While the improvement for SQLi is less pronounced, we still observe improvements in 73\% cases, with an average improvement of 4\%pt. Additionally, we can see that, as $k$ increases, the average improvement decreases for both tasks, but the gains become more stable.
+ The violin plots shown in the figure below depict the effect of Self-Ranking, i.e., ${top\_k}$ selection across three values of $k$ for the two tasks, considering all the possible pairs of function configurations and synthetic dataset generation. Overall, we observe a clear improvement, particularly for XSS. The region between quartiles for XSS falls largely between a 20\%pt and 40\%pt improvement, with an average improvement of 25\%pt and an improvement that affects 98\% of the cases. While the improvement for SQLi is less pronounced, we still observe improvements in 73\% cases, with an average improvement of 4\%pt. Additionally, we can see that, as $k$ increases, the average improvement decreases for both tasks, but the gains become more stable.
 The improvements given by the usage of $top\_k$ selection are statistically significant: the p-values obtained with the Wilcoxon signed-rank test are below the threshold of 0.05 for both the tasks and all the values of k.
 
-In the TDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.21\%pt and 4.94\%pt increases in F2, for XSS and SQLi respectively.
+In the TDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U^{best}$, employing $S^{best}$ achieves 3.21\%pt and 4.94\%pt increases in F2, for XSS and SQLi respectively.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -129,7 +129,7 @@ Overall, we observe a significant improvement, especially for XSS. The interquar
 
 The improvements due to $top\_k$ selection are statistically significant. The p-values from the Wilcoxon signed-rank test are below 0.05 for both tasks across all values of $k$, confirming the reliability of these enhancements.
 
-In the TDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U_{best}$, employing $S_{best}$ achieves 3.37\%pt and 7.29\%pt increases in Accuracy, for XSS and SQLi respectively.
+In the TDA scenario, we observe that utilizing the Self-Ranking mechanism to select the top\_k functions is more effective than not employing it: when compared to solely using $U^{best}$, employing $S^{best}$ achieves 3.37\%pt and 7.29\%pt increases in Accuracy, for XSS and SQLi respectively.
 
 <!DOCTYPE html>
 <html lang="en">
