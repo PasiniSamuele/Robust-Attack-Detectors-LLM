@@ -6,7 +6,7 @@ This work addresses the critical issue of evaluating and improving the robustnes
 
 In the page [Artifacts](docs/artifacts.md) you can find the guide to download the artifacts with their accurate description.
 
-[Results](docs/results.md) reportes an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* in addition of the *F2* considered as the main metric in the paper.
+[Results](docs/results.md) reportes an extension of the analysis of the results reported in the submitted paper, taking into account the *accuracy* and the *F1* in addition of the *F2* considered as the main metric in the paper.
 
 The following paragraphs will provide a guide to reproduce our experiments.
 
